@@ -1,0 +1,1147 @@
+/* Kitty waitlist: layout only. Every value is a system token or a page extension in ./tokens.css. */
+[data-page='fintech-landing'] {
+  position: relative;
+  min-block-size: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: var(--leading-body);
+}
+/* Paper grain over the whole page: fixed, faint, decorative */
+[data-page='fintech-landing']::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background-image: var(--grain);
+  background-size: 180px 180px;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: multiply;
+}
+.fl-skip {
+  position: absolute;
+  inset-block-start: var(--space-3);
+  inset-inline-start: var(--space-3);
+  z-index: 50;
+  padding: var(--space-3);
+  background: var(--surface);
+  color: var(--ink);
+  transform: translateY(-200%);
+}
+.fl-skip:focus {
+  transform: none;
+}
+.fl-header,
+.fl-footer,
+.fl-story,
+.fl-week,
+.fl-section {
+  max-inline-size: 90rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Header */
+.fl-header {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  min-block-size: 4.5rem;
+}
+.fl-nav {
+  margin-inline-start: auto;
+}
+.fl-nav ul {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.fl-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tap-min);
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-control);
+  color: var(--ink);
+  text-decoration: none;
+}
+.fl-nav a:hover {
+  background: var(--sunken);
+}
+.fl-header__join {
+  white-space: nowrap;
+}
+@media (max-width: 47.99rem) {
+  .fl-nav {
+    display: none;
+  }
+  .fl-header__join {
+    margin-inline-start: auto;
+  }
+}
+
+/* Type */
+.fl-h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--hero-h1);
+  font-weight: var(--weight-display);
+  line-height: 0.98;
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+.fl-h2 {
+  max-inline-size: 20ch;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--step-h2);
+  font-weight: var(--weight-display);
+  line-height: 1.04;
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+@media (max-width: 47.99rem) {
+  .fl-h2 {
+    max-inline-size: none;
+  }
+}
+.fl-lead {
+  max-inline-size: 34rem;
+  margin: var(--space-5) 0 0;
+  color: var(--muted);
+  font-size: var(--step-1);
+}
+.fl-body {
+  max-inline-size: 34rem;
+  margin: var(--space-4) 0 0;
+  color: var(--muted);
+  font-size: var(--step-1);
+}
+.fl-note,
+.fl-sample {
+  margin: var(--space-2) 0 0;
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+.fl-sample {
+  font-size: var(--step--1);
+}
+.fl-sim {
+  color: var(--muted);
+}
+/* A pen line under a few words: drawn once (hero) or with scroll (the band) */
+.fl-ink {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+.fl-ink__line {
+  position: absolute;
+  inset-inline-start: -2%;
+  inset-block-end: -0.12em;
+  inline-size: 104%;
+  block-size: 0.32em;
+  overflow: visible;
+  pointer-events: none;
+}
+.fl-ink__line path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.fl-ink--band .fl-ink__line path {
+  stroke: var(--band-muted);
+}
+@supports (animation-timeline: view()) {
+  .fl-ink__line--scroll path {
+    stroke-dasharray: 1;
+    animation: fl-draw linear both;
+    animation-timeline: view();
+    animation-range: entry 30% cover 55%;
+  }
+}
+@keyframes fl-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fl-ink__line--scroll path {
+    animation: none;
+  }
+}
+:root[data-motion='reduced'] .fl-ink__line--scroll path {
+  animation: none;
+}
+
+/* S1 the scene: the kitchen table with the ledger lying on it */
+.fl-scene {
+  position: relative;
+}
+.fl-scene__stage {
+  position: relative;
+  display: grid;
+  overflow: hidden; /* the photo bleeds to the stage edge on purpose */
+  margin-inline: calc(var(--gutter) / 2);
+  border-radius: var(--radius-card);
+}
+.fl-scene__photo {
+  grid-area: 1 / 1;
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 26rem;
+  object-fit: cover;
+  transform-origin: 70% 60%;
+}
+.fl-scene__veil {
+  grid-area: 1 / 1;
+  background: var(--bg);
+  opacity: 0;
+}
+.fl-scene__table {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+  padding: var(--space-7) var(--space-4) var(--space-5);
+  perspective: 1400px;
+}
+.fl-scene__ledger {
+  inline-size: min(36rem, 100%);
+  transform-style: preserve-3d;
+  transform-origin: 50% 70%;
+  rotate: -1.5deg;
+}
+.fl-scene__ledger .k-ledger {
+  box-shadow: var(--shadow-overlay); /* taste-skill-ignore: a paper lying on the kitchen-table photo casts a shadow */
+}
+.fl-scene__copy {
+  padding: var(--space-5) var(--space-4) var(--space-6);
+}
+.fl-hero__form {
+  margin-block-start: var(--space-6);
+  max-inline-size: 32rem;
+}
+.fl-secondary {
+  display: inline-block;
+  margin-block-start: var(--space-4);
+}
+.fl-caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  /* reserved for the longest of the three captions (two lines on phones), so the result never shifts layout */
+  min-block-size: calc(2 * 1.5em);
+}
+.fl-reset {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+/* phones: copy first, then the table with the ledger on it; tight enough that Ivy's request shows in the first screen */
+@media (max-width: 63.99rem) {
+  .fl-scene {
+    display: flex;
+    flex-direction: column;
+  }
+  .fl-scene__copy {
+    order: -1;
+    padding-block: var(--space-3) var(--space-4);
+  }
+  .fl-scene__table {
+    padding: var(--space-4) var(--space-3);
+  }
+  .fl-scene__photo {
+    min-block-size: 0;
+  }
+  .fl-hero__form {
+    margin-block-start: var(--space-5);
+  }
+  .fl-lead {
+    margin-block-start: var(--space-4);
+    font-size: var(--step-0);
+  }
+  .fl-secondary {
+    margin-block-start: var(--space-3);
+  }
+}
+/* Wide screens: the copy sits on a paper panel at the left of the stage */
+@media (min-width: 64rem) {
+  .fl-scene {
+    display: grid;
+    max-inline-size: 90rem;
+    margin-inline: auto;
+    padding-inline: calc(var(--gutter) / 2);
+  }
+  .fl-scene__stage {
+    grid-area: 1 / 1;
+    block-size: calc(100svh - 5.5rem);
+    min-block-size: 40rem;
+    margin: 0;
+  }
+  .fl-scene__table {
+    padding: var(--space-8) var(--space-7) var(--space-8) 55%;
+  }
+  .fl-scene__ledger {
+    rotate: none;
+  }
+  .fl-scene__copy {
+    grid-area: 1 / 1;
+    align-self: center;
+    justify-self: start;
+    z-index: 2;
+    inline-size: min(46rem, 52%);
+    margin-inline-start: calc(var(--gutter) / 2);
+    padding: 0;
+  }
+  .fl-scene__paper {
+    padding: var(--space-7) var(--space-7) var(--space-6);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+    box-shadow: var(--shadow-raised); /* taste-skill-ignore: the copy's paper lies on the photo */
+  }
+  .fl-h1 {
+    font-size: var(--hero-h1-wide);
+  }
+  /* The dive: the stage holds for one more screen of scroll while the copy scrolls away */
+  .fl-scene[data-cinematic] {
+    block-size: calc(200svh - 5.5rem);
+    align-items: start;
+  }
+  .fl-scene[data-cinematic] .fl-scene__stage {
+    position: sticky;
+    inset-block-start: var(--space-4);
+  }
+  .fl-scene[data-cinematic] .fl-scene__copy {
+    align-self: start;
+    margin-block-start: calc((100svh - 5.5rem) / 2);
+    translate: 0 -50%;
+  }
+}
+
+/* The waitlist form */
+.fl-join__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.fl-join__row > :first-child {
+  flex: 1 1 14rem;
+  min-inline-size: 0;
+}
+.fl-join__row > .fb-btn {
+  flex: 0 0 auto;
+}
+@media (max-width: 30rem) {
+  .fl-join__row > .fb-btn {
+    flex: 1 1 100%;
+  }
+}
+.fl-join__failure {
+  margin-block-start: var(--space-2);
+}
+.fl-join--done {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+  /* the same box as the form: field row plus its message */
+  min-block-size: 5.5rem;
+  padding: var(--space-4);
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+.fl-join--done[data-tone='positive'] {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+.fl-join__result {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  font-weight: var(--weight-medium);
+}
+.fl-join__result:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+
+/* S2-S5 the pinned story */
+.fl-story {
+  display: grid;
+  gap: 0 var(--space-8);
+  padding-block: var(--section-pad) 0;
+}
+@media (min-width: 64rem) {
+  .fl-story {
+    padding-block-start: 0;
+  }
+  .fl-step:first-child {
+    min-block-size: 80svh;
+  }
+}
+.fl-story__steps {
+  min-inline-size: 0;
+}
+.fl-step {
+  padding-block: var(--space-7);
+  border-block-start: var(--border) solid var(--line);
+  scroll-margin-block-start: var(--space-4);
+}
+.fl-step__count {
+  margin: 0 0 var(--space-3);
+  color: var(--muted);
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+.fl-step__figure {
+  display: grid;
+  gap: var(--space-3);
+  max-inline-size: 40rem;
+  margin-block-start: var(--space-6);
+}
+/* each step's three facts: ruled lines with a tick, like the ledger */
+.fl-facts {
+  display: grid;
+  max-inline-size: 30rem;
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+  border-block-start: var(--border) solid var(--line);
+}
+.fl-facts li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-block-size: var(--row-h);
+  border-block-end: var(--border) solid var(--line);
+  font-size: var(--step-0);
+}
+.fl-facts li::before {
+  content: '';
+  flex: none;
+  inline-size: 0.7em;
+  block-size: 0.35em;
+  margin-block-start: -0.2em;
+  border-inline-start: calc(2 * var(--border)) solid var(--accent);
+  border-block-end: calc(2 * var(--border)) solid var(--accent);
+  rotate: -45deg;
+}
+.fl-ask {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+}
+.fl-ask > .k-card {
+  inline-size: 100%;
+}
+/* A step's objection, answered beside it: a small paper with the question in the display face */
+.fl-qa {
+  display: grid;
+  gap: var(--space-1);
+  max-inline-size: 30rem;
+  margin-block-start: var(--space-6);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-control);
+  background: var(--sunken);
+}
+.fl-qa__q {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: var(--weight-medium);
+}
+.fl-qa__a {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--step-0);
+}
+/* Two logins, one kitty: a split ground, the two cards fanned */
+.fl-two {
+  max-inline-size: 90rem;
+  margin-inline: auto;
+  padding: var(--section-pad) var(--gutter) 0;
+}
+.fl-two__head {
+  display: grid;
+  gap: var(--space-2);
+}
+.fl-two__pair {
+  display: grid;
+  gap: var(--space-6);
+  margin-block-start: var(--space-7);
+}
+.fl-two__side {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-6) var(--space-5);
+  border-radius: var(--radius-card);
+}
+.fl-two__side--parent {
+  background: var(--raised);
+}
+.fl-two__side--kid {
+  background: var(--sunken);
+}
+.fl-two__who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+}
+.fl-two__card {
+  display: grid;
+  gap: var(--space-2);
+}
+.fl-two__label {
+  margin: 0;
+}
+.fl-two__list {
+  display: grid;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.fl-two__list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-block-size: var(--row-h);
+  border-block-start: var(--border) solid var(--line);
+}
+@media (min-width: 64rem) {
+  .fl-two__pair {
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .fl-two__side {
+    padding: var(--space-8);
+  }
+  .fl-two__side--parent {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+  .fl-two__side--kid {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+  }
+  .fl-two__side--parent .fl-two__card {
+    rotate: -1.5deg;
+  }
+  .fl-two__side--kid .fl-two__card {
+    rotate: 1.5deg;
+  }
+  @supports (animation-timeline: view()) {
+    .fl-two__side--parent .fl-two__card {
+      animation: fl-fan-left linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 45%;
+    }
+    .fl-two__side--kid .fl-two__card {
+      animation: fl-fan-right linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 45%;
+    }
+  }
+}
+@keyframes fl-fan-left {
+  from {
+    translate: var(--space-8) 0;
+    rotate: 4deg;
+  }
+}
+@keyframes fl-fan-right {
+  from {
+    translate: calc(-1 * var(--space-8)) 0;
+    rotate: -4deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fl-two__card {
+    animation: none !important;
+  }
+}
+:root[data-motion='reduced'] .fl-two__card {
+  animation: none !important;
+}
+/* A week in the kitty */
+.fl-week {
+  padding-block: var(--section-pad) 0;
+}
+.fl-week__head {
+  display: grid;
+  gap: var(--space-2);
+}
+.fl-week__frame {
+  position: relative;
+  margin-block-start: var(--space-7);
+}
+.fl-week__days {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.fl-week__day {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--muted);
+  transition: color var(--dur-2xl) var(--ease-standard), background-color var(--dur-2xl) var(--ease-standard);
+}
+.fl-week__day[data-past] {
+  color: var(--ink);
+  background: var(--raised);
+}
+.fl-week__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: var(--weight-medium);
+}
+.fl-week__items {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.fl-week__item {
+  display: grid;
+  gap: var(--space-1);
+  padding-block-start: var(--space-3);
+  border-block-start: var(--border) solid var(--line);
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+}
+.fl-week__who {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: var(--weight-medium);
+}
+.fl-week > .fl-sample {
+  text-align: end;
+}
+.fl-week__yours {
+  color: var(--accent-ink);
+  font-weight: var(--weight-medium);
+}
+.fl-week__quiet {
+  margin: 0;
+  font-size: var(--step--1);
+  font-style: italic;
+}
+.fl-week__now {
+  display: none;
+}
+@media (min-width: 64rem) {
+  .fl-week__days {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+  .fl-week__day {
+    min-block-size: 14rem;
+  }
+  .fl-week__now {
+    position: absolute;
+    inset-block-start: calc(-1 * var(--space-4));
+    display: block;
+    inline-size: calc(100% / 7);
+    block-size: 3px;
+    border-radius: var(--radius-full);
+    background: var(--accent);
+  }
+}
+
+/* the step's own ledger line, ruled, above its heading (phones) */
+.fl-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  margin: var(--space-5) 0 0;
+  padding-block: var(--space-2);
+  border-block: var(--border) solid var(--line);
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+}
+.fl-strip__day {
+  color: var(--muted);
+}
+.fl-strip__who {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: var(--weight-medium);
+}
+.fl-strip__what {
+  flex: 1 1 auto;
+}
+@media (min-width: 64rem) {
+  .fl-story {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+  }
+  .fl-step {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-block-size: 75svh;
+    padding-block: var(--space-8);
+    border: 0;
+  }
+  .fl-strip,
+  .fl-step__figure {
+    display: none;
+  }
+  .fl-story__panel {
+    position: sticky;
+    inset-block-start: 0;
+    display: flex;
+    align-items: center;
+    block-size: 100svh;
+  }
+}
+.fl-panel {
+  position: relative;
+  display: grid;
+  gap: var(--space-5);
+  inline-size: 100%;
+  padding: var(--space-6);
+  overflow: hidden; /* the scenes bleed to the panel's rounded edge on purpose */
+  border-radius: var(--radius-card);
+  background: var(--raised);
+  transition: background-color var(--dur-2xl) var(--ease-standard);
+}
+.fl-panel > :not(.fl-panel__scenes) {
+  position: relative;
+}
+.fl-panel__scenes,
+.fl-panel__scene {
+  position: absolute;
+  inset: 0;
+}
+.fl-panel__scene {
+  opacity: 0;
+  transition: opacity var(--dur-hero) var(--ease-standard);
+}
+.fl-panel__scene[data-active] {
+  opacity: 1;
+}
+.fl-panel__photo {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  scale: 1.06;
+  transition: scale calc(var(--dur-hero) * 2) var(--ease-enter);
+}
+.fl-panel__scene[data-active] .fl-panel__photo {
+  scale: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fl-panel__photo {
+    scale: 1;
+    transition: none;
+  }
+}
+:root[data-motion='reduced'] .fl-panel__photo {
+  scale: 1;
+  transition: none;
+}
+.fl-step__photo {
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--radius-card);
+}
+.fl-panel[data-ground] {
+  background-color: var(--sunken);
+}
+/* all four figures in one cell, so the panel has the tallest one's height and never shifts */
+.fl-panel__stack {
+  display: grid;
+}
+/* The swap: the next figure slides up into place like a paper laid on top; reduced motion cross-fades */
+.fl-panel__figure {
+  grid-area: 1 / 1;
+  align-self: center;
+  opacity: 0;
+  translate: 0 var(--travel-lg);
+  rotate: 1.5deg;
+  clip-path: inset(0 0 100% 0 round var(--radius-card));
+  transition:
+    opacity var(--dur-2xl) var(--ease-standard),
+    translate var(--dur-3xl) var(--ease-enter-emphasized),
+    rotate var(--dur-3xl) var(--ease-enter-emphasized),
+    clip-path var(--dur-3xl) var(--ease-enter-emphasized);
+}
+.fl-panel__figure[data-active] {
+  opacity: 1;
+  translate: 0 0;
+  rotate: 0deg;
+  clip-path: inset(0 0 0 0 round var(--radius-card));
+}
+@media (prefers-reduced-motion: reduce) {
+  .fl-panel__figure {
+    translate: none;
+    rotate: none;
+    clip-path: none;
+    transition: opacity var(--dur-reduced) linear;
+  }
+}
+:root[data-motion='reduced'] .fl-panel__figure {
+  translate: none;
+  rotate: none;
+  clip-path: none;
+  transition: opacity var(--dur-reduced) linear;
+}
+.fl-view {
+  min-block-size: 15rem;
+}
+.fl-pocket {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* S3 split */
+.fl-split {
+  display: grid;
+  gap: var(--space-4);
+}
+.fl-split__bill {
+  margin: 0;
+}
+.fl-split__legend {
+  margin-block-end: var(--space-1);
+  font-weight: var(--weight-medium);
+}
+.fl-split__shares {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.fl-split__shares li {
+  display: flex;
+  justify-content: space-between;
+  min-block-size: var(--row-h);
+  align-items: center;
+  border-block-end: var(--border) solid var(--line);
+}
+.fl-budget {
+  margin-block-start: var(--space-5);
+}
+
+/* Rest beat: a statement on the band */
+.fl-rest {
+  display: grid;
+  place-items: center;
+  min-block-size: clamp(18rem, 60vh, 40rem);
+  margin-block: var(--section-pad) 0;
+  padding: var(--space-8) var(--space-4);
+  background: var(--band-bg);
+  color: var(--band-ink);
+}
+.fl-rest {
+  align-content: center;
+  gap: var(--space-6);
+}
+.fl-rest__cta {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tap-min);
+  padding-inline: var(--space-5);
+  border: calc(2 * var(--border)) solid var(--band-ink);
+  border-radius: var(--radius-control);
+  color: var(--band-ink);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+}
+.fl-rest__cta:hover {
+  background: var(--band-line);
+}
+.fl-rest__cta:focus-visible {
+  outline: var(--focus-width) solid var(--band-ink);
+  outline-offset: var(--focus-offset);
+}
+.fl-rest__line {
+  max-inline-size: 30ch;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--rest-line);
+  font-weight: var(--weight-display);
+  line-height: 1.08;
+  letter-spacing: var(--tracking-display);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* The bookend: back at the kitchen table, the questions and the slip lie on it */
+.fl-table {
+  position: relative;
+  display: grid;
+  max-inline-size: calc(90rem - var(--gutter));
+  margin: var(--section-pad) calc(var(--gutter) / 2) 0;
+  border-radius: var(--radius-card);
+  /* the open ledger book: ruled lines and a red margin rule, in the system's colours */
+  background:
+    linear-gradient(to right, transparent calc(var(--gutter) + var(--space-6)), var(--tomato-300, var(--negative)) 0 calc(var(--gutter) + var(--space-6) + 2px), transparent 0), /* taste-skill-ignore: a hard-stop margin rule, not a fill */
+    repeating-linear-gradient(to bottom, transparent 0 calc(var(--space-7) - 1px), var(--line) calc(var(--space-7) - 1px) var(--space-7)), /* taste-skill-ignore: the ledger page ruling, hard stops */
+    var(--sunken);
+}
+@media (min-width: 90rem) {
+  .fl-table {
+    margin-inline: auto;
+  }
+}
+.fl-table__photo {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.fl-table__papers {
+  position: relative;
+  display: grid;
+  gap: var(--space-6);
+  align-items: start;
+  padding: var(--space-7) var(--space-2);
+}
+/* Phones: the papers lie flat and give their questions the width to stay on one line */
+@media (max-width: 30rem) {
+  .fl-table .fl-paper,
+  .fl-table .fl-slip {
+    padding-inline: var(--space-4);
+    rotate: none;
+    animation: none;
+  }
+}
+@media (min-width: 64rem) {
+  .fl-table__papers {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: var(--space-7);
+    padding: var(--space-9) var(--space-8);
+  }
+}
+.fl-paper,
+.fl-slip {
+  padding: var(--space-6) var(--space-5);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  box-shadow: var(--shadow-overlay); /* taste-skill-ignore: papers lying on the kitchen-table photo */
+  scroll-margin-block-start: var(--space-4);
+}
+.fl-paper {
+  rotate: -0.6deg;
+}
+.fl-slip {
+  rotate: 1.2deg;
+  border-block-start: calc(2 * var(--border)) dashed var(--line-strong);
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}
+@media (min-width: 64rem) {
+  .fl-paper,
+  .fl-slip {
+    padding: var(--space-7);
+  }
+  .fl-slip {
+    margin-block-start: var(--space-9);
+  }
+}
+.fl-slip {
+  position: relative;
+}
+.fl-slip__tear {
+  position: absolute;
+  inset-block-start: calc(-0.5 * var(--icon-sm, 16px) - 1px);
+  inset-inline-start: var(--space-5);
+  padding-inline: var(--space-1);
+  background: var(--surface);
+  color: var(--muted);
+}
+/* Papers settle onto the table as they scroll in (scroll-driven where supported; otherwise at rest) */
+@supports (animation-timeline: view()) {
+  .fl-paper,
+  .fl-slip {
+    animation: fl-settle linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 35%;
+  }
+  .fl-slip {
+    animation-name: fl-settle-slip;
+  }
+}
+@keyframes fl-settle {
+  from {
+    translate: 0 var(--space-8);
+    rotate: -3deg;
+  }
+}
+@keyframes fl-settle-slip {
+  from {
+    translate: 0 var(--space-9);
+    rotate: 4deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fl-paper,
+  .fl-slip {
+    animation: none;
+  }
+}
+:root[data-motion='reduced'] .fl-paper,
+:root[data-motion='reduced'] .fl-slip {
+  animation: none;
+}
+/* The note on the hero ledger, pointing at Approve */
+.fl-margin {
+  position: absolute;
+  inset-block-end: -3.5rem;
+  inset-inline-end: 9%;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-1);
+  pointer-events: none;
+}
+.fl-margin__note {
+  max-inline-size: 14rem;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-1);
+  background: var(--warning-bg);
+  color: var(--ink);
+  box-shadow: var(--shadow-raised); /* taste-skill-ignore: a paper note on the ledger */
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-style: italic;
+  line-height: 1.2;
+}
+.fl-margin__arrow {
+  inline-size: 6rem;
+  block-size: 4rem;
+  margin-block-end: var(--space-6);
+  overflow: visible;
+}
+.fl-margin__arrow path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* The story's rail */
+.fl-rail {
+  display: flex;
+  flex-wrap: wrap;
+  justify-self: start;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--sunken);
+  list-style: none;
+  font-size: var(--step--1);
+}
+.fl-rail li {
+  position: relative;
+}
+.fl-rail a {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: var(--tap-min);
+  padding-inline: var(--space-3);
+  color: var(--muted);
+  text-decoration: none;
+}
+.fl-rail [aria-current='step'] a {
+  color: var(--ink);
+  font-weight: var(--weight-medium);
+}
+.fl-rail__n {
+  font-variant-numeric: tabular-nums;
+}
+.fl-rail__marker {
+  position: absolute;
+  inset: var(--space-1) 0;
+  border-radius: var(--radius-full);
+  background: var(--surface);
+}
+
+/* S6, S7 */
+.fl-section {
+  padding-block: var(--section-pad);
+  scroll-margin-block-start: var(--space-4);
+}
+.fl-section + .fl-section {
+  border-block-start: var(--border) solid var(--line);
+}
+.fl-questions {
+  max-inline-size: 48rem;
+  margin-block-start: var(--space-6);
+}
+.fl-join-section .k-ledger {
+  max-inline-size: 40rem;
+  margin-block-start: var(--space-6);
+}
+.fl-join-box {
+  max-inline-size: 40rem;
+  margin-block-start: var(--space-4);
+}
+.fl-share {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+  margin-block-start: var(--space-4);
+}
+.fl-share__fallback {
+  display: grid;
+  gap: var(--space-1);
+  justify-self: stretch;
+  font-size: var(--step--1);
+}
+.fl-share__fallback input {
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+/* Footer */
+.fl-footer {
+  padding-block: var(--space-7);
+  border-block-start: var(--border) solid var(--line);
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+.fl-footer p {
+  margin: 0 0 var(--space-2);
+}
+.fl-footer .k-link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tap-min);
+}

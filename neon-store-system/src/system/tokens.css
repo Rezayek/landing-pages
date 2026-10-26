@@ -1,0 +1,617 @@
+/*
+ * System tokens for VOLTCART, direction "Volt Readout" (FOUNDATIONS.md; format and rules in guides/design-system.md
+ * §2). Three tiers:
+ *   1. primitives: raw values; components never read them;
+ *   2. roles: what components read (colour, type, space, shape, elevation, density, motion);
+ *   3. component tokens: only for a part a theme must change that no role covers (COMPONENTS.md names each one).
+ * Dark re-points roles and leaves primitives alone. It is written twice with identical values: under the
+ * prefers-color-scheme media query (what the audit emulates), skipped when <html data-theme="light">, and under
+ * <html data-theme="dark"> for a toggle. Edit both blocks together. The more-contrast context is written the same way.
+ * Names are the contract: the feedback components, the /system page and every page template read these roles. Add a
+ * role, never rename one, and add a line to the SYSTEM.md changelog.
+ * Import this file once, after Tailwind (`@import 'tailwindcss'` first), so the base rules at the end sit in the
+ * right layer. Fonts (Chakra Petch, IBM Plex Sans, IBM Plex Mono, all OFL) are imported by each page's entry.
+ */
+:root {
+  /* 1. Primitives ------------------------------------------------------------------------------------------- */
+  /* night: a cool blue-black neutral, the city after dark; the light end is a grey-green "daylight" paper */
+  --gray-0: #ffffff;
+  --gray-50: #f2f3ee;
+  --gray-100: #e6e7e0;
+  --gray-200: #d2d4cd;
+  --gray-300: #b3b6b3;
+  --gray-400: #9399a3;
+  --gray-450: #868c97;
+  --gray-475: #757b86;
+  --gray-500: #5c626d;
+  --gray-600: #494e59;
+  --gray-700: #343843;
+  --gray-800: #23262f;
+  --gray-850: #1b1e26;
+  --gray-900: #14161d;
+  --gray-950: #0d0e13;
+  --gray-975: #08090c;
+
+  /* volt: the charge colour, a lime-leaning yellow. It means "the deal": the price you pay and the act of taking it.
+     400 fills on dark grounds and is the label on the black light-theme button; 700 is the light text step. */
+  --volt-50: #f5fbd3;
+  --volt-300: #e8ff85;
+  --volt-400: #d4ff1f;
+  --volt-700: #4b5c00;
+  --volt-900: #20280a;
+
+  /* cyan: the system talking. Info, live data, the keyboard focus */
+  --cyan-50: #e2f7f9;
+  --cyan-300: #8cf0f7;
+  --cyan-400: #2fd8e6;
+  --cyan-600: #007f8a;
+  --cyan-700: #006872;
+  --cyan-900: #06303a;
+
+  /* status hues: 600 fills on light grounds (white text), 400 on dark ones; 700 and 300 are the text steps */
+  --mint-50: #e3f7ec;
+  --mint-300: #7cf0b6;
+  --mint-400: #3ee6a0;
+  --mint-600: #18784a;
+  --mint-700: #12643d;
+  --mint-900: #0b3323;
+  --red-50: #fde9ec;
+  --red-300: #ff94a3;
+  --red-400: #ff4f66;
+  --red-600: #c81e3a;
+  --red-700: #a5172f;
+  --red-900: #3d0c16;
+  --orange-50: #fdf0e2;
+  --orange-300: #ffbd75;
+  --orange-400: #ff9f33;
+  --orange-600: #a85300;
+  --orange-700: #874300;
+  --orange-900: #3a1f06;
+  /* magenta: data only (the third chart series), never status, never decoration */
+  --magenta-400: #e85ee0;
+  --magenta-600: #a3279c;
+
+  /* receipt paper: the one surface that keeps its look in both themes (the delivered code) */
+  --paper-0: #f1efe4;
+  --paper-ink: #121212;
+  --paper-muted: #57544a;
+  --paper-line: #8b8676;
+
+  --shadow-rgb: 6 7 10;
+
+  /* families and a modular scale (ratio 1.25, base 16 px); nothing below 12 px (0.75rem) */
+  --family-display: 'Chakra Petch', 'Bahnschrift', 'Arial Narrow', system-ui, sans-serif;
+  --family-body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --family-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --size--2: 0.8125rem; /* 13 px: nothing read sits below it (critique 2026-10-24) */
+  --size--1: 0.875rem;
+  --size-0: 1rem;
+  --size-1: 1.25rem;
+  --size-2: 1.5625rem;
+  --size-3: 1.953rem;
+  --size-display: clamp(2.5rem, 1.6rem + 4vw, 4.75rem);
+
+  /* spacing on a 4 px base */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  /* corners: square, with a 45° cut on two opposite corners (top-right and bottom-left) instead of a round */
+  --radius-0: 0;
+  --radius-1: 2px;
+  --radius-full: 999px;
+  --cut-1: 4px;
+  --cut-2: 8px;
+  --cut-3: 14px;
+
+  /* 2. Roles: light ------------------------------------------------------------------------------------------ */
+  /* surfaces: tone steps first (guides/craft.md Depth); --overlay is the scrim behind a modal, menus and dialogs sit on --raised */
+  --bg: var(--gray-50);
+  --surface: var(--gray-0);
+  --raised: var(--gray-0);
+  --sunken: var(--gray-100);
+  --overlay: rgb(var(--shadow-rgb) / 0.5);
+
+  /* text and lines: --line divides, --line-strong draws a control (3:1 on every surface) */
+  --ink: var(--gray-900);
+  --muted: var(--gray-600);
+  --subtle: var(--gray-500);
+  --line: var(--gray-200);
+  --line-strong: var(--gray-475);
+
+  /* accent: the primary action. In daylight it is the black block with a volt label; at night the volt block with a
+     black label. --accent-ink is the text-safe version, --accent-bg a quiet container (selected rows) */
+  --accent: var(--gray-900);
+  --accent-hover: var(--gray-600); /* round 7: a visible step (volt on it stays 7:1) */
+  --on-accent: var(--volt-400);
+  --accent-ink: var(--volt-700);
+  --accent-bg: var(--volt-50);
+
+  /* deal: the saving itself (discount tag, "you save", lowest-price marker). Same hue as the action, on purpose:
+     volt means "the deal" wherever it appears. */
+  --deal: var(--volt-400);
+  --on-deal: var(--gray-975);
+  --deal-ink: var(--volt-700);
+  --deal-bg: var(--volt-50);
+
+  /* status: info, success (positive), warning, danger (negative). Each role is a set:
+       --x        fill, icon and border (3:1 on every surface), with --on-x as the text on it (4.5:1)
+       --x-ink    text on the surfaces and on --x-bg (4.5:1)
+       --x-bg     the quiet container
+     A status always shows an icon and a word as well as the colour (guides/craft.md Colour). */
+  --positive: var(--mint-600);
+  --on-positive: var(--gray-0);
+  --positive-ink: var(--mint-700);
+  --positive-bg: var(--mint-50);
+  --negative: var(--red-600);
+  --on-negative: var(--gray-0);
+  --negative-ink: var(--red-700);
+  --negative-bg: var(--red-50);
+  --warning: var(--orange-600);
+  --on-warning: var(--gray-0);
+  --warning-ink: var(--orange-700);
+  --warning-bg: var(--orange-50);
+  --info: var(--cyan-600);
+  --on-info: var(--gray-0);
+  --info-ink: var(--cyan-700);
+  --info-bg: var(--cyan-50);
+
+  /* data: three series at most, each with a second encoding (line style or marker shape) */
+  --data-1: var(--cyan-600);
+  --data-2: var(--volt-700);
+  --data-3: var(--magenta-600);
+
+  /* focus, selection and state layers (hover 8 %, pressed 10 %: Material 3; a disabled control keeps 38 %).
+     --focus is 3:1 on every surface in every theme; the offset keeps the ring off the control. */
+  --focus: var(--cyan-700);
+  --focus-width: 2px;
+  --focus-offset: 2px;
+  --selection-bg: var(--cyan-600);
+  --selection-ink: var(--gray-0);
+  --hover-bg: color-mix(in srgb, var(--ink) 8%, transparent);
+  --pressed-bg: color-mix(in srgb, var(--ink) 10%, transparent);
+  --disabled-opacity: 0.38;
+
+  /* depth: tone steps carry it, shadows come second; overlays keep a border so they survive forced colours */
+  --shadow-raised: 0 1px 2px rgb(var(--shadow-rgb) / 0.08), 0 8px 18px -8px rgb(var(--shadow-rgb) / 0.18);
+  --shadow-overlay: 0 2px 4px rgb(var(--shadow-rgb) / 0.1), 0 20px 44px -14px rgb(var(--shadow-rgb) / 0.3);
+  --overlay-border: 1px solid var(--line);
+  --z-base: 0;
+  --z-sticky: 100;
+  --z-dropdown: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* type: six named steps plus the badge step (guides/craft.md Type) */
+  --font-display: var(--family-display);
+  --font-body: var(--family-body);
+  --font-mono: var(--family-mono);
+  --step--2: var(--size--2);
+  --step--1: var(--size--1);
+  --step-0: var(--size-0);
+  --step-1: var(--size-1);
+  --step-2: var(--size-2);
+  --step-3: var(--size-3);
+  --step-display: var(--size-display);
+  --leading-body: 1.55;
+  --leading-heading: 1.12;
+  --leading-display: 1;
+  --tracking-display: -0.01em;
+  --tracking-tag: 0.04em;
+  --weight-body: 400;
+  --weight-label: 500;
+  --weight-heading: 600;
+  --measure: 66ch;
+
+  /* space: --gutter is 16 px on a phone */
+  --gap-tight: var(--space-2);
+  --gap-group: var(--space-5);
+  --gap-section: clamp(var(--space-8), 8vw, var(--space-10));
+  --inset-control: var(--space-4);
+  --inset-card: var(--space-5);
+  --gutter: clamp(16px, 4vw, 48px);
+  --container: 80rem;
+  --sticky-top: 0px; /* height of a sticky header: scroll-padding keeps a focused control from sitting under it */
+  --sticky-bottom: 0px;
+
+  /* shape: square corners with a cut by role; a full round only on avatars. A nested cut is the outer cut minus the
+     padding between them, never less than --cut-1. */
+  --radius-control: var(--radius-0);
+  --radius-card: var(--radius-0);
+  --radius-sheet: var(--radius-0);
+  --radius-tag: var(--radius-0);
+  --cut-control: var(--cut-2);
+  --cut-card: var(--cut-3);
+  --cut-tag: var(--cut-1);
+  --border: 1px;
+
+  /* icons: one authored set, 1.75 px stroke, square caps; an icon takes its colour from the text beside it */
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-stroke: 1.75;
+
+  /* targets and density: heights are roles, so a compact region changes them. Nothing goes under --target-min;
+     primary actions and every control on a coarse pointer are --tap-min or more. */
+  --target-min: 24px;
+  --tap-min: 44px;
+  --control-h: 44px; /* round 6: every control meets the 44 px target, not only primary actions and touch */
+  --row-h: 48px;
+
+  /* Motion tokens (MOTION-SYSTEM.md; the same values as motion.ts). The guide's scale, unchanged. -------------- */
+  --dur-instant: 0ms;
+  --dur-xs: 50ms;
+  --dur-sm: 100ms;
+  --dur-md: 150ms;
+  --dur-lg: 200ms;
+  --dur-xl: 250ms;
+  --dur-2xl: 300ms;
+  --dur-3xl: 400ms;
+  --dur-4xl: 600ms;
+  --dur-hero: 800ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-enter: cubic-bezier(0, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+  --ease-enter-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-exit-emphasized: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-symmetric: cubic-bezier(0.42, 0, 0.58, 1);
+  --ease-linear: linear;
+  --ease-tick: steps(4, end); /* the spinner's quarter-turn tick */
+  /* by role: components read these, not the scale */
+  --dur-press: var(--dur-sm);
+  --dur-hover: var(--dur-sm);
+  --dur-tooltip-in: var(--dur-md);
+  --dur-tooltip-out: var(--dur-sm);
+  --dur-popover-in: var(--dur-md);
+  --dur-popover-out: var(--dur-sm);
+  --dur-modal-in: var(--dur-xl);
+  --dur-modal-out: var(--dur-lg);
+  --dur-sheet-in: var(--dur-3xl);
+  --dur-sheet-out: var(--dur-2xl);
+  --dur-toast-in: var(--dur-xl);
+  --dur-toast-out: var(--dur-lg);
+  --dur-disclosure: var(--dur-lg);
+  --dur-list-in: var(--dur-lg);
+  --dur-list-out: var(--dur-md);
+  --dur-tab: var(--dur-lg);
+  --dur-route-in: var(--dur-xl);
+  --dur-route-out: var(--dur-lg);
+  --dur-swap: var(--dur-lg);
+  --dur-success-swap: var(--dur-md);
+  --dur-scene: var(--dur-4xl);
+  --dur-decode: var(--dur-4xl); /* the code receipt's decode, one group; the one expressive moment */
+  --dur-charge: var(--dur-3xl); /* a charge bar filling: step connector, tier unlocks */
+  --dur-chart-in: var(--dur-3xl); /* a chart's first view, once */
+  --dur-reduced: var(--dur-sm);
+  --dur-spin: 1000ms; /* one turn of the spinner (constant, linear) */
+  --dur-shimmer: 1400ms; /* one skeleton sweep; it stops after 5 s */
+  --hold-success: 1500ms;
+  --stagger-ui: 30ms;
+  --stagger-scene: 60ms;
+  --travel-sm: 8px; /* how far things move; 0 under reduced motion */
+  --travel-md: 16px;
+  --travel-lg: 24px;
+  --scale-from: 0.95; /* what an overlay grows from; never 0 */
+  --press-scale: 0.97;
+
+  /* 3. Component tokens ---------------------------------------------------------------------------------------
+     Add one only for a part a theme must change that no role covers. A component token that aliases a density role
+     (--control-h, --row-h) would not follow a compact region, so components read those roles directly. */
+  --toast-gap: var(--space-2);
+  --skeleton-bg: var(--sunken);
+  /* the primary button's edge: the black daylight block needs none; the volt night block needs none either, but a
+     theme or contrast context can draw one here without touching the button */
+  --button-primary-edge: transparent;
+  --ring-inner: var(--surface); /* the inner ring of the two-tone focus on covers and images */
+  --menu-min: 200px; /* the narrowest menu or listbox panel */
+  --slider-fill: var(--ink); /* the chosen range of a slider; volt at night */
+  --row-h-media: 64px; /* rows with a cover thumbnail: suggestions, cart lines */
+
+  /* The receipt: the delivered-code surface keeps its paper look in both themes; no theme block re-points these */
+  --band-bg: var(--paper-0);
+  --band-ink: var(--paper-ink);
+  --band-muted: var(--paper-muted);
+  --band-line: var(--paper-line);
+
+  /* The document, from the roles (browser surfaces: guides/craft.md Browser surfaces) */
+  color-scheme: light;
+  caret-color: var(--focus);
+  accent-color: var(--accent);
+  scrollbar-color: var(--line-strong) transparent;
+  scroll-padding-top: var(--sticky-top);
+  scroll-padding-bottom: var(--sticky-bottom);
+}
+
+/* 2. Roles: dark, following the system setting unless <html data-theme="light"> */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: var(--gray-950);
+    --surface: var(--gray-900);
+    --raised: var(--gray-850);
+    --sunken: var(--gray-975);
+    --overlay: rgb(var(--shadow-rgb) / 0.72);
+    --ink: var(--gray-50);
+    --muted: var(--gray-400);
+    --subtle: var(--gray-450);
+    --line: var(--gray-800);
+    --line-strong: var(--gray-475);
+    --accent: var(--volt-400);
+    --accent-hover: var(--volt-300);
+    --on-accent: var(--gray-975);
+    --accent-ink: var(--volt-400);
+    --accent-bg: var(--volt-900);
+    --deal: var(--volt-400);
+    --on-deal: var(--gray-975);
+    --deal-ink: var(--volt-400);
+    --deal-bg: var(--volt-900);
+    --positive: var(--mint-400);
+    --on-positive: var(--gray-975);
+    --positive-ink: var(--mint-300);
+    --positive-bg: var(--mint-900);
+    --negative: var(--red-400);
+    --on-negative: var(--gray-975);
+    --negative-ink: var(--red-300);
+    --negative-bg: var(--red-900);
+    --warning: var(--orange-400);
+    --on-warning: var(--gray-975);
+    --warning-ink: var(--orange-300);
+    --warning-bg: var(--orange-900);
+    --info: var(--cyan-400);
+    --on-info: var(--gray-975);
+    --info-ink: var(--cyan-300);
+    --info-bg: var(--cyan-900);
+    --data-1: var(--cyan-400);
+    --data-2: var(--volt-400);
+    --data-3: var(--magenta-400);
+    --focus: var(--cyan-300);
+    --selection-bg: var(--cyan-400);
+    --selection-ink: var(--gray-975);
+    --shadow-raised: 0 1px 2px rgb(var(--shadow-rgb) / 0.5), 0 8px 18px -8px rgb(var(--shadow-rgb) / 0.6);
+    --shadow-overlay: 0 2px 4px rgb(var(--shadow-rgb) / 0.5), 0 20px 44px -14px rgb(var(--shadow-rgb) / 0.7);
+    --overlay-border: 1px solid var(--line);
+    --slider-fill: var(--accent);
+    color-scheme: dark;
+  }
+}
+
+/* 2. Roles: dark, when a toggle sets <html data-theme="dark">. Identical to the block above. */
+:root[data-theme='dark'] {
+  --slider-fill: var(--accent);
+  --bg: var(--gray-950);
+  --surface: var(--gray-900);
+  --raised: var(--gray-850);
+  --sunken: var(--gray-975);
+  --overlay: rgb(var(--shadow-rgb) / 0.72);
+  --ink: var(--gray-50);
+  --muted: var(--gray-400);
+  --subtle: var(--gray-450);
+  --line: var(--gray-800);
+  --line-strong: var(--gray-475);
+  --accent: var(--volt-400);
+  --accent-hover: var(--volt-300);
+  --on-accent: var(--gray-975);
+  --accent-ink: var(--volt-400);
+  --accent-bg: var(--volt-900);
+  --deal: var(--volt-400);
+  --on-deal: var(--gray-975);
+  --deal-ink: var(--volt-400);
+  --deal-bg: var(--volt-900);
+  --positive: var(--mint-400);
+  --on-positive: var(--gray-975);
+  --positive-ink: var(--mint-300);
+  --positive-bg: var(--mint-900);
+  --negative: var(--red-400);
+  --on-negative: var(--gray-975);
+  --negative-ink: var(--red-300);
+  --negative-bg: var(--red-900);
+  --warning: var(--orange-400);
+  --on-warning: var(--gray-975);
+  --warning-ink: var(--orange-300);
+  --warning-bg: var(--orange-900);
+  --info: var(--cyan-400);
+  --on-info: var(--gray-975);
+  --info-ink: var(--cyan-300);
+  --info-bg: var(--cyan-900);
+  --data-1: var(--cyan-400);
+  --data-2: var(--volt-400);
+  --data-3: var(--magenta-400);
+  --focus: var(--cyan-300);
+  --selection-bg: var(--cyan-400);
+  --selection-ink: var(--gray-975);
+  --shadow-raised: 0 1px 2px rgb(var(--shadow-rgb) / 0.5), 0 8px 18px -8px rgb(var(--shadow-rgb) / 0.6);
+  --shadow-overlay: 0 2px 4px rgb(var(--shadow-rgb) / 0.5), 0 20px 44px -14px rgb(var(--shadow-rgb) / 0.7);
+  --overlay-border: 1px solid var(--line);
+  color-scheme: dark;
+}
+
+/* More contrast (`product` scope): text pairs reach 7:1 and control lines 4.5:1 (WCAG 1.4.6). Light first, then
+   dark; each written for the system setting and for <html data-contrast="more">, with identical values. */
+@media (prefers-contrast: more) {
+  :root:not([data-contrast='normal']) {
+    --muted: var(--gray-700);
+    --subtle: var(--gray-700);
+    --line: var(--gray-475);
+    --line-strong: var(--gray-500);
+    --button-primary-edge: var(--ink);
+  }
+}
+:root[data-contrast='more'] {
+  --muted: var(--gray-700);
+  --subtle: var(--gray-700);
+  --line: var(--gray-475);
+  --line-strong: var(--gray-500);
+  --button-primary-edge: var(--ink);
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root:not([data-contrast='normal']):not([data-theme='light']) {
+    --muted: var(--gray-200);
+    --subtle: var(--gray-300);
+    --line: var(--gray-475);
+    --line-strong: var(--gray-400);
+    --button-primary-edge: var(--ink);
+  }
+}
+@media (prefers-contrast: more) {
+  :root[data-theme='dark']:not([data-contrast='normal']) {
+    --muted: var(--gray-200);
+    --subtle: var(--gray-300);
+    --line: var(--gray-475);
+    --line-strong: var(--gray-400);
+    --button-primary-edge: var(--ink);
+  }
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-contrast='more']:not([data-theme='light']) {
+    --muted: var(--gray-200);
+    --subtle: var(--gray-300);
+    --line: var(--gray-475);
+    --line-strong: var(--gray-400);
+    --button-primary-edge: var(--ink);
+  }
+}
+:root[data-theme='dark'][data-contrast='more'] {
+  --muted: var(--gray-200);
+  --subtle: var(--gray-300);
+  --line: var(--gray-475);
+  --line-strong: var(--gray-400);
+  --button-primary-edge: var(--ink);
+}
+
+/* Density: one step is 4 px (Material). A region or the whole document sets data-density="compact" (catalogue
+   tables, order history, the filter rail). Controls are --tap-min or more on a coarse pointer, whatever the density. */
+[data-density='compact'] {
+  --control-h: 36px;
+  --row-h: 40px;
+  --inset-control: var(--space-3);
+}
+@media (pointer: coarse) {
+  :root,
+  [data-density] {
+    --control-h: var(--tap-min);
+    --row-h: var(--tap-min);
+  }
+}
+/* Phone and tablet widths are touch in practice even when a device reports a fine pointer: same 44 px floor. */
+@media (max-width: 63.99rem) {
+  :root,
+  [data-density] {
+    --control-h: var(--tap-min);
+    --row-h: var(--tap-min);
+  }
+}
+
+/* Reduced motion keeps the state change and drops the travel (MOTION-SYSTEM.md, Reduced motion). Written twice,
+   like dark: the system setting, and the in-app switch <html data-motion="reduced"> that motion.ts reads. No global
+   kill rule anywhere. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --travel-sm: 0px;
+    --travel-md: 0px;
+    --travel-lg: 0px;
+    --scale-from: 1;
+    --press-scale: 1;
+    --stagger-ui: 0ms;
+    --stagger-scene: 0ms;
+    --dur-modal-in: var(--dur-reduced);
+    --dur-modal-out: var(--dur-reduced);
+    --dur-sheet-in: var(--dur-reduced);
+    --dur-sheet-out: var(--dur-reduced);
+    --dur-toast-in: var(--dur-reduced);
+    --dur-toast-out: var(--dur-reduced);
+    --dur-list-in: var(--dur-reduced);
+    --dur-list-out: var(--dur-reduced);
+    --dur-route-in: var(--dur-reduced);
+    --dur-route-out: var(--dur-reduced);
+    --dur-disclosure: var(--dur-instant);
+    --dur-tab: var(--dur-instant);
+    --dur-scene: var(--dur-reduced);
+    --dur-decode: var(--dur-reduced);
+    --dur-charge: var(--dur-instant);
+    --dur-chart-in: var(--dur-reduced);
+    --dur-spin: 2000ms; /* the spinner keeps turning, slower: it carries status */
+  }
+}
+:root[data-motion='reduced'] {
+  --travel-sm: 0px;
+  --travel-md: 0px;
+  --travel-lg: 0px;
+  --scale-from: 1;
+  --press-scale: 1;
+  --stagger-ui: 0ms;
+  --stagger-scene: 0ms;
+  --dur-modal-in: var(--dur-reduced);
+  --dur-modal-out: var(--dur-reduced);
+  --dur-sheet-in: var(--dur-reduced);
+  --dur-sheet-out: var(--dur-reduced);
+  --dur-toast-in: var(--dur-reduced);
+  --dur-toast-out: var(--dur-reduced);
+  --dur-list-in: var(--dur-reduced);
+  --dur-list-out: var(--dur-reduced);
+  --dur-route-in: var(--dur-reduced);
+  --dur-route-out: var(--dur-reduced);
+  --dur-disclosure: var(--dur-instant);
+  --dur-tab: var(--dur-instant);
+  --dur-scene: var(--dur-reduced);
+  --dur-decode: var(--dur-reduced);
+  --dur-charge: var(--dur-instant);
+  --dur-chart-in: var(--dur-reduced);
+  --dur-spin: 2000ms; /* the spinner keeps turning, slower: it carries status */
+}
+
+/* Document base, from the roles. It sits in the base layer so Tailwind utilities and component styles win. */
+@layer base {
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    font-weight: var(--weight-body);
+    line-height: var(--leading-body);
+  }
+  ::selection {
+    background: var(--selection-bg);
+    color: var(--selection-ink);
+  }
+  :focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+  a {
+    color: inherit;
+    text-underline-offset: 0.2em;
+  }
+  :is(h1, h2, h3) {
+    font-family: var(--font-display);
+    font-weight: var(--weight-heading);
+    line-height: var(--leading-heading);
+    text-wrap: balance;
+  }
+  h1 {
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+  }
+  p {
+    text-wrap: pretty;
+  }
+  code,
+  kbd,
+  samp {
+    font-family: var(--font-mono);
+  }
+}
+
+/* Forced colours: fix only what turns illegible. Cut corners are drawn by clipped layers, so they fall back to
+   plain borders here (the layers are hidden by the components under this query). */
+@media (forced-colors: active) {
+  :root {
+    --overlay-border: 1px solid CanvasText;
+  }
+}

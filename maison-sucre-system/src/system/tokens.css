@@ -1,0 +1,653 @@
+/*
+ * System tokens for Maison Sucre: direction "Royal icing" (FOUNDATIONS.md; format and rules in guides/design-system.md
+ * §2). Three tiers:
+ *   1. primitives: raw values; components never read them;
+ *   2. roles: what components read (colour, type, space, shape, elevation, density, motion);
+ *   3. component tokens: only for a part a theme must change that no role covers (COMPONENTS.md names each one).
+ * Dark (ganache and lamplight) re-points roles and leaves primitives alone. It is written twice with identical values:
+ * under the prefers-color-scheme media query (what the audit emulates), skipped when <html data-theme="light">, and
+ * under <html data-theme="dark"> for the toggle. Edit both blocks together.
+ * Names are the contract: the feedback components, the /system page and every page template read these roles. Add a
+ * role, never rename one, and add a line to the SYSTEM.md changelog.
+ * Every pair is measured in FOUNDATIONS.md §2 (WCAG 2.2 relative luminance); the /system page re-measures the render.
+ * Import this file once, after Tailwind (`@import 'tailwindcss'` first), so the base rules at the end sit in the
+ * right layer.
+ */
+
+/* Georgia sized to Fraunces' widths and line box (measured 2026-10-25: Fraunces sets 0.86 of Georgia's width), so a
+   display line breaks in the same place before and after the web font arrives: no shift on swap. */
+@font-face {
+  font-family: 'Fraunces Fallback';
+  src: local('Georgia');
+  size-adjust: 86%;
+  ascent-override: 114%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}
+
+:root {
+  /* 1. Primitives ------------------------------------------------------------------------------------------- */
+  /* sugar: the warm neutral of royal icing, fondant and marzipan, down to vanilla bean */
+  --sugar-0: #ffffff;
+  --sugar-25: #fffaf1; /* 0.3.0: creamier (was #fffdf9) */
+  --sugar-50: #f8f0e2; /* 0.3.0: warmer cream (was #faf6ef) */
+  --sugar-100: #efe4d1;
+  --sugar-200: #dccbb3; /* 0.3.0: firmer line (was #e7ddd0) */
+  --sugar-250: #cfb999;
+  --sugar-450: #82705d;
+  --sugar-500: #614f43;
+  --sugar-600: #4c3c33; /* 0.3.0: muted text darker for contrast (was #5c4e46) */
+  --sugar-900: #211813; /* 0.3.0: deeper ink (was #2a201b) */
+
+  /* ganache: the dark theme's grounds and its light text */
+  --ganache-50: #f6eee4;
+  --ganache-200: #c9bbae;
+  --ganache-300: #b3a497;
+  --ganache-500: #85766a;
+  --ganache-600: #4a3d36;
+  --ganache-700: #3a2f2a;
+  --ganache-800: #2c221e;
+  --ganache-850: #221a17;
+  --ganache-900: #1a1412;
+  --ganache-950: #140f0d;
+
+  /* garnet: the deepest petal on the cake, the one action colour. 600 fills on sugar, 400 on ganache */
+  --garnet-50: #f8e4e3; /* 0.3.0: blush, warmer */
+  --garnet-300: #f3bcc0;
+  --garnet-350: #efadb5;
+  --garnet-400: #eaa0ab; /* 0.3.0: warmer rose in dark (was #e79ab3) */
+  --garnet-600: #922f47; /* 0.3.0: a warmer, softer garnet, still 6.7:1 on cream (was #8e2b4f) */
+  --garnet-650: #8a2b43;
+  --garnet-700: #7d263d;
+  --garnet-900: #47202a;
+
+  /* gold leaf: an ornament, never a fill and never body text */
+  --gold-300: #ddbd78;
+  --gold-400: #d2ae62;
+  --gold-500: #a9802f;
+  --gold-700: #7a5a1c;
+
+  /* status hues, each kept far from garnet and the petal dusts: leaf, brick, honey, cornflower */
+  --leaf-50: #e6f0e4;
+  --leaf-300: #8cc79a;
+  --leaf-350: #97cfa4;
+  --leaf-600: #3b6b47;
+  --leaf-700: #335e3e;
+  --leaf-900: #1f3325;
+  --brick-50: #fbe7e1;
+  --brick-300: #f2957f;
+  --brick-350: #f5a592;
+  --brick-600: #b0341f;
+  --brick-700: #9c2d1a;
+  --brick-900: #46201a;
+  --honey-50: #faefd6;
+  --honey-300: #e2b65c;
+  --honey-350: #e8c276;
+  --honey-600: #946000;
+  --honey-700: #7a4f00;
+  --honey-900: #3d2c0e;
+  --cornflower-50: #e9ebf6;
+  --cornflower-300: #a9b2e8;
+  --cornflower-350: #b5bdec;
+  --cornflower-600: #4a5590;
+  --cornflower-700: #424c82;
+  --cornflower-900: #252a47;
+
+  /* petal dust: chalky sugar-flower colours, one per cake style. -fill on sugar, -ink the text on it */
+  --pearl-fill: #e3e1dd;
+  --pearl-ink: #4f4a44;
+  --sweetpea-fill: #ddd3ea;
+  --sweetpea-ink: #54457a;
+  --peony-fill: #ebcbc7;
+  --peony-ink: #7e3a35;
+  --crumb-fill: #e9d7bc;
+  --crumb-ink: #6b4e26;
+  --pistachio-fill: #dae4c9;
+  --pistachio-ink: #45592a;
+  /* the sugar leaf of the rendered cakes (0.4.0): a soft sage, as the hero film's leaves */
+  --leaf-sage: #8fa07e;
+  /* slices (0.4.0): the crumb and the filling of each flavour, as a cut slice shows them; food colours, the same in
+     both themes (a picture of the cake, not a surface) */
+  --slice-lemon-elderflower-sponge: #f0d98a;
+  --slice-lemon-elderflower-fill: #f7f0c8;
+  --slice-vanilla-raspberry-sponge: #f3e2b8;
+  --slice-vanilla-raspberry-fill: #c7425a;
+  --slice-chocolate-caramel-sponge: #4a2c1f;
+  --slice-chocolate-caramel-fill: #c88a3d;
+  --slice-pistachio-rose-sponge: #b9c98a;
+  --slice-pistachio-rose-fill: #f0c4cc;
+  --slice-earl-grey-honey-sponge: #c9b79a;
+  --slice-earl-grey-honey-fill: #e8b850;
+  --slice-coconut-lime-sponge: #f6f1e4;
+  --slice-coconut-lime-fill: #c4d96a;
+  --slice-hazelnut-praline-sponge: #b88a5a;
+  --slice-hazelnut-praline-fill: #7a4e2a;
+  --slice-carrot-orange-sponge: #c8843f;
+  --slice-carrot-orange-fill: #f6eedd;
+  --peach-fill: #f3d8c1;
+  --peach-ink: #7a4522;
+  /* the same on ganache */
+  --pearl-fill-dk: #34302c;
+  --pearl-ink-dk: #ddd8d1;
+  --sweetpea-fill-dk: #352e45;
+  --sweetpea-ink-dk: #d6caea;
+  --peony-fill-dk: #4a2d2b;
+  --peony-ink-dk: #f0c3bd;
+  --crumb-fill-dk: #43341f;
+  --crumb-ink-dk: #e9d3ae;
+  --pistachio-fill-dk: #2f3a22;
+  --pistachio-ink-dk: #cfddb5;
+  --peach-fill-dk: #4a3222;
+  --peach-ink-dk: #f1cdae;
+
+  --shadow-rgb: 42 32 27;
+
+  /* families and a modular scale (ratio 1.333, base 17 px); nothing below 12 px. Fraunces sets display with its
+     SOFT axis at 100: rounded terminals, like a bead where the nozzle lifts. Figtree sets text and every figure. */
+  --family-display: 'Fraunces Variable', 'Fraunces Fallback', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --family-body: 'Figtree Variable', 'Segoe UI', system-ui, sans-serif;
+  --size--1: 0.875rem;
+  --size-0: 1.0625rem;
+  --size-1: 1.375rem;
+  --size-2: 1.875rem;
+  --size-3: clamp(2rem, 1.55rem + 1.6vw, 2.75rem);
+  --size-display: clamp(2.75rem, 1.35rem + 5.4vw, 6rem);
+
+  /* spacing on a 4 px base */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 144px;
+
+  /* radius: a smoothed fondant edge, never a sharp board and never a pill except the sugar pearl */
+  --radius-0: 0;
+  --radius-1: 4px;
+  --radius-2: 10px;
+  --radius-3: 16px;
+  --radius-4: 24px;
+  --radius-full: 999px;
+
+  /* 2. Roles: light ------------------------------------------------------------------------------------------ */
+  /* surfaces: royal icing ground, fondant surface, white for what sits on top, marzipan for wells and forms */
+  --bg: var(--sugar-50);
+  --surface: var(--sugar-25);
+  --raised: var(--sugar-0);
+  --sunken: var(--sugar-100);
+  --overlay: rgb(var(--shadow-rgb) / 0.42);
+
+  /* text and lines: --line divides, --line-strong draws a control (3:1 on every surface) */
+  --ink: var(--sugar-900);
+  --muted: var(--sugar-600);
+  --subtle: var(--sugar-500);
+  --line: var(--sugar-200);
+  --line-strong: var(--sugar-450);
+
+  /* accent: garnet, the primary action and nothing else. --accent-ink is its text-safe version, --accent-bg a quiet
+     container (a selected tier, a chosen slot) */
+  --accent: var(--garnet-600);
+  --accent-hover: var(--garnet-700);
+  --on-accent: var(--sugar-25);
+  --accent-ink: var(--garnet-650);
+  --accent-bg: var(--garnet-50);
+
+  /* gold leaf: marks one finished thing (the price range, a confirmed booking). Ornament at 3:1; text only in the
+     rare -ink form */
+  --gold: var(--gold-500);
+  --gold-ink: var(--gold-700);
+
+  /* piping: the bead border and the lace, decorative (no contrast duty: never the only edge of a control) */
+  --bead: var(--sugar-250);
+
+  /* petal dust by cake style: -fill a quiet ground, -ink its text (4.5:1 on the fill and on --surface). A style
+     colour names a style; it never means status */
+  --petal-classic: var(--pearl-fill);
+  --petal-classic-ink: var(--pearl-ink);
+  --petal-modern: var(--sweetpea-fill);
+  --petal-modern-ink: var(--sweetpea-ink);
+  --petal-floral: var(--peony-fill);
+  --petal-floral-ink: var(--peony-ink);
+  --petal-naked: var(--crumb-fill);
+  --petal-naked-ink: var(--crumb-ink);
+  --petal-sculptural: var(--pistachio-fill);
+  --petal-sculptural-ink: var(--pistachio-ink);
+  --petal-flavour: var(--peach-fill);
+  --petal-flavour-ink: var(--peach-ink);
+
+  /* status: info, positive, warning, negative. Each role is a set:
+       --x        fill, icon and border (3:1 on every surface), with --on-x as the text on it (4.5:1)
+       --x-ink    text on the surfaces and on --x-bg (4.5:1)
+       --x-bg     the quiet container
+     A status always shows an icon and a word as well as the colour (guides/craft.md Colour). */
+  --positive: var(--leaf-600);
+  --on-positive: var(--sugar-25);
+  --positive-ink: var(--leaf-700);
+  --positive-bg: var(--leaf-50);
+  --negative: var(--brick-600);
+  --on-negative: var(--sugar-25);
+  --negative-ink: var(--brick-700);
+  --negative-bg: var(--brick-50);
+  --warning: var(--honey-600);
+  --on-warning: var(--sugar-25);
+  --warning-ink: var(--honey-700);
+  --warning-bg: var(--honey-50);
+  --info: var(--cornflower-600);
+  --on-info: var(--sugar-25);
+  --info-ink: var(--cornflower-700);
+  --info-bg: var(--cornflower-50);
+
+  /* focus, selection and state layers (hover 8 %, pressed 10 %; a disabled control keeps 38 %).
+     --focus is 3:1 on every surface in every theme; the offset keeps the ring off the control. */
+  --focus: var(--garnet-700);
+  --focus-width: 2px;
+  --focus-offset: 2px;
+  --selection-bg: var(--garnet-50);
+  --selection-ink: var(--sugar-900);
+  --hover-bg: color-mix(in srgb, var(--ink) 8%, transparent);
+  --pressed-bg: color-mix(in srgb, var(--ink) 10%, transparent);
+  --disabled-opacity: 0.38;
+
+  /* depth: tone steps carry it; one warm shadow, light from the upper left, only for what floats */
+  --shadow-raised: 0 1px 2px rgb(var(--shadow-rgb) / 0.05), 0 10px 24px -12px rgb(var(--shadow-rgb) / 0.18);
+  --shadow-overlay: 0 2px 6px rgb(var(--shadow-rgb) / 0.08), 0 24px 48px -16px rgb(var(--shadow-rgb) / 0.28);
+  --overlay-border: 1px solid transparent;
+  --z-base: 0;
+  --z-sticky: 100;
+  --z-dropdown: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* type: six named steps (guides/craft.md Type) */
+  --font-display: var(--family-display);
+  --font-body: var(--family-body);
+  --font-display-settings: 'SOFT' 100, 'WONK' 0;
+  --weight-display: 380;
+  --weight-heading: 440;
+  --weight-strong: 600;
+  --step--1: var(--size--1);
+  --step-0: var(--size-0);
+  --step-1: var(--size-1);
+  --step-2: var(--size-2);
+  --step-3: var(--size-3);
+  --step-display: var(--size-display);
+  --leading-body: 1.55;
+  --leading-heading: 1.12;
+  --leading-display: 1.02;
+  --tracking-display: -0.025em;
+  --measure: 64ch;
+
+  /* space: --gutter is 16 px on a phone */
+  --gap-tight: var(--space-2);
+  --gap-group: var(--space-5);
+  --gap-section: clamp(var(--space-8), 9vw, var(--space-10));
+  --inset-control: var(--space-4);
+  --inset-card: var(--space-5);
+  --gutter: clamp(16px, 4vw, 56px);
+  --container: 76rem;
+  --sticky-top: 0px; /* height of a sticky header: scroll-padding keeps a focused control from sitting under it */
+  --sticky-bottom: 0px;
+
+  /* shape: radius by role (FOUNDATIONS.md Shapes). A nested corner is the outer radius minus the padding between
+     them. The full pill is the sugar pearl: style chips and the bead only. */
+  --radius-control: var(--radius-2);
+  --radius-card: var(--radius-3);
+  --radius-sheet: var(--radius-4);
+  --radius-tag: var(--radius-full);
+  --border: 1px;
+
+  /* icons: one hand-drawn set, a piped line: 1.5 px, round caps and joins; colour from the text beside it */
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-stroke: 1.5;
+
+  /* targets and density: heights are roles, so a compact region changes them. Nothing goes under --target-min;
+     primary actions and every control on a coarse pointer are --tap-min or more. */
+  --target-min: 24px;
+  --tap-min: 44px;
+  --control-h: 44px;
+  --row-h: 48px;
+
+  /* Motion tokens (MOTION-SYSTEM.md, the same values as motion.ts). The guide's scale; the Piped roles below it. -- */
+  --dur-instant: 0ms;
+  --dur-xs: 50ms;
+  --dur-sm: 100ms;
+  --dur-md: 150ms;
+  --dur-lg: 200ms;
+  --dur-xl: 250ms;
+  --dur-2xl: 300ms;
+  --dur-3xl: 400ms;
+  --dur-4xl: 600ms;
+  --dur-hero: 800ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-enter: cubic-bezier(0, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+  --ease-enter-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-exit-emphasized: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-symmetric: cubic-bezier(0.42, 0, 0.58, 1);
+  /* by role: components read these, not the scale */
+  --dur-press: var(--dur-sm);
+  --dur-hover: var(--dur-sm);
+  --dur-tooltip-in: var(--dur-md);
+  --dur-tooltip-out: var(--dur-sm);
+  --dur-popover-in: var(--dur-md);
+  --dur-popover-out: var(--dur-sm);
+  --dur-modal-in: var(--dur-xl);
+  --dur-modal-out: var(--dur-lg);
+  --dur-sheet-in: var(--dur-3xl);
+  --dur-sheet-out: var(--dur-2xl);
+  --dur-toast-in: var(--dur-xl);
+  --dur-toast-out: var(--dur-lg);
+  --dur-disclosure: var(--dur-lg);
+  --dur-list-in: var(--dur-lg);
+  --dur-list-out: var(--dur-md);
+  --dur-tab: var(--dur-lg);
+  --dur-route-in: var(--dur-xl);
+  --dur-route-out: var(--dur-lg);
+  --dur-swap: var(--dur-lg);
+  --dur-success-swap: var(--dur-md);
+  --dur-scene: var(--dur-4xl);
+  --dur-reduced: var(--dur-sm);
+  /* the Piped language's roles: a mark piped on, a row of beads, a figure rolling, the turntable, a choice sliding,
+     a tier set down (stack runs on spring.default in motion.ts; this is its CSS fallback) */
+  --dur-pipe: var(--dur-2xl);
+  --dur-bead: var(--dur-4xl);
+  --dur-count: var(--dur-3xl);
+  --dur-turn: 1200ms; /* one turn of the turntable spinner, linear, a loop that carries status */
+  --dur-select: var(--dur-lg);
+  --dur-stack: var(--dur-2xl);
+  --delay-tooltip: 500ms; /* the first tooltip waits; its neighbours open at once */
+  --hold-success: 1500ms;
+  --stagger-ui: 30ms;
+  --stagger-scene: 60ms;
+  --travel-sm: 6px; /* how far things move; 0 under reduced motion. 0.3.0: calmer, shorter (was 8/16/24) */
+  --travel-md: 12px;
+  --travel-lg: 16px;
+  --scale-from: 0.95; /* what an overlay grows from; never 0 */
+  --press-scale: 0.97;
+  /* end of motion tokens */
+
+  /* 3. Component tokens ---------------------------------------------------------------------------------------
+     Add one only for a part a theme must change that no role covers. A component token that aliases a density role
+     (--control-h, --row-h) would not follow a compact region, so components read those roles directly. */
+  --toast-gap: var(--space-2);
+  --skeleton-bg: var(--sunken);
+  --skeleton-sheen: color-mix(in srgb, var(--raised) 70%, transparent); /* the dusting of icing sugar */
+  --bead-size: 4px; /* the bead border's dot; its pitch is 3× the size */
+  --lace-ink: color-mix(in srgb, var(--bead) 55%, transparent); /* the lace texture on the form well */
+  /* 0.3.0 craft devices (critique round 2, "more craft detail"): masks drawn in the host colour, so they follow theme */
+  --scallop-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8'%3E%3Cpath fill-rule='evenodd' d='M0 8Q0 0 8 0T16 8ZM8 3.2a1.3 1.3 0 1 0 0 2.6a1.3 1.3 0 1 0 0-2.6Z'/%3E%3C/svg%3E"); /* a lace scallop with its pinhole, one per 16 px */
+  --shell-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='12'%3E%3Cpath d='M1 8.5C1 3.5 6 1.2 10.5 2.6C14.5 3.9 16 7 20 9.6V11C13.5 11.6 6 11.6 1 8.5Z'/%3E%3C/svg%3E"); /* shell piping: a rounded head and a tail that runs under the next shell, one per 20 px */
+  --numeral-ink: var(--gold-ink); /* gilded numerals: section numbers, tier counts */
+
+  /* The ganache band keeps its look in both themes (the footer and the tasting card's top), so no theme block
+     re-points it (guides/design-system.md §2). */
+  --band-bg: var(--sugar-900);
+  --band-ink: var(--ganache-50);
+  --band-muted: var(--ganache-200);
+  --band-line: var(--ganache-600);
+  --band-accent: var(--garnet-400);
+  --band-on-accent: var(--ganache-900);
+  --band-gold: var(--gold-400);
+
+  /* The cake is a physical object: its colours keep their look in both themes (the 3D cake, its poster and the
+     stand), so no theme block re-points them. Three.js reads them by name (cake/Cake3D.tsx). */
+  --cake-fondant: var(--sugar-25);
+  --cake-buttercream: var(--sugar-50);
+  --cake-crumb: var(--crumb-fill);
+  --cake-shade: var(--sugar-100);
+  --cake-stand: var(--sugar-25); /* porcelain, as the rendered stand */
+  --cake-bead: var(--sugar-0);
+  --cake-gold: var(--gold-400);
+  --cake-petal-1: var(--peony-fill);
+  --cake-petal-2: var(--peach-fill);
+  --cake-petal-3: var(--sweetpea-fill);
+  --cake-leaf: var(--leaf-sage);
+
+  /* The document, from the roles (browser surfaces: guides/craft.md Browser surfaces) */
+  color-scheme: light;
+  caret-color: var(--accent);
+  accent-color: var(--accent);
+  scrollbar-color: var(--line-strong) transparent;
+  scroll-padding-top: var(--sticky-top);
+  scroll-padding-bottom: var(--sticky-bottom);
+}
+
+/* 2. Roles: dark (ganache and lamplight), following the system setting unless <html data-theme="light"> */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: var(--ganache-900);
+    --surface: var(--ganache-850);
+    --raised: var(--ganache-800);
+    --sunken: var(--ganache-950);
+    --overlay: rgb(10 7 6 / 0.66);
+    --ink: var(--ganache-50);
+    --muted: var(--ganache-200);
+    --subtle: var(--ganache-300);
+    --line: var(--ganache-700);
+    --line-strong: var(--ganache-500);
+    --accent: var(--garnet-400);
+    --accent-hover: var(--garnet-300);
+    --on-accent: var(--ganache-900);
+    --accent-ink: var(--garnet-350);
+    --accent-bg: var(--garnet-900);
+    --gold: var(--gold-400);
+    --gold-ink: var(--gold-300);
+    --bead: var(--ganache-600);
+    --petal-classic: var(--pearl-fill-dk);
+    --petal-classic-ink: var(--pearl-ink-dk);
+    --petal-modern: var(--sweetpea-fill-dk);
+    --petal-modern-ink: var(--sweetpea-ink-dk);
+    --petal-floral: var(--peony-fill-dk);
+    --petal-floral-ink: var(--peony-ink-dk);
+    --petal-naked: var(--crumb-fill-dk);
+    --petal-naked-ink: var(--crumb-ink-dk);
+    --petal-sculptural: var(--pistachio-fill-dk);
+    --petal-sculptural-ink: var(--pistachio-ink-dk);
+    --petal-flavour: var(--peach-fill-dk);
+    --petal-flavour-ink: var(--peach-ink-dk);
+    --positive: var(--leaf-300);
+    --on-positive: var(--ganache-900);
+    --positive-ink: var(--leaf-350);
+    --positive-bg: var(--leaf-900);
+    --negative: var(--brick-300);
+    --on-negative: var(--ganache-900);
+    --negative-ink: var(--brick-350);
+    --negative-bg: var(--brick-900);
+    --warning: var(--honey-300);
+    --on-warning: var(--ganache-900);
+    --warning-ink: var(--honey-350);
+    --warning-bg: var(--honey-900);
+    --info: var(--cornflower-300);
+    --on-info: var(--ganache-900);
+    --info-ink: var(--cornflower-350);
+    --info-bg: var(--cornflower-900);
+    --focus: var(--garnet-300);
+    --selection-bg: var(--garnet-900);
+    --selection-ink: var(--ganache-50);
+    --shadow-raised: 0 1px 2px rgb(0 0 0 / 0.35), 0 10px 24px -12px rgb(0 0 0 / 0.5);
+    --shadow-overlay: 0 2px 6px rgb(0 0 0 / 0.4), 0 24px 48px -16px rgb(0 0 0 / 0.6);
+    --overlay-border: 1px solid var(--line);
+    color-scheme: dark;
+  }
+}
+
+/* 2. Roles: dark, when the toggle sets <html data-theme="dark">. Identical to the block above. */
+:root[data-theme='dark'] {
+  --bg: var(--ganache-900);
+  --surface: var(--ganache-850);
+  --raised: var(--ganache-800);
+  --sunken: var(--ganache-950);
+  --overlay: rgb(10 7 6 / 0.66);
+  --ink: var(--ganache-50);
+  --muted: var(--ganache-200);
+  --subtle: var(--ganache-300);
+  --line: var(--ganache-700);
+  --line-strong: var(--ganache-500);
+  --accent: var(--garnet-400);
+  --accent-hover: var(--garnet-300);
+  --on-accent: var(--ganache-900);
+  --accent-ink: var(--garnet-350);
+  --accent-bg: var(--garnet-900);
+  --gold: var(--gold-400);
+  --gold-ink: var(--gold-300);
+  --bead: var(--ganache-600);
+  --petal-classic: var(--pearl-fill-dk);
+  --petal-classic-ink: var(--pearl-ink-dk);
+  --petal-modern: var(--sweetpea-fill-dk);
+  --petal-modern-ink: var(--sweetpea-ink-dk);
+  --petal-floral: var(--peony-fill-dk);
+  --petal-floral-ink: var(--peony-ink-dk);
+  --petal-naked: var(--crumb-fill-dk);
+  --petal-naked-ink: var(--crumb-ink-dk);
+  --petal-sculptural: var(--pistachio-fill-dk);
+  --petal-sculptural-ink: var(--pistachio-ink-dk);
+  --petal-flavour: var(--peach-fill-dk);
+  --petal-flavour-ink: var(--peach-ink-dk);
+  --positive: var(--leaf-300);
+  --on-positive: var(--ganache-900);
+  --positive-ink: var(--leaf-350);
+  --positive-bg: var(--leaf-900);
+  --negative: var(--brick-300);
+  --on-negative: var(--ganache-900);
+  --negative-ink: var(--brick-350);
+  --negative-bg: var(--brick-900);
+  --warning: var(--honey-300);
+  --on-warning: var(--ganache-900);
+  --warning-ink: var(--honey-350);
+  --warning-bg: var(--honey-900);
+  --info: var(--cornflower-300);
+  --on-info: var(--ganache-900);
+  --info-ink: var(--cornflower-350);
+  --info-bg: var(--cornflower-900);
+  --focus: var(--garnet-300);
+  --selection-bg: var(--garnet-900);
+  --selection-ink: var(--ganache-50);
+  --shadow-raised: 0 1px 2px rgb(0 0 0 / 0.35), 0 10px 24px -12px rgb(0 0 0 / 0.5);
+  --shadow-overlay: 0 2px 6px rgb(0 0 0 / 0.4), 0 24px 48px -16px rgb(0 0 0 / 0.6);
+  --overlay-border: 1px solid var(--line);
+  color-scheme: dark;
+}
+
+/* More contrast: not shipped. `landing` scope, and every text pair already clears 4.5:1 with room (FOUNDATIONS.md
+   §8). Forced colours fix only what turns illegible (below). */
+@media (forced-colors: active) {
+  :root {
+    --bead: CanvasText;
+    --overlay-border: 1px solid CanvasText;
+  }
+}
+
+/* Density: one step is 4 px (Material). A region or the whole document sets data-density="compact" (the builder's
+   summary, the servings table). Controls are --tap-min or more on a coarse pointer, whatever the density. */
+[data-density='compact'] {
+  --control-h: 36px;
+  --row-h: 40px;
+}
+@media (pointer: coarse) {
+  :root,
+  [data-density] {
+    --control-h: var(--tap-min);
+    --row-h: var(--tap-min);
+  }
+}
+
+/* Reduced motion keeps the state change and drops the travel (guides/motion.md Reduced motion). Written twice, like
+   dark: the system setting, and the in-app switch <html data-motion="reduced"> motion.ts reads. The turntable
+   keeps turning: it carries status. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --travel-sm: 0px;
+    --travel-md: 0px;
+    --travel-lg: 0px;
+    --scale-from: 1;
+    --press-scale: 1;
+    --stagger-ui: 0ms;
+    --stagger-scene: 0ms;
+    --dur-modal-in: var(--dur-reduced);
+    --dur-modal-out: var(--dur-reduced);
+    --dur-sheet-in: var(--dur-reduced);
+    --dur-sheet-out: var(--dur-reduced);
+    --dur-toast-in: var(--dur-reduced);
+    --dur-toast-out: var(--dur-reduced);
+    --dur-list-in: var(--dur-reduced);
+    --dur-list-out: var(--dur-reduced);
+    --dur-route-in: var(--dur-reduced);
+    --dur-route-out: var(--dur-reduced);
+    --dur-disclosure: var(--dur-reduced);
+    --dur-scene: var(--dur-reduced);
+    --dur-select: var(--dur-reduced);
+    --dur-stack: var(--dur-reduced);
+    --dur-count: 0ms;
+  }
+}
+:root[data-motion='reduced'] {
+  --travel-sm: 0px;
+  --travel-md: 0px;
+  --travel-lg: 0px;
+  --scale-from: 1;
+  --press-scale: 1;
+  --stagger-ui: 0ms;
+  --stagger-scene: 0ms;
+  --dur-modal-in: var(--dur-reduced);
+  --dur-modal-out: var(--dur-reduced);
+  --dur-sheet-in: var(--dur-reduced);
+  --dur-sheet-out: var(--dur-reduced);
+  --dur-toast-in: var(--dur-reduced);
+  --dur-toast-out: var(--dur-reduced);
+  --dur-list-in: var(--dur-reduced);
+  --dur-list-out: var(--dur-reduced);
+  --dur-route-in: var(--dur-reduced);
+  --dur-route-out: var(--dur-reduced);
+  --dur-disclosure: var(--dur-reduced);
+  --dur-scene: var(--dur-reduced);
+  --dur-select: var(--dur-reduced);
+  --dur-stack: var(--dur-reduced);
+  --dur-count: 0ms;
+}
+
+/* Document base, from the roles. It sits in the base layer so Tailwind utilities and component styles win. */
+@layer base {
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    line-height: var(--leading-body);
+  }
+  ::selection {
+    background: var(--selection-bg);
+    color: var(--selection-ink);
+  }
+  :focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+  a {
+    text-underline-offset: 0.2em;
+  }
+  :is(h1, h2, h3) {
+    font-family: var(--font-display);
+    font-variation-settings: var(--font-display-settings);
+    font-weight: var(--weight-heading);
+    line-height: var(--leading-heading);
+    text-wrap: balance;
+  }
+  h1 {
+    font-weight: var(--weight-display);
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :is(data, output, [data-figure]) {
+    font-variant-numeric: tabular-nums;
+  }
+}

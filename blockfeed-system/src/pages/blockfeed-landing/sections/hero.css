@@ -1,0 +1,288 @@
+/* S1 Hero: a full-bleed slice of world at night; the build's label floats above it; the words sit in a corner panel. */
+@layer components {
+  .bl-hero {
+    position: relative;
+    display: grid;
+  }
+  /* the world: a fixed height, so a teleport to a smaller build never moves the page */
+  .bl-hero__world {
+    position: relative;
+    block-size: max(calc(var(--u) * 320), calc(100dvh - var(--control-h) - var(--space-4)));
+    overflow: hidden;
+    background: var(--bl-sky-1);
+  }
+  .bl-hero__canvas {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    image-rendering: pixelated;
+  }
+
+  /* the build's label: centred above its top block */
+  .bl-hero__tag {
+    position: absolute;
+    display: grid;
+    justify-items: center;
+    gap: var(--space-2);
+    translate: -50% calc(-100% - var(--space-4));
+    pointer-events: none;
+  }
+  .bl-hero__tag > * {
+    pointer-events: auto;
+  }
+  /* the item frame: the purple tooltip */
+  .bl-hero__frame {
+    display: grid;
+    margin: 0;
+    padding: var(--space-2) var(--space-4);
+    background: var(--tip-bg);
+    color: var(--tip-ink);
+    text-align: center;
+    white-space: nowrap;
+    box-shadow: inset 0 0 0 var(--u) var(--tip-edge);
+    clip-path: var(--notch-path);
+    text-shadow: var(--u) var(--u) 0 var(--tip-shadow);
+  }
+  .bl-hero__frame:focus-visible {
+    outline: var(--u) solid transparent;
+    box-shadow: inset 0 0 0 var(--u) var(--select), 0 0 0 var(--u) var(--focus-2), 0 0 0 calc(var(--u) * 2) var(--focus);
+  }
+  .bl-hero__by {
+    color: var(--tip-muted);
+  }
+  /* reserved height, so the prompt, the progress and the result swap without moving the label */
+  .bl-hero__place {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--tap-min);
+    padding-inline: var(--space-2);
+    background: color-mix(in srgb, var(--bl-sky-1) 80%, transparent);
+    color: var(--bg-ink);
+    white-space: nowrap;
+    text-shadow: var(--u) var(--u) 0 var(--text-shadow);
+  }
+  /* the hand-drawn arrow, as pixels: a short diagonal with a head */
+  .bl-hero__arrow {
+    inline-size: calc(var(--u) * 10);
+    block-size: calc(var(--u) * 10);
+    background:
+      linear-gradient(var(--xp), var(--xp)) 0 0 / calc(var(--u) * 2) calc(var(--u) * 2) no-repeat,
+      linear-gradient(var(--xp), var(--xp)) calc(var(--u) * 2) calc(var(--u) * 2) / calc(var(--u) * 2) calc(var(--u) * 2) no-repeat,
+      linear-gradient(var(--xp), var(--xp)) calc(var(--u) * 4) calc(var(--u) * 4) / calc(var(--u) * 2) calc(var(--u) * 2) no-repeat,
+      linear-gradient(var(--xp), var(--xp)) calc(var(--u) * 6) calc(var(--u) * 6) / calc(var(--u) * 4) calc(var(--u) * 2) no-repeat,
+      linear-gradient(var(--xp), var(--xp)) calc(var(--u) * 8) calc(var(--u) * 2) / calc(var(--u) * 2) calc(var(--u) * 6) no-repeat;
+  }
+
+  /* no 2D canvas: the build's address in words, where the build would stand (clear of the panel) */
+  .bl-hero__tag[hidden] {
+    display: none;
+  }
+  .bl-hero__poster {
+    position: absolute;
+    inset-block-start: 35%;
+    inset-inline-start: 62%;
+    inline-size: min(calc(var(--u) * 220), calc(100% - var(--space-4) * 2));
+    translate: -50% -50%;
+  }
+
+  /* HUD readouts on the world */
+  .bl-hero__hud {
+    position: absolute;
+    padding: var(--space-4);
+  }
+  .bl-hero__hud--tl { inset-block-start: 0; inset-inline-start: 0; }
+  .bl-hero__hud--tr { inset-block-start: 0; inset-inline-end: 0; text-align: end; }
+
+  /* the words: a stone panel in the bottom-left corner of the world (desktop), under it on phones */
+  .bl-hero__panel {
+    position: absolute;
+    inset-block-end: var(--space-6);
+    inset-inline-start: max(var(--space-4), calc((100% - var(--u) * 600) / 2));
+    display: grid;
+    gap: var(--space-3);
+    inline-size: min(calc(var(--u) * 260), calc(100% - var(--space-4) * 2));
+    padding: var(--space-5);
+    background: color-mix(in srgb, var(--bl-sky-1) 88%, transparent);
+    box-shadow: inset 0 0 0 var(--u) var(--edge), inset calc(var(--u) * 3) calc(var(--u) * 3) 0 color-mix(in srgb, var(--select) 14%, transparent),
+      inset calc(var(--u) * -3) calc(var(--u) * -3) 0 color-mix(in srgb, var(--edge) 60%, transparent);
+    clip-path: var(--notch-path);
+  }
+  .bl-hero__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--bl-size-hero);
+    font-weight: 400;
+    line-height: 1;
+    text-shadow: var(--u) var(--u) 0 var(--text-shadow);
+  }
+  .bl-hero__sub {
+    margin: 0;
+    color: var(--bg-muted);
+  }
+  .bl-hero__browse {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--control-h);
+    padding-inline: var(--space-2);
+    color: var(--bg-ink);
+    text-decoration: underline;
+    text-decoration-thickness: var(--u);
+    text-underline-offset: calc(var(--u) * 2);
+  }
+  .bl-hero__browse:focus-visible {
+    outline: var(--u) solid transparent;
+    box-shadow: 0 0 0 var(--u) var(--focus-2), 0 0 0 calc(var(--u) * 2) var(--focus);
+  }
+  .bl-hero__note {
+    margin: 0;
+    color: var(--bg-muted);
+  }
+
+  @media (max-width: 48rem) {
+    .bl-hero__world {
+      block-size: calc(var(--u) * 140);
+    }
+    /* phones: the world is short; the build's name stays for screen readers and focus, the prompt stays on screen.
+       Pinned to the tag's start edge, so the hidden name never reaches past a 320 px screen. */
+    .bl-hero__frame {
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline-start: 0;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+    .bl-hero__hud--tl {
+      display: none;
+    }
+    /* both actions above the hotbar at 320 and 390 (critique round 4, U3/U7); the unofficial line follows them */
+    .bl-hero__actions {
+      order: 2;
+    }
+    .bl-hero__note {
+      order: 3;
+    }
+    .bl-hero__panel {
+      position: static;
+      inline-size: auto;
+      padding: var(--space-4);
+      background: var(--bl-sky-1);
+      clip-path: none;
+      box-shadow: inset 0 var(--u) 0 var(--edge);
+    }
+    .bl-hero__hud--tr {
+      display: none;
+    }
+    .bl-hero__poster {
+      inset-block-start: 50%;
+      inset-inline-start: 50%;
+    }
+  }
+  /* short phones (320×640): a lower strip of world and the actions straight under the headline, so both clear the
+     hotbar; the sub-line follows them */
+  @media (max-width: 48rem) and (max-height: 45rem) {
+    .bl-hero__world {
+      block-size: calc(var(--u) * 120);
+    }
+    .bl-hero__actions {
+      order: 1;
+    }
+    .bl-hero__sub {
+      order: 2;
+    }
+  }
+}
+
+/* ----- building in the world: the block bar, break toggle, reset and hint (after the last block is placed) ---------- */
+@layer components {
+  .bl-hero__canvas {
+    cursor: crosshair;
+    touch-action: manipulation;
+  }
+  .bl-hero__canvas:focus-visible {
+    outline: calc(var(--u) * 2) solid var(--focus);
+    outline-offset: calc(var(--u) * -3);
+  }
+  .bl-hero__tools {
+    position: absolute;
+    inset-block-end: var(--space-4);
+    inset-inline-end: var(--space-4);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+    justify-content: flex-end;
+    max-inline-size: calc(var(--u) * 240);
+  }
+  .bl-hero__bar {
+    display: flex;
+    gap: var(--u);
+    padding: var(--u);
+    background: color-mix(in srgb, var(--bl-sky-1) 85%, transparent);
+    box-shadow: inset 0 0 0 var(--u) var(--edge);
+  }
+  /* each block is a hotbar slot; the chosen one wears the white select frame */
+  .bl-hero__block {
+    position: relative;
+    display: grid;
+    place-items: center;
+    inline-size: var(--tap-min);
+    block-size: var(--tap-min);
+    padding: 0;
+    border: 0;
+    background: var(--slot);
+    background: var(--sunken);
+    box-shadow: inset var(--u) var(--u) 0 var(--slot-dark), inset calc(var(--u) * -1) calc(var(--u) * -1) 0 var(--slot-light);
+    cursor: pointer;
+  }
+  .bl-hero__block[aria-checked='true'] {
+    box-shadow: inset 0 0 0 calc(var(--u) * 2) var(--select), inset 0 0 0 calc(var(--u) * 3) var(--edge);
+  }
+  .bl-hero__block:focus-visible {
+    outline: var(--u) solid transparent;
+    box-shadow: inset 0 0 0 calc(var(--u) * 2) var(--select), 0 0 0 var(--u) var(--focus-2), 0 0 0 calc(var(--u) * 2) var(--focus);
+  }
+  .bl-hero__swatch {
+    inline-size: calc(var(--u) * 10);
+    block-size: calc(var(--u) * 10);
+    background: linear-gradient(var(--_top) 0 40%, var(--_side) 40% 100%);
+    box-shadow: inset 0 0 0 var(--u) color-mix(in srgb, var(--edge) 40%, transparent);
+  }
+  .bl-hero__block[data-block='grass'] { --_top: var(--bl-grass-1); --_side: var(--bl-dirt-2); }
+  .bl-hero__block[data-block='stone'] { --_top: var(--bl-stone-1); --_side: var(--bl-stone-2); }
+  .bl-hero__block[data-block='plank'] { --_top: var(--bl-plank-1); --_side: var(--bl-plank-2); }
+  .bl-hero__block[data-block='glass'] { --_top: var(--bl-glass-1); --_side: var(--bl-glass-2); }
+  .bl-hero__block[data-block='lamp'] { --_top: var(--bl-lamp-1); --_side: var(--bl-lamp-2); }
+  .bl-hero__block[data-block='roof'] { --_top: var(--bl-roof-1); --_side: var(--bl-roof-2); }
+  .bl-hero__key {
+    position: absolute;
+    inset-block-start: var(--u);
+    inset-inline-start: calc(var(--u) * 2);
+    color: var(--select);
+    font-size: var(--size-hint);
+    text-shadow: var(--u) var(--u) 0 var(--text-shadow);
+  }
+  .bl-hero__hint {
+    flex-basis: 100%;
+    margin: 0;
+    color: var(--bg-ink);
+    text-align: end;
+    text-shadow: var(--u) var(--u) 0 var(--text-shadow);
+  }
+  @media (max-width: 48rem) {
+    .bl-hero__tools {
+      position: static;
+      justify-content: center;
+      max-inline-size: none;
+      padding: var(--space-3) var(--space-2) 0;
+      background: var(--bl-sky-1);
+    }
+    .bl-hero__hint {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,317 @@
+/*
+ * Blockfeed's skin for the reference feedback components (phase 10). The behaviour is untouched: states, timing,
+ * announcements and the data attributes in feedback.css and the .tsx files stay as they are. This file only changes how
+ * each state LOOKS, in the same pixel language as ui/ui.css: a one-unit frame, a lit top-left edge, a shaded bottom-right
+ * edge, no rounding, stepped motion. Colours, sizes and times are roles from tokens.css; it loads after feedback.css and
+ * wins by order inside the same layer.
+ */
+@layer components {
+  .fb-icon {
+    font-size: inherit;
+  }
+
+  /* ----- spinner: a square whose lit edge hops round in four steps ----------------------------------------------- */
+  .fb-spinner {
+    --_size: var(--icon-sm);
+    --_ring: calc(var(--u) * 2);
+    border-radius: 0;
+    /* same keyframes and duration as the base (reduced motion slows it through --fb-spin-ms): the lit edge hops a quarter turn at a time */
+    animation-timing-function: steps(4, end);
+  }
+  .fb-spinner[data-size='sm'] {
+    --_size: var(--icon-sm);
+  }
+  .fb-spinner[data-size='lg'] {
+    --_size: calc(var(--u) * 16);
+    --_ring: calc(var(--u) * 3);
+  }
+
+  /* ----- skeleton: a slot-shaped block that blinks in two steps -------------------------------------------------- */
+  .fb-skeleton {
+    border-radius: 0;
+    box-shadow: inset var(--u) var(--u) 0 var(--slot-dark), inset calc(var(--u) * -1) calc(var(--u) * -1) 0 var(--slot-light);
+    /* one step per half-cycle: full, then dimmed, then full again (no tween) */
+    animation-timing-function: steps(1, end);
+  }
+
+  /* ----- progress: the experience bar ---------------------------------------------------------------------------- */
+  .fb-progress__label {
+    color: var(--fb-ink);
+  }
+  .fb-progress__track {
+    block-size: calc(var(--u) * 6);
+    border-radius: 0;
+    background: var(--xp-empty);
+    box-shadow: inset 0 0 0 var(--u) var(--edge), inset 0 calc(var(--u) * -1) 0 0 var(--xp-lip);
+  }
+  .fb-progress__fill {
+    inset: var(--u);
+    inset-inline-end: auto;
+    inline-size: calc((100% - var(--u) * 2) * var(--fb-progress, 0));
+    transform: none;
+    background: var(--xp);
+    box-shadow: inset 0 var(--u) 0 0 color-mix(in srgb, var(--xp), var(--select) 55%), inset 0 calc(var(--u) * -1) 0 0 var(--xp-dark);
+    transition: inline-size var(--fb-progress-ms) steps(6, end);
+  }
+  .fb-progress__fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(90deg, transparent 0 calc(var(--u) * 5), var(--xp-dark) calc(var(--u) * 5) calc(var(--u) * 6));
+  }
+  .fb-progress__fill[data-indeterminate] {
+    inline-size: 38%;
+    animation: fb-slide var(--fb-slide-ms) steps(14, end) infinite;
+  }
+
+  /* ----- button: the bevelled face, its states drawn as bevels --------------------------------------------------- */
+  .fb-btn {
+    --b-face: var(--face);
+    --b-hi: var(--face-hi);
+    --b-sh: var(--face-sh);
+    --b-edge: var(--line-strong);
+    --b-ink: var(--face-ink);
+    --b-hover: var(--face-hover);
+    --b-shadow: var(--text-shadow);
+    --bf-bevel: inset 0 0 0 var(--u) var(--b-edge), inset calc(var(--u) * 2) calc(var(--u) * 2) 0 0 var(--b-hi),
+      inset calc(var(--u) * -2) calc(var(--u) * -3) 0 0 var(--b-sh);
+    --icon-shadow: var(--b-shadow);
+    min-block-size: var(--control-h);
+    min-inline-size: var(--control-h);
+    padding: 0 var(--inset-control);
+    border: 0;
+    border-radius: 0;
+    background: var(--b-face);
+    color: var(--b-ink);
+    font-weight: 400;
+    line-height: 1;
+    text-shadow: var(--u) var(--u) 0 var(--b-shadow);
+    box-shadow: var(--bf-bevel), var(--bf-ring, 0 0 0 0 transparent);
+    transition: none;
+  }
+  .fb-btn[data-variant='primary'] {
+    --b-face: var(--accent);
+    --b-hi: var(--accent-hi);
+    --b-sh: var(--accent-sh);
+    --b-ink: var(--on-accent);
+    --b-hover: var(--accent-hover);
+    --b-shadow: var(--accent-shadow);
+  }
+  .fb-btn[data-variant='secondary'] {
+    --b-face: var(--face);
+    --b-ink: var(--face-ink);
+  }
+  .fb-btn[data-variant='ghost'] {
+    --b-face: transparent;
+    --b-ink: var(--ink);
+    --b-shadow: transparent;
+    --b-hover: var(--hover-bg);
+    --bf-bevel: 0 0 0 0 transparent;
+  }
+  .fb-btn[data-variant='danger'],
+  .fb-btn[data-state='error'] {
+    --b-face: var(--negative);
+    --b-hi: var(--negative-hi);
+    --b-sh: var(--negative-sh);
+    --b-ink: var(--on-negative);
+    --b-hover: var(--negative-hi);
+    --b-shadow: var(--negative-shadow);
+  }
+  /* success replaces the variant's fill: a green face, the check and the word say it too */
+  .fb-btn[data-state='success'] {
+    --b-face: var(--positive);
+    --b-hi: color-mix(in srgb, var(--positive), white 32%);
+    --b-sh: color-mix(in srgb, var(--positive), black 38%);
+    --b-ink: var(--on-positive);
+    --b-shadow: transparent;
+  }
+  .fb-btn[data-state='disabled'] {
+    --b-face: var(--face);
+    --b-ink: var(--face-ink);
+    opacity: var(--disabled-opacity);
+  }
+  .fb-btn[data-variant='ghost'][data-state='disabled'] {
+    --b-face: transparent;
+    --b-ink: var(--ink);
+  }
+  /* waiting: the same face with a static diagonal hatch, so the state is a picture and needs no motion to read */
+  .fb-btn[data-state='pending'] {
+    background-image: repeating-linear-gradient(135deg, transparent 0 calc(var(--u) * 4), color-mix(in srgb, var(--b-sh) 55%, transparent) calc(var(--u) * 4) calc(var(--u) * 8));
+    box-shadow: var(--bf-bevel), var(--bf-ring, 0 0 0 0 transparent);
+  }
+  @media (hover: hover) {
+    .fb-btn:hover:not([aria-disabled='true']) {
+      background-color: var(--b-hover);
+      --bf-bevel: inset 0 0 0 var(--u) var(--select), inset calc(var(--u) * 2) calc(var(--u) * 2) 0 0 var(--b-hi),
+        inset calc(var(--u) * -2) calc(var(--u) * -3) 0 0 var(--b-sh);
+      box-shadow: var(--bf-bevel), var(--bf-ring, 0 0 0 0 transparent);
+    }
+    .fb-btn[data-variant='ghost']:hover:not([aria-disabled='true']) {
+      --bf-bevel: 0 0 0 0 transparent;
+      text-decoration: underline;
+      text-decoration-thickness: var(--u);
+      text-underline-offset: calc(var(--u) * 2);
+    }
+  }
+  .fb-btn[data-preview='hover'] {
+    background-color: var(--b-hover);
+    --bf-bevel: inset 0 0 0 var(--u) var(--select), inset calc(var(--u) * 2) calc(var(--u) * 2) 0 0 var(--b-hi),
+      inset calc(var(--u) * -2) calc(var(--u) * -3) 0 0 var(--b-sh);
+    box-shadow: var(--bf-bevel), var(--bf-ring, 0 0 0 0 transparent);
+  }
+  .fb-btn:active:not([aria-disabled='true']),
+  .fb-btn[data-preview='pressed'] {
+    --bf-bevel: inset 0 0 0 var(--u) var(--b-edge), inset calc(var(--u) * 2) calc(var(--u) * 2) 0 0 var(--b-sh),
+      inset calc(var(--u) * -2) calc(var(--u) * -2) 0 0 var(--b-hi);
+    transform: translateY(var(--press-travel));
+    box-shadow: var(--bf-bevel), var(--bf-ring, 0 0 0 0 transparent);
+  }
+  .fb-btn:focus-visible,
+  .fb-btn[data-preview='focus'] {
+    /* the ring is a shadow; the transparent outline is what forced-colors mode turns into a visible one */
+    outline: var(--u) solid transparent;
+    outline-offset: 0;
+    --bf-ring: 0 0 0 var(--u) var(--focus-2), 0 0 0 calc(var(--u) * 2) var(--focus);
+    box-shadow: var(--bf-bevel), var(--bf-ring);
+  }
+  .fb-btn__label {
+    gap: var(--space-2);
+  }
+
+  /* ----- toast: the advancement frame, the dark tooltip purple --------------------------------------------------- */
+  .fb-toasts {
+    inset-block-end: max(var(--space-3), env(safe-area-inset-bottom));
+    padding-inline: var(--space-3);
+    /* the hard shadow sits on the stack: the toast itself is clipped to its notched outline */
+    filter: drop-shadow(var(--shadow-overlay));
+  }
+  .fb-toast {
+    inline-size: min(calc(var(--u) * 170), 100%);
+    padding: calc(var(--u) * 2) calc(var(--u) * 2) calc(var(--u) * 2) var(--space-4);
+    column-gap: var(--space-3);
+    border: 0;
+    border-radius: 0;
+    background: var(--tip-bg);
+    color: var(--tip-ink);
+    box-shadow: inset 0 0 0 var(--u) var(--tip-edge);
+    clip-path: var(--notch-path);
+    font-size: var(--fb-text);
+    text-shadow: var(--u) var(--u) 0 var(--tip-shadow);
+    animation-timing-function: steps(4, end);
+  }
+  .fb-toast[data-state='closing'] {
+    animation-timing-function: steps(3, end);
+  }
+  .fb-toast__text {
+    padding-block: var(--space-3);
+  }
+  .fb-toast[data-tone='info'] .fb-toast__icon {
+    color: var(--tier-rare);
+  }
+  .fb-toast[data-tone='success'] .fb-toast__icon {
+    color: var(--xp);
+  }
+  .fb-toast[data-tone='warning'] .fb-toast__icon {
+    color: var(--tier-uncommon);
+  }
+  .fb-toast[data-tone='error'] .fb-toast__icon {
+    color: var(--ping-bad);
+  }
+  .fb-toast__button {
+    border-radius: 0;
+    color: var(--tier-rare);
+    font-weight: 400;
+    text-decoration: underline;
+    text-decoration-thickness: var(--u);
+    text-underline-offset: calc(var(--u) * 2);
+  }
+  .fb-toast__close {
+    color: var(--tip-muted);
+    text-decoration: none;
+  }
+  .fb-toast :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 var(--u) var(--tip-bg), 0 0 0 calc(var(--u) * 2) var(--select);
+  }
+  @media (hover: hover) {
+    .fb-toast__button:hover {
+      background: color-mix(in srgb, var(--tip-ink) 16%, transparent);
+    }
+  }
+
+  /* ----- inline message: a framed panel with a tone bar on the left ---------------------------------------------- */
+  .fb-msg {
+    padding: var(--space-3) var(--space-2) var(--space-3) var(--space-4);
+    column-gap: var(--space-3);
+    border: 0;
+    border-radius: 0;
+    /* a full frame in the tone, two units: the icon and title carry the tone, no thick left stripe */
+    box-shadow: inset 0 0 0 var(--u) var(--_fill), inset 0 0 0 calc(var(--u) * 2) color-mix(in srgb, var(--_fill) 45%, transparent);
+    clip-path: var(--notch-path);
+    font-size: var(--fb-text);
+  }
+  .fb-msg__title {
+    font-weight: 400;
+    text-shadow: var(--u) var(--u) 0 color-mix(in srgb, var(--_tone) 22%, transparent);
+  }
+  .fb-msg__close {
+    border-radius: 0;
+  }
+
+  /* ----- empty and error states: a slot-framed icon in a dashed well ---------------------------------------------- */
+  .fb-state {
+    padding: var(--space-6) var(--space-4);
+    border-width: var(--u);
+    border-radius: 0;
+    font-size: var(--fb-text);
+  }
+  .fb-state__icon {
+    inline-size: calc(var(--u) * 26);
+    block-size: calc(var(--u) * 26);
+    border-radius: 0;
+    background: var(--sunken);
+    box-shadow: inset var(--u) var(--u) 0 var(--slot-dark), inset calc(var(--u) * -1) calc(var(--u) * -1) 0 var(--slot-light);
+  }
+  .fb-state[data-kind='error'] .fb-state__icon {
+    --icon-accent: var(--negative);
+    background: var(--negative-bg);
+  }
+  /* phones: centred above the bottom hotbar (a slot and a gap) */
+  @media (max-width: 40rem) {
+    .fb-toasts {
+      inset-block-end: calc(var(--tap-min) + var(--space-4) + env(safe-area-inset-bottom));
+    }
+  }
+  .fb-state[data-kind='cleared'] .fb-state__icon {
+    background: var(--positive-bg);
+  }
+  .fb-state__title {
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-weight: 400;
+    line-height: 1.1;
+  }
+  .fb-state__body {
+    font-size: var(--fb-text);
+  }
+  .fb-chip {
+    padding: 0 var(--space-2);
+    border: 0;
+    border-radius: 0;
+    background: var(--sunken);
+    box-shadow: inset 0 0 0 var(--u) var(--line-strong);
+    font-size: var(--fb-text);
+    line-height: calc(var(--u) * 12);
+  }
+
+  /* ----- region: the refresh bar steps along the top ------------------------------------------------------------- */
+  .fb-region__bar {
+    block-size: calc(var(--u) * 2);
+    border-radius: 0;
+    background: color-mix(in srgb, var(--xp) 24%, var(--xp-empty));
+  }
+  .fb-region__bar > span {
+    background: var(--xp);
+    animation-timing-function: steps(14, end);
+  }
+}

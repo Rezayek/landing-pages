@@ -1,0 +1,101 @@
+/*
+ * VOLTCART VFX (MOTION-SYSTEM.md, "Cyberpunk VFX", v3). The HUD language made to move, on the action lifecycle only
+ * (the person's choice, round 9): what is loading, what is working, what just landed. Hover and press stay a quick
+ * colour change (the motion guide's rule for the most frequent interactions).
+ *   - Charge-cell spinner and the receipt's issuing charge: state-carrying; slowed, never removed, under reduced motion.
+ *   - Scan skeleton: loading; three sweeps, then still; texture only under reduced motion.
+ *   - Lightning (feedback/Lightning.tsx): a procedural bolt, new every strike, with forks and three passes of light;
+ *     arcs across a working button (pending), strikes once as it lands (success). At most 2.5 strikes a second over a
+ *     button-sized area (WCAG 2.3.1 allows 3 and a far larger area); off under reduced motion and forced colours.
+ * The lightning's glow is the one kept glow in the system, at the person's request ("real lightning"); nothing else
+ * blooms. Durations and curves are tokens; only transform and opacity animate.
+ */
+@layer components {
+  /* 1. Spinner: a cut cell that ticks round in quarter turns, like a HUD charge indicator. State-carrying. ------- */
+  .fb-spinner {
+    border-radius: 0;
+    border-color: color-mix(in srgb, currentColor 22%, transparent);
+    border-block-start-color: currentColor;
+    border-inline-end-color: currentColor;
+    clip-path: polygon(0 0, 75% 0, 100% 25%, 100% 100%, 25% 100%, 0 75%);
+    animation-timing-function: var(--ease-tick);
+  }
+
+  /* 2. Skeleton: a scanline texture and one cyan scan sweep (the system talking), three passes, then still. ------ */
+  .fb-skeleton {
+    position: relative;
+    overflow: hidden;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 3px, color-mix(in srgb, var(--ink) 5%, transparent) 3px 4px),
+      var(--skeleton-bg); /* taste-skill-ignore: a scanline texture on a placeholder, not a decoration gradient */
+    animation: none;
+  }
+  .fb-skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0 35%, color-mix(in srgb, var(--info) 24%, transparent) 50%, transparent 65%); /* taste-skill-ignore: the scan sweep */
+    transform: translateX(-100%);
+    animation: vfx-scan var(--dur-shimmer) var(--ease-linear) 3;
+  }
+
+  /* 3. Lightning on the action button (feedback/Lightning.tsx draws it on this canvas): arcs while pending, one
+     strike on success. The canvas fills the cut face under the label; the clip keeps the light inside the cut. */
+  .fb-lightning {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    pointer-events: none;
+    clip-path: polygon(0 0, calc(100% - var(--_cut, 8px)) 0, 100% var(--_cut, 8px), 100% 100%, var(--_cut, 8px) 100%, 0 calc(100% - var(--_cut, 8px)));
+  }
+  .fb-btn__labels {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* 4. The receipt's issuing charge: the next cell fills with energy while the job runs. State-carrying. -------- */
+  .vc-receipt-status .vc-charge > span[data-on='true'] + span[data-on='false']::after {
+    animation: vfx-charge var(--dur-shimmer) var(--ease-standard) infinite;
+  }
+
+  /* 5. Region refresh bar and indeterminate progress: drawn as a cyan scan (same slide, same timing). ----------- */
+  .fb-region__bar > span,
+  .fb-progress__fill[data-indeterminate] {
+    background: linear-gradient(90deg, transparent, var(--info) 60%, var(--info-ink)); /* taste-skill-ignore: a scan bar */
+  }
+
+  /* Reduced motion: the decorative layers are off (scoped to them, never a global rule); the spinner and the
+     charge stay, slower. */
+  @media (prefers-reduced-motion: reduce) {
+    .fb-skeleton::after,
+    .fb-lightning {
+      display: none;
+    }
+  }
+  :root[data-motion='reduced'] .fb-skeleton::after,
+  :root[data-motion='reduced'] .fb-lightning {
+    display: none;
+  }
+  @media (forced-colors: active) {
+    .fb-skeleton::after,
+    .fb-lightning {
+      display: none;
+    }
+  }
+}
+
+@keyframes vfx-scan {
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes vfx-charge {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(0.92);
+  }
+}

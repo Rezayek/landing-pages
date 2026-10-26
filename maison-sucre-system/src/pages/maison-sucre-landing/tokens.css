@@ -1,0 +1,24 @@
+/*
+ * Page-level extensions for `maison-sucre-landing`. The SYSTEM owns the tokens; this file only adds what the climb
+ * needs, built from system tokens with var().
+ */
+[data-page='maison-sucre-landing'] {
+  /* the climb's text and rail stand on the sections' 76rem column (the footer's edge), the gutter on narrow screens */
+  --climb-edge: max(var(--gutter), (100% - var(--container)) / 2);
+  /* the film's reading shade: the page ground fading across the text side of the frame (desktop: from the left) */
+  --climb-shade: linear-gradient(90deg, color-mix(in srgb, var(--bg) 92%, transparent) 0%, color-mix(in srgb, var(--bg) 88%, transparent) 34%, color-mix(in srgb, var(--bg) 62%, transparent) 48%, transparent 62%); /* taste-skill-ignore: neutral scrim over the rendered film */
+}
+/* desktops up to 1366 px: the headline ends further across the frame, so the wash holds its density further too */
+@media (min-width: 901px) and (max-width: 1366px) {
+  [data-page='maison-sucre-landing'] {
+    --climb-shade: linear-gradient(90deg, color-mix(in srgb, var(--bg) 92%, transparent) 0%, color-mix(in srgb, var(--bg) 88%, transparent) 42%, color-mix(in srgb, var(--bg) 66%, transparent) 54%, transparent 66%); /* taste-skill-ignore: neutral scrim over the rendered film */
+  }
+}
+@media (max-width: 900px) and (orientation: portrait) {
+  [data-page='maison-sucre-landing'] {
+    /* phones: from the bottom, where the card and the hero text sit */
+    --climb-hero-phone: linear-gradient(0deg, var(--bg) 0%, var(--bg) 58%, color-mix(in srgb, var(--bg) 0%, transparent) 76%); /* taste-skill-ignore: the page ground fading over the film on phones */
+    --climb-hero-phone-short: linear-gradient(0deg, var(--bg) 0%, var(--bg) 66%, color-mix(in srgb, var(--bg) 0%, transparent) 80%); /* taste-skill-ignore: the same ground, higher on short screens */
+    --climb-shade: linear-gradient(0deg, color-mix(in srgb, var(--bg) 92%, transparent) 0%, color-mix(in srgb, var(--bg) 55%, transparent) 38%, transparent 62%); /* taste-skill-ignore: neutral scrim over the rendered film */
+  }
+}

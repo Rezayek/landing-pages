@@ -1,0 +1,60 @@
+/*
+ * S4 Servers: the finder on the deep-slate ground. The system's filter bar and rows do the work; this file only
+ * frames the list, turns the filter bar into a sideways-scrolling strip on phones [#14], hides the Join button (there
+ * is no server to join in a study) and draws the copy answer ("Copied" / "Select the text and copy it") in place.
+ */
+@layer components {
+  .bl-servers .bl-inner > * {
+    min-inline-size: 0;
+  }
+
+  .bl-servers__list {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  /* an empty result keeps the height of about two rows, so the page below does not jump */
+  .bl-servers__empty {
+    --fb-region-min: calc(var(--u) * 140);
+  }
+
+  /* no Join button: the study has nothing to join */
+  .bl-servers .bf-server__live > .bf-btn {
+    display: none;
+  }
+
+  /* the copy answer, written beside the button it answers */
+  .bl-servers .bf-copy {
+    flex-wrap: wrap;
+  }
+  .bl-servers .bf-copy[data-copied]::after {
+    color: var(--tier-uncommon);
+    font-size: var(--size-0);
+    text-shadow: var(--u) var(--u) 0 var(--text-shadow);
+  }
+  .bl-servers .bf-copy[data-copied='ok']::after {
+    content: 'Copied';
+  }
+  .bl-servers .bf-copy[data-copied='fail']::after {
+    content: 'Select the text and copy it';
+    flex-basis: 100%;
+    color: var(--field-bad);
+  }
+
+  /* phones: the four filters are one strip of slots you slide sideways [#10, #14] */
+  @media (max-width: 40rem) {
+    .bl-servers .bf-filters__row {
+      display: flex;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x proximity;
+      padding-block-end: var(--space-1);
+    }
+    .bl-servers .bf-filters__row > * {
+      flex: 0 0 auto;
+      min-inline-size: calc(var(--u) * 78);
+      min-block-size: var(--tap-min);
+      scroll-snap-align: start;
+    }
+  }
+}

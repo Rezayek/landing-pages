@@ -1,0 +1,882 @@
+/*
+ * Reference styles for the feedback components. Phase 10 of the workflow restyles them with the project's tokens.
+ *
+ * How the colours work: section 1 maps every `--fb-*` knob to a role in the system's tokens.css (`--surface`,
+ * `--ink`, `--accent`, `--positive-ink`, …) with a neutral fallback, so the components look right before the
+ * system has tokens and take the real ones the moment tokens.css defines the roles. The role names are the contract
+ * of tokens.css; when a project renames or adds one, edit the left-hand sides of section 1 and nothing else.
+ * Components never use a colour, size, duration or curve of their own: only `--fb-*`.
+ *
+ * Motion: the loading motion (spin, slide, pulse) is state, so under reduced motion it slows or goes static
+ * instead of vanishing, and every result still appears (section 9). There is no global kill switch. The block runs
+ * for the system setting and for <html data-motion="reduced"> (the in-app switch).
+ *
+ * Everything sits in the `components` layer so Tailwind utilities and page CSS can still override it.
+ */
+
+@layer components {
+  /* 1. Token map ------------------------------------------------------------------------------------------------ */
+  :where(.fb) {
+    /* colour roles */
+    --fb-bg: var(--surface, #ffffff);
+    --fb-raised: var(--raised, var(--fb-bg));
+    --fb-sunken: var(--sunken, #eceef1);
+    --fb-ink: var(--ink, #15181d);
+    --fb-muted: var(--muted, #535b68);
+    --fb-line: var(--line, #dde1e6);
+    --fb-line-strong: var(--line-strong, #7d8591);
+    --fb-accent: var(--accent, #2f66e0);
+    --fb-on-accent: var(--on-accent, #ffffff);
+    --fb-accent-ink: var(--accent-ink, #1d4499);
+    --fb-info: var(--info, #2f66e0);
+    --fb-info-ink: var(--info-ink, #1d4499);
+    --fb-info-bg: var(--info-bg, #eaf1ff);
+    --fb-positive: var(--positive, #23804f);
+    --fb-positive-ink: var(--positive-ink, #1a6b40);
+    --fb-positive-bg: var(--positive-bg, #e8f6ee);
+    --fb-warning: var(--warning, #9a6200);
+    --fb-warning-ink: var(--warning-ink, #7a4a00);
+    --fb-warning-bg: var(--warning-bg, #fdf3e1);
+    --fb-negative: var(--negative, #c8342c);
+    --fb-on-negative: var(--on-negative, #ffffff);
+    --fb-negative-ink: var(--negative-ink, #a12a23);
+    --fb-negative-bg: var(--negative-bg, #fdeceb);
+    --fb-focus: var(--focus, #2453bd);
+    --fb-disabled: var(--disabled-opacity, 0.38);
+    --fb-overlay-border: var(--overlay-border, 1px solid var(--fb-line-strong));
+    --fb-shadow: var(--shadow-overlay, 0 2px 4px rgb(14 16 20 / 0.08), 0 18px 40px -12px rgb(14 16 20 / 0.24));
+    /* a translucent wash that reads on any ground, in either theme */
+    --fb-wash: color-mix(in srgb, var(--fb-ink) 8%, transparent);
+    --fb-skeleton: var(--skeleton-bg, color-mix(in srgb, var(--fb-ink) 9%, transparent));
+
+    /* type, shape, size */
+    --fb-font: var(--font-body, system-ui, sans-serif);
+    --fb-text: var(--step-0, 1rem);
+    --fb-text-sm: var(--step--1, 0.875rem);
+    --fb-text-lg: var(--step-1, 1.25rem);
+    --fb-leading: var(--leading-body, 1.5);
+    --fb-radius: var(--radius-control, 8px);
+    --fb-radius-card: var(--radius-card, 12px);
+    --fb-radius-full: var(--radius-full, 999px);
+    --fb-control-h: var(--control-h, 40px);
+    --fb-tap: var(--tap-min, 44px);
+    --fb-target: var(--target-min, 24px);
+    --fb-icon-sm: var(--icon-sm, 16px);
+    --fb-icon-md: var(--icon-md, 20px);
+    --fb-icon-lg: var(--icon-lg, 24px);
+    --fb-focus-width: var(--focus-width, 2px);
+    --fb-focus-offset: var(--focus-offset, 2px);
+    --fb-toast-gap: var(--toast-gap, 8px);
+    --fb-z-toast: var(--z-toast, 500);
+
+    /* motion: durations by role, curves, the press scale and the travel */
+    --fb-dur-press: var(--dur-press, 100ms);
+    --fb-dur-swap: var(--dur-swap, 200ms);
+    --fb-dur-toast-in: var(--dur-toast-in, 250ms);
+    --fb-dur-toast-out: var(--dur-toast-out, 200ms);
+    --fb-ease-enter: var(--ease-enter, cubic-bezier(0, 0, 0, 1));
+    --fb-ease-move: var(--ease-standard, cubic-bezier(0.2, 0, 0, 1));
+    --fb-ease-exit: var(--ease-exit, cubic-bezier(0.3, 0, 1, 1));
+    --fb-press-scale: var(--press-scale, 0.97);
+    --fb-travel: var(--travel-sm, 8px);
+
+    /* loading motion; section 9 slows or stops these under reduced motion */
+    --fb-spin-ms: var(--dur-turn, 1200ms);
+    --fb-slide-ms: 1400ms;
+    --fb-pulse-ms: 1600ms;
+    --fb-skeleton-anim: none; /* Piped: a bead row pipes along each line once (section 10), then the skeleton is still */
+    --fb-progress-ms: 300ms;
+    /* opacity of a region that is refreshing (guides/interaction.md: 0.6 to 0.7). Dimmed text is measured at its
+       dimmed contrast, so muted text drops under 4.5:1 at this value: keep anything that must stay readable in ink. */
+    --fb-dim: 0.7; /* the guide's upper value: ink dimmed to 0.6 measured 4.26:1 on fondant, 0.7 keeps it over 4.5 */
+  }
+
+  /* Dark fallbacks, written twice with the same values (system setting, and <html data-theme="dark">). They only
+     matter while the system's tokens.css does not define the roles. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) :where(.fb) {
+      --fb-bg: var(--surface, #15181d);
+      --fb-sunken: var(--sunken, #090a0d);
+      --fb-ink: var(--ink, #f6f7f8);
+      --fb-muted: var(--muted, #9aa2ae);
+      --fb-line: var(--line, #262b33);
+      --fb-accent: var(--accent, #6b98f7);
+      --fb-on-accent: var(--on-accent, #0e1014);
+      --fb-accent-ink: var(--accent-ink, #8fb3ff);
+      --fb-info: var(--info, #6b98f7);
+      --fb-info-ink: var(--info-ink, #8fb3ff);
+      --fb-info-bg: var(--info-bg, #14285e);
+      --fb-positive: var(--positive, #7fd6a4);
+      --fb-positive-ink: var(--positive-ink, #7fd6a4);
+      --fb-positive-bg: var(--positive-bg, #123d27);
+      --fb-warning: var(--warning, #ffcf7a);
+      --fb-warning-ink: var(--warning-ink, #ffcf7a);
+      --fb-warning-bg: var(--warning-bg, #4a3000);
+      --fb-negative: var(--negative, #ff9b95);
+      --fb-negative-ink: var(--negative-ink, #ff9b95);
+      --fb-negative-bg: var(--negative-bg, #4a1613);
+      --fb-on-negative: var(--on-negative, #0e1014);
+      --fb-focus: var(--focus, #8fb3ff);
+      --fb-shadow: var(--shadow-overlay, 0 2px 4px rgb(0 0 0 / 0.4), 0 18px 40px -12px rgb(0 0 0 / 0.6));
+    }
+  }
+  :root[data-theme='dark'] :where(.fb) {
+    --fb-bg: var(--surface, #15181d);
+    --fb-sunken: var(--sunken, #090a0d);
+    --fb-ink: var(--ink, #f6f7f8);
+    --fb-muted: var(--muted, #9aa2ae);
+    --fb-line: var(--line, #262b33);
+    --fb-accent: var(--accent, #6b98f7);
+    --fb-on-accent: var(--on-accent, #0e1014);
+    --fb-accent-ink: var(--accent-ink, #8fb3ff);
+    --fb-info: var(--info, #6b98f7);
+    --fb-info-ink: var(--info-ink, #8fb3ff);
+    --fb-info-bg: var(--info-bg, #14285e);
+    --fb-positive: var(--positive, #7fd6a4);
+    --fb-positive-ink: var(--positive-ink, #7fd6a4);
+    --fb-positive-bg: var(--positive-bg, #123d27);
+    --fb-warning: var(--warning, #ffcf7a);
+    --fb-warning-ink: var(--warning-ink, #ffcf7a);
+    --fb-warning-bg: var(--warning-bg, #4a3000);
+    --fb-negative: var(--negative, #ff9b95);
+    --fb-negative-ink: var(--negative-ink, #ff9b95);
+    --fb-negative-bg: var(--negative-bg, #4a1613);
+    --fb-on-negative: var(--on-negative, #0e1014);
+    --fb-focus: var(--focus, #8fb3ff);
+    --fb-shadow: var(--shadow-overlay, 0 2px 4px rgb(0 0 0 / 0.4), 0 18px 40px -12px rgb(0 0 0 / 0.6));
+  }
+
+  /* 2. Shared ---------------------------------------------------------------------------------------------------- */
+  .fb-sr {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .fb-icon {
+    flex: none;
+    font-size: var(--fb-icon-sm);
+  }
+  .fb :focus-visible,
+  .fb:focus-visible {
+    outline: var(--fb-focus-width) solid var(--fb-focus);
+    outline-offset: var(--fb-focus-offset);
+  }
+
+  /* 3. Spinner --------------------------------------------------------------------------------------------------- */
+  .fb-spinner {
+    --_size: var(--fb-icon-md);
+    --_ring: 2px;
+    display: inline-block;
+    flex: none;
+    inline-size: var(--_size);
+    block-size: var(--_size);
+    box-sizing: border-box;
+    border: var(--_ring) solid color-mix(in srgb, currentColor 25%, transparent);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: fb-spin var(--fb-spin-ms) linear infinite;
+  }
+  .fb-spinner[data-size='sm'] {
+    --_size: var(--fb-icon-sm);
+  }
+  .fb-spinner[data-size='lg'] {
+    --_size: 2rem;
+    --_ring: 3px;
+  }
+
+  /* 4. Skeleton -------------------------------------------------------------------------------------------------- */
+  .fb-skeleton {
+    display: block;
+    border-radius: calc(var(--fb-radius) / 2);
+    background: var(--fb-skeleton);
+    animation: var(--fb-skeleton-anim) var(--fb-pulse-ms) ease-in-out infinite;
+  }
+  .fb-skeleton[data-variant='circle'] {
+    border-radius: 50%;
+  }
+  /* Each text line takes 1.5em, the height of a line of body text, so a skeleton paragraph equals the real one.
+     A heading bar is thicker and shorter. */
+  .fb-skeleton-text {
+    display: block;
+  }
+  .fb-skeleton-text > .fb-skeleton {
+    block-size: 0.9em;
+    margin-block: 0.3em;
+  }
+  .fb-skeleton-text[data-variant='heading'] > .fb-skeleton {
+    inline-size: 45%;
+    block-size: 1.15em;
+    margin-block: 0.175em;
+  }
+
+  /* 5. Progress -------------------------------------------------------------------------------------------------- */
+  .fb-progress {
+    display: grid;
+    gap: 0.5rem;
+    color: var(--fb-ink);
+    font-family: var(--fb-font);
+  }
+  .fb-progress__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: var(--fb-text-sm);
+  }
+  .fb-progress__detail {
+    color: var(--fb-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .fb-progress__row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .fb-progress__track {
+    position: relative;
+    flex: 1;
+    block-size: 0.5rem;
+    overflow: hidden;
+    border-radius: var(--fb-radius-full);
+    background: var(--fb-sunken);
+    box-shadow: inset 0 0 0 1px var(--fb-line); /* taste-skill-ignore: a state ring or an inset edge, not a resting shadow */
+  }
+  .fb-progress__fill {
+    position: absolute;
+    inset: 0;
+    background: var(--fb-accent);
+    transform: scaleX(var(--fb-progress, 0));
+    transform-origin: 0 50%;
+    transition: transform var(--fb-progress-ms) var(--fb-ease-move);
+  }
+  .fb-progress__fill[data-indeterminate] {
+    inset-inline-end: auto;
+    inline-size: 40%;
+    transform: none;
+    transition: none;
+    animation: fb-slide var(--fb-slide-ms) var(--fb-ease-move) infinite;
+  }
+
+  /* 6. Button ---------------------------------------------------------------------------------------------------- */
+  .fb-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-block-size: var(--fb-control-h);
+    min-inline-size: var(--fb-target);
+    padding: 0 1.25rem;
+    border: 1px solid var(--_line, transparent); /* taste-skill-ignore: a control edge or a status edge (3:1) */
+    border-radius: var(--fb-radius);
+    background: var(--_bg, var(--fb-bg));
+    color: var(--_ink, var(--fb-ink));
+    font: inherit;
+    font-family: var(--fb-font);
+    font-size: var(--fb-text);
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      transform var(--fb-dur-press) var(--fb-ease-enter),
+      background-color var(--fb-dur-press) ease,
+      border-color var(--fb-dur-press) ease,
+      color var(--fb-dur-press) ease,
+      box-shadow var(--fb-dur-press) ease;
+  }
+  .fb-btn[data-variant='primary'] {
+    --_bg: var(--fb-accent);
+    --_ink: var(--fb-on-accent);
+    --_line: transparent;
+    min-block-size: max(var(--fb-control-h), var(--fb-tap));
+  }
+  .fb-btn[data-variant='secondary'] {
+    --_bg: var(--fb-bg);
+    --_ink: var(--fb-ink);
+    --_line: var(--fb-line-strong);
+  }
+  .fb-btn[data-variant='ghost'] {
+    --_bg: transparent;
+    --_ink: var(--fb-ink);
+    --_line: transparent;
+  }
+  .fb-btn[data-variant='danger'] {
+    --_bg: var(--fb-negative);
+    --_ink: var(--fb-on-negative);
+    --_line: transparent;
+  }
+  /* Success and error read from text, icon and border as well as colour; they replace the variant's fill. */
+  .fb-btn[data-state='success'] {
+    --_bg: var(--fb-bg);
+    --_ink: var(--fb-positive-ink);
+    --_line: var(--fb-positive-ink);
+  }
+  .fb-btn[data-state='error'] {
+    --_bg: var(--fb-bg);
+    --_ink: var(--fb-negative-ink);
+    --_line: var(--fb-negative-ink);
+  }
+  .fb-btn[data-state='disabled'] {
+    --_bg: color-mix(in srgb, var(--fb-ink) 8%, transparent);
+    --_ink: color-mix(in srgb, var(--fb-ink) calc(var(--fb-disabled) * 100%), transparent);
+    --_line: transparent;
+  }
+  .fb-btn[aria-disabled='true'] {
+    cursor: not-allowed;
+  }
+  .fb-btn[data-state='pending'] {
+    cursor: progress;
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--_ink) 10%, transparent); /* taste-skill-ignore: a state ring or an inset edge, not a resting shadow */
+  }
+  /* State layers: hover 8%, pressed 10% plus a small scale. Focus is a ring (section 2), not a layer. */
+  @media (hover: hover) {
+    .fb-btn:hover:not([aria-disabled='true']) {
+      box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--_ink) 8%, transparent); /* taste-skill-ignore: a state ring or an inset edge, not a resting shadow */
+    }
+  }
+  .fb-btn[data-preview='hover'] {
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--_ink) 8%, transparent); /* taste-skill-ignore: a state ring or an inset edge, not a resting shadow */
+  }
+  .fb-btn:active:not([aria-disabled='true']),
+  .fb-btn[data-preview='pressed'] {
+    transform: scale(var(--fb-press-scale));
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--_ink) 10%, transparent); /* taste-skill-ignore: a state ring or an inset edge, not a resting shadow */
+  }
+  .fb-btn[data-preview='focus'] {
+    outline: var(--fb-focus-width) solid var(--fb-focus);
+    outline-offset: var(--fb-focus-offset);
+  }
+  /* Every label sits in one grid cell: the widest sets the width, and the button never jumps. */
+  .fb-btn__labels {
+    display: inline-grid;
+  }
+  .fb-btn__label {
+    display: inline-flex;
+    grid-area: 1 / 1;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+  .fb-btn__label[data-on='false'] {
+    visibility: hidden;
+  }
+
+  /* 7. Toast ----------------------------------------------------------------------------------------------------- */
+  .fb-toasts {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: var(--fb-toast-bottom, max(1rem, env(safe-area-inset-bottom)));
+    z-index: var(--fb-z-toast);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--fb-toast-gap);
+    padding-inline: 1rem;
+    pointer-events: none;
+  }
+  @media (min-width: 40rem) {
+    .fb-toasts {
+      inset-inline: auto 1rem;
+      align-items: flex-end;
+    }
+  }
+  .fb-toast {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 0.75rem;
+    box-sizing: border-box;
+    inline-size: min(26rem, 100%);
+    padding: 0.25rem 0.25rem 0.25rem 1rem;
+    border: var(--fb-overlay-border);
+    border-radius: var(--fb-radius);
+    background: var(--fb-raised);
+    color: var(--fb-ink);
+    box-shadow: var(--fb-shadow);
+    font-family: var(--fb-font);
+    font-size: var(--fb-text-sm);
+    line-height: var(--fb-leading);
+    pointer-events: auto;
+    touch-action: pan-y;
+    transform: translateX(var(--fb-swipe, 0px));
+    animation: fb-toast-in var(--fb-dur-toast-in) var(--fb-ease-enter) both;
+  }
+  .fb-toast[data-state='closing'] {
+    animation: fb-toast-out var(--fb-dur-toast-out) var(--fb-ease-enter) forwards;
+  }
+  .fb-toast[data-swiping] {
+    animation: none;
+    opacity: calc(1 - var(--fb-swipe-fade, 0));
+  }
+  .fb-toast__icon {
+    display: inline-flex;
+    font-size: var(--fb-icon-md);
+  }
+  .fb-toast__icon:empty {
+    display: none;
+  }
+  .fb-toast:not(:has(.fb-toast__icon > *)) {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .fb-toast[data-tone='info'] .fb-toast__icon {
+    color: var(--fb-info-ink);
+  }
+  .fb-toast[data-tone='success'] .fb-toast__icon {
+    color: var(--fb-positive-ink);
+  }
+  .fb-toast[data-tone='warning'] .fb-toast__icon {
+    color: var(--fb-warning-ink);
+  }
+  .fb-toast[data-tone='error'] .fb-toast__icon {
+    color: var(--fb-negative-ink);
+  }
+  .fb-toast__text {
+    margin: 0;
+    padding-block: 0.625rem;
+    text-wrap: pretty;
+  }
+  .fb-toast__buttons {
+    display: inline-flex;
+    align-items: center;
+  }
+  .fb-toast__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--fb-tap);
+    min-inline-size: var(--fb-tap);
+    padding: 0 0.625rem;
+    border: 0;
+    border-radius: calc(var(--fb-radius) - 2px);
+    background: transparent;
+    color: var(--fb-accent-ink);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .fb-toast__close {
+    color: var(--fb-muted);
+    font-size: var(--fb-icon-md);
+  }
+  @media (hover: hover) {
+    .fb-toast__button:hover {
+      background: var(--fb-wash);
+    }
+  }
+
+  /* 8. Messages, states, regions --------------------------------------------------------------------------------- */
+  .fb-msg {
+    --_fill: var(--fb-info);
+    --_tone: var(--fb-info-ink);
+    --_bg: var(--fb-info-bg);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 0.75rem;
+    align-items: start;
+    box-sizing: border-box;
+    padding: 0.75rem 0.5rem 0.75rem 1rem;
+    border: 1px solid var(--_fill); /* taste-skill-ignore: a control edge or a status edge (3:1) */
+    border-radius: var(--fb-radius-card);
+    background: var(--_bg);
+    color: var(--fb-ink);
+    font-family: var(--fb-font);
+    font-size: var(--fb-text-sm);
+    line-height: var(--fb-leading);
+  }
+  .fb-msg[data-tone='success'] {
+    --_fill: var(--fb-positive);
+    --_tone: var(--fb-positive-ink);
+    --_bg: var(--fb-positive-bg);
+  }
+  .fb-msg[data-tone='warning'] {
+    --_fill: var(--fb-warning);
+    --_tone: var(--fb-warning-ink);
+    --_bg: var(--fb-warning-bg);
+  }
+  .fb-msg[data-tone='error'] {
+    --_fill: var(--fb-negative);
+    --_tone: var(--fb-negative-ink);
+    --_bg: var(--fb-negative-bg);
+  }
+  .fb-msg__icon {
+    display: inline-flex;
+    padding-block: 0.125rem;
+    color: var(--_tone);
+    font-size: var(--fb-icon-md);
+  }
+  .fb-msg__title {
+    display: block;
+    color: var(--_tone);
+    font-weight: 600;
+  }
+  .fb-msg__text {
+    text-wrap: pretty;
+  }
+  .fb-msg__action {
+    margin-block-start: 0.5rem;
+  }
+  .fb-msg__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--fb-tap);
+    min-inline-size: var(--fb-tap);
+    margin-block: -0.5rem;
+    border: 0;
+    border-radius: calc(var(--fb-radius) - 2px);
+    background: transparent;
+    color: var(--fb-muted);
+    font-size: var(--fb-icon-md);
+    cursor: pointer;
+  }
+  @media (hover: hover) {
+    .fb-msg__close:hover {
+      background: var(--fb-wash);
+    }
+  }
+
+  .fb-state {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 0.75rem;
+    box-sizing: border-box;
+    min-block-size: var(--fb-region-min, 12rem);
+    padding: 2rem 1.25rem;
+    border: 1px dashed var(--fb-line-strong); /* taste-skill-ignore: a control edge or a status edge (3:1) */
+    border-radius: var(--fb-radius-card);
+    color: var(--fb-ink);
+    font-family: var(--fb-font);
+    text-align: center;
+  }
+  .fb-state[data-kind='error'] {
+    border-style: solid;
+    border-color: var(--fb-negative);
+  }
+  .fb-state__icon {
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border-radius: 50%;
+    background: var(--fb-wash);
+    color: var(--fb-muted);
+    font-size: var(--fb-icon-lg);
+  }
+  .fb-state[data-kind='error'] .fb-state__icon {
+    background: var(--fb-negative-bg);
+    color: var(--fb-negative-ink);
+  }
+  .fb-state[data-kind='cleared'] .fb-state__icon {
+    background: var(--fb-positive-bg);
+    color: var(--fb-positive-ink);
+  }
+  .fb-state__title {
+    margin: 0;
+    font-size: var(--fb-text-lg);
+    font-weight: 600;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+  .fb-state__body {
+    margin: 0;
+    max-inline-size: 38ch;
+    color: var(--fb-muted);
+    font-size: var(--fb-text-sm);
+    line-height: var(--fb-leading);
+    text-wrap: pretty;
+  }
+  .fb-state__filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .fb-chip {
+    padding: 0.25rem 0.625rem;
+    border: 1px solid var(--fb-line-strong); /* taste-skill-ignore: a control edge or a status edge (3:1) */
+    border-radius: var(--fb-radius-full);
+    color: var(--fb-ink);
+    font-size: var(--fb-text-sm);
+  }
+  .fb-state__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .fb-region {
+    position: relative;
+    min-block-size: var(--fb-region-min, 0);
+  }
+  .fb-region__content {
+    transition: opacity var(--fb-dur-swap) ease;
+  }
+  .fb-region[data-stale='true'] > .fb-region__content {
+    opacity: var(--fb-dim);
+  }
+  .fb-region__bar {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 1;
+    block-size: 3px;
+    overflow: hidden;
+    border-radius: var(--fb-radius-full);
+    background: color-mix(in srgb, var(--fb-accent) 20%, transparent);
+  }
+  .fb-region__bar > span {
+    display: block;
+    inline-size: 40%;
+    block-size: 100%;
+    background: var(--fb-accent);
+    animation: fb-slide var(--fb-slide-ms) var(--fb-ease-move) infinite;
+  }
+
+  /* 9. Reduced motion -------------------------------------------------------------------------------------------- */
+  /* Slow what carries state, stop what only decorates, drop the travel and the press scale, keep every result.
+     Written twice with the same values: the system setting, and <html data-motion="reduced">. */
+  @media (prefers-reduced-motion: reduce) {
+    :root :where(.fb) {
+      --fb-spin-ms: calc(var(--dur-turn, 1200ms) * 2);
+      --fb-slide-ms: 3200ms;
+      --fb-skeleton-anim: none;
+      --fb-progress-ms: 0ms;
+      --fb-press-scale: 1;
+      --fb-travel: 0px;
+    }
+  }
+  :root[data-motion='reduced'] :where(.fb) {
+    --fb-spin-ms: calc(var(--dur-turn, 1200ms) * 2);
+    --fb-slide-ms: 3200ms;
+    --fb-skeleton-anim: none;
+    --fb-progress-ms: 0ms;
+    --fb-press-scale: 1;
+    --fb-travel: 0px;
+  }
+}
+
+@keyframes fb-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+@keyframes fb-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+@keyframes fb-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+@keyframes fb-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--fb-travel));
+  }
+}
+@keyframes fb-toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(calc(var(--fb-travel) / 2));
+  }
+}
+
+/* 10. Maison Sucre: the Piped skin (FOUNDATIONS.md §10, MOTION-SYSTEM.md). Restyles the reference look; behaviour
+   is untouched. Every value is a token. ------------------------------------------------------------------------ */
+@layer components {
+  .fb-icon {
+    stroke-width: var(--icon-stroke);
+  }
+  .fb-icon--mirror {
+    transform: scaleX(-1);
+  }
+
+  /* The turntable: a ring in line-strong with one bead riding its rim (role `turn`). */
+  .ms-turn.fb-spinner {
+    --_ring: 1.5px;
+    position: relative;
+    border: var(--_ring) solid var(--fb-line-strong);
+    border-top-color: var(--fb-line-strong);
+    color: var(--fb-accent);
+  }
+  .fb-btn .ms-turn.fb-spinner {
+    color: currentColor;
+    border-color: color-mix(in srgb, currentColor 45%, transparent);
+  }
+  .ms-turn__bead {
+    position: absolute;
+    inset-block-start: calc(var(--_ring) * -1 - 0.14em);
+    inset-inline-start: 50%;
+    inline-size: 0.3em;
+    block-size: 0.3em;
+    margin-inline-start: -0.15em;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .ms-turn.fb-spinner[data-size='sm'] .ms-turn__bead {
+    inline-size: 5px;
+    block-size: 5px;
+    margin-inline-start: -2.5px;
+    inset-block-start: -3.5px;
+  }
+
+  /* Skeleton: marzipan blocks; a row of beads piped once along each line. Picture blocks take a petal fill. */
+  .fb-skeleton {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--fb-radius-full);
+  }
+  .fb-skeleton[data-variant='rect'] {
+    border-radius: var(--fb-radius-card);
+  }
+  .ms-skeleton-beads {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, var(--bead) 1.6px, transparent 2px) 4px 50% / 9px 100% repeat-x; /* taste-skill-ignore: the bead border device, FOUNDATIONS.md §10 */
+    --vfx-dur: var(--dur-bead);
+  }
+
+  /* Buttons: the soft fondant edge; primary garnet deepens on hover and press. */
+  .fb-btn {
+    border-radius: var(--radius-control);
+    font-weight: var(--weight-strong);
+  }
+  @media (hover: hover) {
+    .fb-btn[data-variant='primary'][data-state='idle']:hover:not([aria-disabled='true']) {
+      --_bg: var(--accent-hover);
+      box-shadow: none; /* taste-skill-ignore: removes a shadow */
+    }
+  }
+  .fb-btn[data-variant='primary'][data-state='idle'][data-preview='hover'] {
+    --_bg: var(--accent-hover);
+    box-shadow: none; /* taste-skill-ignore: removes a shadow */
+  }
+  .fb-btn[data-variant='primary'][data-state='idle']:active:not([aria-disabled='true']),
+  .fb-btn[data-variant='primary'][data-state='idle'][data-preview='pressed'] {
+    --_bg: var(--accent-hover);
+    box-shadow: none; /* taste-skill-ignore: removes a shadow */
+    transform: scale(var(--press-scale));
+  }
+  .fb-btn[data-variant='ghost'] {
+    --_ink: var(--accent-ink);
+  }
+
+  /* Messages: a quiet container with its status edge; the tone icon pipes on (data-vfx-play). */
+  .fb-msg {
+    border-radius: var(--radius-control);
+    padding: var(--space-3) var(--space-2) var(--space-3) var(--space-4);
+  }
+
+  /* Empty and error states: no dashed box; the drawing sits on a sunken disc, the region keeps its height. */
+  .fb-state {
+    border: 0;
+    background: var(--surface);
+    border-radius: var(--radius-card);
+  }
+  .fb-state[data-kind='error'] {
+    border: 1px solid var(--negative); /* taste-skill-ignore: a control edge or a status edge (3:1) */
+  }
+  .fb-state__icon {
+    inline-size: 3.5rem;
+    block-size: 3.5rem;
+    background: var(--sunken);
+    color: var(--muted);
+    font-size: 2rem;
+  }
+  .fb-state[data-kind='cleared'] .fb-state__icon {
+    background: var(--positive-bg);
+    color: var(--positive-ink);
+  }
+  .fb-state__title {
+    font-family: var(--font-display);
+    font-variation-settings: var(--font-display-settings);
+    font-weight: var(--weight-heading);
+    font-size: var(--step-2);
+  }
+  .fb-chip {
+    border-color: transparent;
+    background: var(--sunken);
+  }
+
+  /* Toast: the ganache band, the same in both themes; Undo in band garnet. */
+  .fb-toast {
+    background: var(--band-bg);
+    color: var(--band-ink);
+    border: 1px solid var(--band-line); /* taste-skill-ignore: a control edge or a status edge (3:1) */
+    border-radius: var(--radius-control);
+  }
+  .fb-toast__button {
+    color: var(--band-accent);
+  }
+  .fb-toast__close {
+    color: var(--band-muted);
+  }
+  @media (hover: hover) {
+    .fb-toast__button:hover {
+      background: color-mix(in srgb, var(--band-ink) 10%, transparent);
+    }
+  }
+
+  /* Region: a 2 px garnet bar on refresh. */
+  .fb-region__bar {
+    block-size: 2px;
+  }
+
+  /* Progress: garnet on marzipan, pearl ends. */
+  .fb-progress__track {
+    block-size: 6px;
+    box-shadow: inset 0 0 0 1px var(--line-strong); /* taste-skill-ignore: a state ring or an inset edge, not a resting shadow */
+  }
+}
+@layer components {
+  /* the drawing takes the disc's size, not the small default icon size */
+  .fb-state__icon .fb-icon,
+  .fb-msg__icon .fb-icon {
+    font-size: inherit;
+  }
+}
+
+@layer components {
+  /* 0.3.0: a secondary link in an empty or error state is a target of its own (44 px on touch) */
+  @media (pointer: coarse) {
+    .fb-state__actions a { display: inline-flex; align-items: center; min-block-size: var(--fb-tap); }
+  }
+  .fb-btn[data-preview='pressed'] { min-block-size: calc(max(var(--fb-control-h), var(--fb-tap)) / var(--fb-press-scale) + 1px); }
+}
+
+@layer components {
+  /* 0.3.0: the indeterminate fill runs inside the track (a band of colour that travels by background position), so
+     no box ever reaches past the track or the page width (critique round 2: hidden overflow at 320-768). */
+  .fb-region__bar > span { inline-size: 100%; background: linear-gradient(90deg, transparent 0 40%, var(--fb-accent) 40% 60%, transparent 60% 100%) 0 0 / 250% 100% no-repeat; animation: fb-band var(--fb-slide-ms) var(--fb-ease-move) infinite; } /* taste-skill-ignore: the travelling band of an indeterminate bar, not a decorative gradient */
+  .fb-progress__fill[data-indeterminate] {
+    inset-inline-end: 0;
+    inline-size: auto;
+    background: linear-gradient(90deg, transparent 0 40%, var(--fb-accent) 40% 60%, transparent 60% 100%) 0 0 / 250% 100% no-repeat; /* taste-skill-ignore: the travelling band of an indeterminate bar, not a decorative gradient */
+    animation: fb-band var(--fb-slide-ms) var(--fb-ease-move) infinite;
+  }
+  @keyframes fb-band {
+    from { background-position: 100% 0; }
+    to { background-position: 0% 0; }
+  }
+}

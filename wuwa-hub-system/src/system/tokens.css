@@ -1,0 +1,691 @@
+/*
+ * System tokens for Echo Atlas, direction "Resonance Terminal" (FOUNDATIONS.md; format and rules in
+ * guides/design-system.md §2). Three tiers:
+ *   1. primitives: raw values; components never read them;
+ *   2. roles: what components read (colour, type, space, shape, elevation, density, motion, data);
+ *   3. component tokens: only for a part a theme must change that no role covers (COMPONENTS.md names each one).
+ * Light (daylight) is the base block; dark (night, the game's own look) re-points roles under the system setting
+ * and again under <html data-theme="dark">, with identical values. Edit both dark blocks together, and both
+ * more-contrast blocks together.
+ * Names are the contract: the feedback components, the /system page and every page read these roles. Add a role,
+ * never rename one, and add a line to the SYSTEM.md changelog.
+ * Import this file once, after Tailwind, so the base rules at the end sit in the right layer.
+ */
+/* Metric-matched local fallbacks, so the swap to Saira moves nothing (measured 2026-10-24: Saira 400 at 100% width
+   is 3.2% wider than Arial; Saira 620 at 125% is 11% wider than Arial Bold). No download: local fonts only. */
+@font-face {
+  font-family: 'Saira Fallback';
+  src: local('Arial'), local('Helvetica Neue'), local('Helvetica');
+  size-adjust: 103.2%;
+}
+@font-face {
+  font-family: 'Saira Display Fallback';
+  src: local('Arial Bold'), local('Arial'), local('Helvetica Neue');
+  font-weight: 600 700;
+  size-adjust: 111%;
+}
+
+:root {
+  /* 1. Primitives ------------------------------------------------------------------------------------------- */
+  /* graphite: the cool night ground of the game menus and the official site (#1A1C20 measured there) */
+  --graphite-500: #77746d;
+  --graphite-600: #4a4a4c;
+  --graphite-700: #34363c;
+  --graphite-750: #2b2d33;
+  --graphite-800: #23252a;
+  --graphite-850: #1a1c20;
+  --graphite-900: #131417;
+  --graphite-950: #0e0f11;
+  /* stone: the warm daylight paper of in-game dialogs; cream is the official site's line colour family */
+  --stone-0: #ffffff;
+  --stone-25: #fbfaf7;
+  --stone-50: #f3f1ec;
+  --stone-100: #e9e6df;
+  --stone-200: #ddd8ce;
+  --stone-400: #87827a;
+  --stone-450: #6c685f;
+  --stone-500: #66635c;
+  --stone-600: #55534e;
+  --stone-700: #44423d;
+  --stone-800: #383733;
+  --cream-300: #97928a;
+  --cream-400: #b3ad9f;
+  --cream-500: #c4beb0;
+  --cream-600: #d2ccbe;
+  --cream-800: #ece6d6;
+  --cream-900: #f4efe3;
+  --ink-900: #1a1c20;
+  --ink-950: #0e0f11;
+
+  /* resonance gold: the one accent (current, selected, primary); 400 is the official site's #DAB67D */
+  --gold-50: #f4ead6;
+  --gold-200: #edd3a6;
+  --gold-300: #e8cf9e;
+  --gold-350: #e3c48f;
+  --gold-400: #dab67d;
+  --gold-450: #e8cb98;
+  --gold-500: #cfa766;
+  --gold-700: #7a5a26;
+  --gold-800: #5e441a;
+  --gold-900: #2e2618;
+
+  /* status hues: night steps (light fills, dark text on them) and day steps (dark fills, white text) */
+  --jade-50: #e3f2ea;
+  --jade-300: #6bd6a6;
+  --jade-250: #7fddb2;
+  --jade-200: #9be8c5;
+  --jade-600: #1e7a52;
+  --jade-700: #1b6b48;
+  --jade-800: #11502f;
+  --jade-900: #14291f;
+  --ember-50: #f9e6e2;
+  --ember-300: #ff8f80;
+  --ember-250: #ffa397;
+  --ember-200: #ffbdb3;
+  --ember-600: #b53a2e;
+  --ember-700: #9e3127;
+  --ember-800: #7a2219;
+  --ember-900: #3a1915;
+  --amber-50: #fbefd5;
+  --amber-300: #f2c35a;
+  --amber-250: #f5cd70;
+  --amber-200: #f8da92;
+  --amber-600: #8a5d00;
+  --amber-700: #7a5200;
+  --amber-800: #5a3c00;
+  --amber-900: #33270f;
+  --tide-50: #e2eff7;
+  --tide-300: #7fc6ee;
+  --tide-250: #93d0f2;
+  --tide-200: #b3def6;
+  --tide-600: #1f6b9a;
+  --tide-700: #1b5e88;
+  --tide-800: #134766;
+  --tide-900: #13283a;
+  --shadow-rgb: 8 9 11;
+
+  /* the six elements and three rarities, night and day steps (graphics only on day grounds: 3:1, never text) */
+  --glacio-night: #5bc8f0;
+  --glacio-day: #1c7fae;
+  --fusion-night: #f07a4e;
+  --fusion-day: #c24e24;
+  --electro-night: #b585ff;
+  --electro-day: #7b48d6;
+  --aero-night: #4fd8a8;
+  --aero-day: #1c8a62;
+  --spectro-night: #e6cf5c;
+  --spectro-day: #86720f;
+  --havoc-night: #e86aa8;
+  --havoc-day: #b23a78;
+  --rarity5-night: #e8b44f;
+  --rarity5-day: #8f6410;
+  --rarity4-night: #b08cf5;
+  --rarity4-day: #7148c9;
+  --rarity3-night: #7eaeea;
+  --rarity3-day: #2f6db5;
+
+  /* families: one family (Saira, OFL), two widths. The face is loaded by the page or the system page. */
+  --family-display: 'Saira Variable', 'Saira', 'Saira Display Fallback', 'Saira Fallback', system-ui, sans-serif;
+  --family-body: 'Saira Variable', 'Saira', 'Saira Fallback', system-ui, sans-serif;
+  /* a modular scale (ratio 1.25, base 16 px); product containers use fixed steps, only display is fluid */
+  --size--2: 0.75rem;
+  --size--1: 0.875rem;
+  --size-0: 1rem;
+  --size-1: 1.25rem;
+  --size-2: 1.5625rem;
+  --size-3: 1.953rem;
+  --size-display: clamp(2.125rem, 1.3rem + 2.8vw, 3.75rem);
+
+  /* spacing on a 4 px base */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  /* corners: near-square with one 45° notch; the notch steps are the shape scale */
+  --radius-0: 0;
+  --radius-1: 2px;
+  --radius-full: 999px;
+  --notch-1: 6px;
+  --notch-2: 12px;
+  --notch-3: 20px;
+
+  /* 2. Roles: light (daylight: the in-game dialog look) ----------------------------------------------------- */
+  --bg: var(--stone-50);
+  --surface: var(--stone-25);
+  --raised: var(--stone-0);
+  --sunken: var(--stone-100);
+  --overlay: rgb(var(--shadow-rgb) / 0.45);
+
+  --ink: var(--ink-900);
+  --muted: var(--stone-600);
+  --subtle: var(--stone-500);
+  --line: var(--stone-200);
+  --line-strong: var(--stone-400);
+
+  /* gold is the same fill in both themes; in daylight it is outlined by --accent-edge so it holds 3:1 */
+  --accent: var(--gold-400);
+  --accent-hover: var(--gold-500);
+  --on-accent: var(--ink-900);
+  --accent-ink: var(--gold-700);
+  --accent-bg: var(--gold-50);
+  --accent-edge: var(--gold-700);
+
+  --positive: var(--jade-600);
+  --on-positive: var(--stone-0);
+  --positive-ink: var(--jade-700);
+  --positive-bg: var(--jade-50);
+  --negative: var(--ember-600);
+  --on-negative: var(--stone-0);
+  --negative-ink: var(--ember-700);
+  --negative-bg: var(--ember-50);
+  --warning: var(--amber-600);
+  --on-warning: var(--stone-0);
+  --warning-ink: var(--amber-700);
+  --warning-bg: var(--amber-50);
+  --info: var(--tide-600);
+  --on-info: var(--stone-0);
+  --info-ink: var(--tide-700);
+  --info-bg: var(--tide-50);
+
+  --focus: var(--gold-700);
+  --focus-width: 2px;
+  --focus-offset: 2px;
+  --selection-bg: var(--gold-400);
+  --selection-ink: var(--ink-900);
+  --hover-bg: color-mix(in srgb, var(--ink) 6%, transparent);
+  --pressed-bg: color-mix(in srgb, var(--ink) 10%, transparent);
+  --selected-bg: color-mix(in srgb, var(--accent) 16%, transparent);
+  --disabled-opacity: 0.38;
+  /* a region refreshing with its old content still on screen (interaction guide: 0.6 to 0.7). 0.65, not lower: ink
+     dimmed to it stays over 4.5:1 on the daylight surface (5.3:1); at 0.6 it fell to 4.42:1 */
+  --stale-opacity: 0.65;
+
+  /* data: element and rarity marks. Always beside a sigil or stars and a word; text stays --ink */
+  --el-glacio: var(--glacio-day);
+  --el-fusion: var(--fusion-day);
+  --el-electro: var(--electro-day);
+  --el-aero: var(--aero-day);
+  --el-spectro: var(--spectro-day);
+  --el-havoc: var(--havoc-day);
+  --rarity-5: var(--rarity5-day);
+  --rarity-4: var(--rarity4-day);
+  --rarity-3: var(--rarity3-day);
+  /* chart: one data hue (gold) plus a neutral comparison series */
+  --chart-1: var(--gold-700);
+  --chart-2: var(--stone-450);
+  --chart-grid: var(--stone-200);
+
+  /* depth: tone steps first; shadows only on overlays, from above */
+  --shadow-raised: 0 1px 2px rgb(var(--shadow-rgb) / 0.06), 0 6px 14px -8px rgb(var(--shadow-rgb) / 0.18);
+  --shadow-overlay: 0 2px 6px rgb(var(--shadow-rgb) / 0.08), 0 22px 44px -16px rgb(var(--shadow-rgb) / 0.32);
+  --overlay-border: 1px solid var(--line);
+  --z-base: 0;
+  --z-sticky: 100;
+  --z-dropdown: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* type: named steps; display and section titles are wide caps, text is normal width */
+  --font-display: var(--family-display);
+  --font-body: var(--family-body);
+  --step--2: var(--size--2);
+  --step--1: var(--size--1);
+  --step-0: var(--size-0);
+  --step-1: var(--size-1);
+  --step-2: var(--size-2);
+  --step-3: var(--size-3);
+  --step-display: var(--size-display);
+  --leading-body: 1.55;
+  --leading-compact: 1.4;
+  --leading-heading: 1.15;
+  --leading-display: 1.02;
+  --tracking-display: 0.04em;
+  --tracking-title: 0.06em;
+  --tracking-label: 0.02em;
+  --stretch-display: 125%;
+  --stretch-title: 112.5%;
+  --stretch-body: 100%;
+  --weight-body: 400;
+  --weight-strong: 560;
+  --weight-title: 620;
+  --measure: 68ch;
+
+  /* space */
+  --gap-tight: var(--space-2);
+  --gap-group: var(--space-5);
+  --gap-section: clamp(var(--space-7), 6vw, var(--space-9));
+  --inset-control: var(--space-3);
+  --inset-card: var(--space-5);
+  --gutter: clamp(16px, 3.4vw, 40px);
+  --container: 90rem;
+  --rail-w: 64px;
+  --sidebar-w: 248px;
+  --sticky-top: 0px;
+  --sticky-bottom: 0px;
+
+  /* shape: one notched corner (top right) by role; the radius softens the other three only by a hair */
+  --radius-control: var(--radius-1);
+  --radius-card: var(--radius-0);
+  --radius-sheet: var(--radius-0);
+  --radius-tag: var(--radius-1);
+  --notch-control: var(--notch-1);
+  --notch-card: var(--notch-2);
+  --notch-sheet: var(--notch-3);
+  --border: 1px;
+
+  /* icons: one authored set, 1.5 px stroke on a 24 grid; colour from the text beside it */
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-stroke: 1.5;
+
+  /* targets and density */
+  --target-min: 24px;
+  --tap-min: 44px;
+  --control-h: 40px;
+  --row-h: 44px;
+
+  /* Motion (MOTION-SYSTEM.md; the same values as motion.ts) ------------------------------------------------- */
+  --dur-instant: 0ms;
+  --dur-xs: 50ms;
+  --dur-sm: 100ms;
+  --dur-md: 150ms;
+  --dur-lg: 200ms;
+  --dur-xl: 250ms;
+  --dur-2xl: 300ms;
+  --dur-3xl: 400ms;
+  --dur-4xl: 600ms;
+  --dur-hero: 800ms;
+  --dur-tune: 1200ms;
+  --dur-field: 4800ms;
+  --ease-sweep: cubic-bezier(0.6, 0, 0.4, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-enter: cubic-bezier(0, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+  --ease-enter-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-exit-emphasized: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-symmetric: cubic-bezier(0.42, 0, 0.58, 1);
+  --dur-press: var(--dur-sm);
+  --dur-hover: var(--dur-sm);
+  --dur-tooltip-in: var(--dur-md);
+  --dur-tooltip-out: var(--dur-sm);
+  --dur-popover-in: var(--dur-md);
+  --dur-popover-out: var(--dur-sm);
+  --dur-modal-in: var(--dur-xl);
+  --dur-modal-out: var(--dur-lg);
+  --dur-sheet-in: var(--dur-3xl);
+  --dur-sheet-out: var(--dur-2xl);
+  --dur-toast-in: var(--dur-xl);
+  --dur-toast-out: var(--dur-lg);
+  --dur-disclosure: var(--dur-lg);
+  --dur-list-in: var(--dur-lg);
+  --dur-list-out: var(--dur-md);
+  --dur-tab: var(--dur-lg);
+  --dur-route-in: var(--dur-xl);
+  --dur-route-out: var(--dur-lg);
+  --dur-swap: var(--dur-lg);
+  --dur-success-swap: var(--dur-md);
+  --dur-scene: var(--dur-4xl);
+  --dur-draw: var(--dur-xl);
+  --dur-ripple: var(--dur-2xl);
+  --dur-reduced: var(--dur-sm);
+  --tooltip-delay: 500ms;
+  --hold-success: 1500ms;
+  --stagger-ui: 30ms;
+  --stagger-scene: 60ms;
+  --travel-sm: 8px;
+  --travel-md: 16px;
+  --travel-lg: 24px;
+  --scale-from: 0.95;
+  --press-scale: 0.97;
+  /* the waveform: amplitude and period scale (halved and doubled under reduced motion: it carries status) */
+  --wave-amp: 1;
+  --wave-period: var(--dur-tune);
+
+  /* 3. Component tokens --------------------------------------------------------------------------------------- */
+  --toast-gap: var(--space-2);
+  /* skeleton bars: ink at 12%, so they read on every surface in both themes (as --sunken they vanished in dark) */
+  --skeleton-bg: color-mix(in srgb, var(--ink) 12%, transparent);
+  /* the resonance field (dotted wave mesh): dot colour and strength per theme */
+  --field-dot: color-mix(in srgb, var(--gold-700) 38%, transparent);
+  --field-pitch: 9px;
+  /* frame: the notched panel's border tone and the lit edge drawn along the notch */
+  --frame-line: var(--line);
+  --frame-edge: var(--accent-edge);
+
+  /* Fixed-look band: banner art and the shell's top bar keep the night look in both themes */
+  --band-bg: var(--graphite-900);
+  --band-surface: var(--graphite-850);
+  --band-ink: var(--cream-800);
+  --band-muted: var(--cream-400);
+  --band-line: var(--graphite-500);
+  --band-accent: var(--gold-400);
+
+  /* The document, from the roles */
+  color-scheme: light;
+  caret-color: var(--accent-ink);
+  accent-color: var(--accent);
+  scrollbar-color: var(--line-strong) transparent;
+  scroll-padding-top: var(--sticky-top);
+  scroll-padding-bottom: var(--sticky-bottom);
+}
+
+/* 2. Roles: dark (night), following the system setting unless <html data-theme="light"> */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: var(--graphite-900);
+    --surface: var(--graphite-850);
+    --raised: var(--graphite-800);
+    --sunken: var(--graphite-950);
+    --overlay: rgb(var(--shadow-rgb) / 0.72);
+    --ink: var(--cream-800);
+    --muted: var(--cream-400);
+    --subtle: var(--cream-300);
+    --line: var(--graphite-700);
+    --line-strong: var(--graphite-500);
+    --accent: var(--gold-400);
+    --accent-hover: var(--gold-450);
+    --on-accent: var(--graphite-900);
+    --accent-ink: var(--gold-350);
+    --accent-bg: var(--gold-900);
+    --accent-edge: var(--gold-400);
+    --positive: var(--jade-300);
+    --on-positive: var(--graphite-950);
+    --positive-ink: var(--jade-250);
+    --positive-bg: var(--jade-900);
+    --negative: var(--ember-300);
+    --on-negative: var(--graphite-950);
+    --negative-ink: var(--ember-250);
+    --negative-bg: var(--ember-900);
+    --warning: var(--amber-300);
+    --on-warning: var(--graphite-950);
+    --warning-ink: var(--amber-250);
+    --warning-bg: var(--amber-900);
+    --info: var(--tide-300);
+    --on-info: var(--graphite-950);
+    --info-ink: var(--tide-250);
+    --info-bg: var(--tide-900);
+    --focus: var(--gold-300);
+    --selection-bg: var(--gold-400);
+    --selection-ink: var(--graphite-900);
+    --hover-bg: color-mix(in srgb, var(--ink) 7%, transparent);
+    --pressed-bg: color-mix(in srgb, var(--ink) 11%, transparent);
+    --selected-bg: color-mix(in srgb, var(--accent) 12%, transparent);
+    --el-glacio: var(--glacio-night);
+    --el-fusion: var(--fusion-night);
+    --el-electro: var(--electro-night);
+    --el-aero: var(--aero-night);
+    --el-spectro: var(--spectro-night);
+    --el-havoc: var(--havoc-night);
+    --rarity-5: var(--rarity5-night);
+    --rarity-4: var(--rarity4-night);
+    --rarity-3: var(--rarity3-night);
+    --chart-1: var(--gold-400);
+    --chart-2: var(--graphite-500);
+    --chart-grid: var(--graphite-700);
+    --shadow-raised: 0 1px 2px rgb(var(--shadow-rgb) / 0.4), 0 6px 16px -6px rgb(var(--shadow-rgb) / 0.55);
+    --shadow-overlay: 0 2px 6px rgb(var(--shadow-rgb) / 0.45), 0 24px 48px -12px rgb(var(--shadow-rgb) / 0.7);
+    --overlay-border: 1px solid var(--line);
+    --field-dot: color-mix(in srgb, var(--gold-400) 30%, transparent);
+    color-scheme: dark;
+  }
+}
+
+/* 2. Roles: dark, when a toggle sets <html data-theme="dark">. Identical to the block above.
+   `.ea-night` takes the same role set on one block, in both themes: a full-bleed night band inside a light page.
+   Component tokens that a component sets on itself follow it; ones resolved on :root keep the page theme. */
+:root[data-theme='dark'],
+.ea-night {
+  --bg: var(--graphite-900);
+  --surface: var(--graphite-850);
+  --raised: var(--graphite-800);
+  --sunken: var(--graphite-950);
+  --overlay: rgb(var(--shadow-rgb) / 0.72);
+  --ink: var(--cream-800);
+  --muted: var(--cream-400);
+  --subtle: var(--cream-300);
+  --line: var(--graphite-700);
+  --line-strong: var(--graphite-500);
+  --accent: var(--gold-400);
+  --accent-hover: var(--gold-450);
+  --on-accent: var(--graphite-900);
+  --accent-ink: var(--gold-350);
+  --accent-bg: var(--gold-900);
+  --accent-edge: var(--gold-400);
+  --positive: var(--jade-300);
+  --on-positive: var(--graphite-950);
+  --positive-ink: var(--jade-250);
+  --positive-bg: var(--jade-900);
+  --negative: var(--ember-300);
+  --on-negative: var(--graphite-950);
+  --negative-ink: var(--ember-250);
+  --negative-bg: var(--ember-900);
+  --warning: var(--amber-300);
+  --on-warning: var(--graphite-950);
+  --warning-ink: var(--amber-250);
+  --warning-bg: var(--amber-900);
+  --info: var(--tide-300);
+  --on-info: var(--graphite-950);
+  --info-ink: var(--tide-250);
+  --info-bg: var(--tide-900);
+  --focus: var(--gold-300);
+  --selection-bg: var(--gold-400);
+  --selection-ink: var(--graphite-900);
+  --hover-bg: color-mix(in srgb, var(--ink) 7%, transparent);
+  --pressed-bg: color-mix(in srgb, var(--ink) 11%, transparent);
+  --selected-bg: color-mix(in srgb, var(--accent) 12%, transparent);
+  --el-glacio: var(--glacio-night);
+  --el-fusion: var(--fusion-night);
+  --el-electro: var(--electro-night);
+  --el-aero: var(--aero-night);
+  --el-spectro: var(--spectro-night);
+  --el-havoc: var(--havoc-night);
+  --rarity-5: var(--rarity5-night);
+  --rarity-4: var(--rarity4-night);
+  --rarity-3: var(--rarity3-night);
+  --chart-1: var(--gold-400);
+  --chart-2: var(--graphite-500);
+  --chart-grid: var(--graphite-700);
+  --shadow-raised: 0 1px 2px rgb(var(--shadow-rgb) / 0.4), 0 6px 16px -6px rgb(var(--shadow-rgb) / 0.55);
+  --shadow-overlay: 0 2px 6px rgb(var(--shadow-rgb) / 0.45), 0 24px 48px -12px rgb(var(--shadow-rgb) / 0.7);
+  --overlay-border: 1px solid var(--line);
+  --field-dot: color-mix(in srgb, var(--gold-400) 30%, transparent);
+  color-scheme: dark;
+}
+
+/* More contrast (product scope): text pairs to 7:1. Light first, then dark, each by the system setting and by
+   [data-contrast='more'], with identical values in both. */
+@media (prefers-contrast: more) {
+  :root {
+    --ink: var(--ink-950);
+    --muted: var(--stone-800);
+    --subtle: var(--stone-700);
+    --line-strong: var(--stone-450);
+    --accent-ink: var(--gold-800);
+    --positive-ink: var(--jade-800);
+    --negative-ink: var(--ember-800);
+    --warning-ink: var(--amber-800);
+    --info-ink: var(--tide-800);
+    --line: var(--stone-400);
+  }
+}
+:root[data-contrast='more'] {
+  --ink: var(--ink-950);
+  --muted: var(--stone-800);
+  --subtle: var(--stone-700);
+  --line-strong: var(--stone-450);
+  --accent-ink: var(--gold-800);
+  --positive-ink: var(--jade-800);
+  --negative-ink: var(--ember-800);
+  --warning-ink: var(--amber-800);
+  --info-ink: var(--tide-800);
+  --line: var(--stone-400);
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --ink: var(--cream-900);
+    --muted: var(--cream-600);
+    --subtle: var(--cream-500);
+    --line-strong: var(--cream-300);
+    --accent-ink: var(--gold-200);
+    --positive-ink: var(--jade-200);
+    --negative-ink: var(--ember-200);
+    --warning-ink: var(--amber-200);
+    --info-ink: var(--tide-200);
+    --line: var(--graphite-500);
+  }
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-contrast='more']:not([data-theme='light']) {
+    --ink: var(--cream-900);
+    --muted: var(--cream-600);
+    --subtle: var(--cream-500);
+    --line-strong: var(--cream-300);
+    --accent-ink: var(--gold-200);
+    --positive-ink: var(--jade-200);
+    --negative-ink: var(--ember-200);
+    --warning-ink: var(--amber-200);
+    --info-ink: var(--tide-200);
+    --line: var(--graphite-500);
+  }
+}
+:root[data-theme='dark'][data-contrast='more'] {
+  --ink: var(--cream-900);
+  --muted: var(--cream-600);
+  --subtle: var(--cream-500);
+  --line-strong: var(--cream-300);
+  --accent-ink: var(--gold-200);
+  --positive-ink: var(--jade-200);
+  --negative-ink: var(--ember-200);
+  --warning-ink: var(--amber-200);
+  --info-ink: var(--tide-200);
+  --line: var(--graphite-500);
+}
+
+/* Density: one step is 4 px. A region or the whole document sets data-density="compact" (stat tables, the Echo
+   planner). Controls are --tap-min or more on a coarse pointer, whatever the density. */
+[data-density='compact'] {
+  --control-h: 32px;
+  --row-h: 36px;
+  --inset-card: var(--space-4);
+  --gap-group: var(--space-4);
+}
+@media (pointer: coarse) {
+  :root,
+  [data-density] {
+    --control-h: var(--tap-min);
+    --row-h: var(--tap-min);
+  }
+}
+
+/* Reduced motion keeps the state change and drops the travel (MOTION-SYSTEM.md §Reduced motion). Written twice,
+   like dark: the system setting, and the in-app switch <html data-motion="reduced"> motion.ts reads. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --travel-sm: 0px;
+    --travel-md: 0px;
+    --travel-lg: 0px;
+    --scale-from: 1;
+    --press-scale: 1;
+    --stagger-ui: 0ms;
+    --stagger-scene: 0ms;
+    --dur-modal-in: var(--dur-reduced);
+    --dur-modal-out: var(--dur-reduced);
+    --dur-sheet-in: var(--dur-reduced);
+    --dur-sheet-out: var(--dur-reduced);
+    --dur-toast-in: var(--dur-reduced);
+    --dur-toast-out: var(--dur-reduced);
+    --dur-list-in: var(--dur-reduced);
+    --dur-list-out: var(--dur-reduced);
+    --dur-route-in: var(--dur-reduced);
+    --dur-route-out: var(--dur-reduced);
+    --dur-disclosure: var(--dur-reduced);
+    --dur-scene: var(--dur-reduced);
+    --dur-draw: var(--dur-instant);
+    --dur-ripple: var(--dur-instant);
+    --wave-amp: 0.5;
+    --wave-period: calc(var(--dur-tune) * 2);
+  }
+}
+:root[data-motion='reduced'] {
+  --travel-sm: 0px;
+  --travel-md: 0px;
+  --travel-lg: 0px;
+  --scale-from: 1;
+  --press-scale: 1;
+  --stagger-ui: 0ms;
+  --stagger-scene: 0ms;
+  --dur-modal-in: var(--dur-reduced);
+  --dur-modal-out: var(--dur-reduced);
+  --dur-sheet-in: var(--dur-reduced);
+  --dur-sheet-out: var(--dur-reduced);
+  --dur-toast-in: var(--dur-reduced);
+  --dur-toast-out: var(--dur-reduced);
+  --dur-list-in: var(--dur-reduced);
+  --dur-list-out: var(--dur-reduced);
+  --dur-route-in: var(--dur-reduced);
+  --dur-route-out: var(--dur-reduced);
+  --dur-disclosure: var(--dur-reduced);
+  --dur-scene: var(--dur-reduced);
+  --dur-draw: var(--dur-instant);
+  --dur-ripple: var(--dur-instant);
+  --wave-amp: 0.5;
+  --wave-period: calc(var(--dur-tune) * 2);
+}
+
+/* Forced colours: fix only what turns illegible (frames are drawn with pseudo-elements, so give them real borders) */
+@media (forced-colors: active) {
+  .ea-frame {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* Document base, from the roles. It sits in the base layer so Tailwind utilities and component styles win. */
+@layer base {
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    font-stretch: var(--stretch-body);
+    font-weight: var(--weight-body);
+    line-height: var(--leading-body);
+  }
+  ::selection {
+    background: var(--selection-bg);
+    color: var(--selection-ink);
+  }
+  :focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+  a {
+    color: inherit;
+    text-underline-offset: 0.2em;
+  }
+  :is(h1, h2, h3) {
+    font-family: var(--font-display);
+    line-height: var(--leading-heading);
+    font-weight: var(--weight-title);
+    text-wrap: balance;
+  }
+  h1 {
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+    font-stretch: var(--stretch-display);
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :where(table, [data-numeric]) {
+    font-variant-numeric: tabular-nums;
+  }
+}

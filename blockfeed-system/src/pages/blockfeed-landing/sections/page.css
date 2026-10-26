@@ -1,0 +1,143 @@
+/*
+ * blockfeed-landing: the page's shared layout. Sections compose system components (ui/, social/, feedback/) and read
+ * system tokens; this file holds only the page's own composition: the section frame, the type roles on the dark
+ * ground, the strata dividers and the HUD readouts. Every length is in pixel units.
+ */
+@layer components {
+  [data-page='blockfeed-landing'] {
+    color: var(--bg-ink);
+    font-family: var(--font-body);
+    font-size: var(--size-0);
+    line-height: var(--leading-body);
+  }
+
+  /* a section: one Y-level of the descent */
+  .bl-section {
+    position: relative;
+    padding-block: var(--space-8);
+    scroll-margin-block-start: var(--space-8);
+  }
+  .bl-inner {
+    display: grid;
+    gap: var(--space-5);
+    inline-size: min(100% - var(--space-4) * 2, calc(var(--u) * 600));
+    margin-inline: auto;
+  }
+  .bl-head {
+    display: grid;
+    gap: var(--space-3);
+    max-inline-size: var(--measure);
+  }
+  .bl-h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--bl-size-h2);
+    font-weight: 400;
+    line-height: 1;
+    text-shadow: var(--u) var(--u) 0 var(--text-shadow);
+  }
+  .bl-lede {
+    margin: 0;
+    color: var(--bg-muted);
+    line-height: var(--leading-heading);
+  }
+  .bl-note {
+    margin: 0;
+    color: var(--bg-muted);
+  }
+  .bl-note::before {
+    content: '';
+    display: inline-block;
+    inline-size: var(--space-2);
+    block-size: var(--space-2);
+    margin-inline-end: var(--space-2);
+    background: var(--tier-uncommon);
+    vertical-align: middle;
+  }
+  .bl-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+  }
+
+  /* the HUD readouts: small game-overlay text on the ground, with the one-unit shadow */
+  .bl-hud {
+    display: grid;
+    gap: var(--u);
+    color: var(--bg-muted);
+    text-shadow: var(--u) var(--u) 0 var(--text-shadow);
+  }
+  .bl-hud strong {
+    color: var(--bg-ink);
+    font-weight: 400;
+  }
+
+  /* the fixed Y readout: the scroll story's counter */
+  .bl-depth {
+    position: fixed;
+    inset-block-end: var(--space-3);
+    inset-inline-end: var(--space-3);
+    z-index: var(--z-sticky, 100);
+    padding: var(--space-1) var(--space-2);
+    background: var(--tip-bg);
+    color: var(--tip-ink);
+    box-shadow: inset 0 0 0 var(--u) var(--tip-edge);
+    clip-path: var(--notch-path);
+    pointer-events: none;
+  }
+  /* phones: hidden; it collided with headings and pictures, and the strata and textures carry the descent */
+  @media (max-width: 40rem) {
+    .bl-depth {
+      display: none;
+    }
+  }
+
+  /* strata: the boundary between two Y-levels, two rows of real blocks (the level above over the level below, each
+     with its own pixel texture from ground.ts, 8u blocks with dark seams). It is placed once as it scrolls in, one
+     block column per frame: the system wipe stepped at the hero assembly's frame (--dur-sm), twelve frames */
+  .bl-strata {
+    display: block;
+    block-size: calc(var(--u) * 16);
+    background-color: var(--_t2);
+    background-image:
+      repeating-linear-gradient(90deg, transparent 0 calc(var(--u) * 7), rgb(0 0 0 / 0.35) calc(var(--u) * 7) calc(var(--u) * 8)),
+      linear-gradient(transparent 0 calc(var(--u) * 7), rgb(0 0 0 / 0.35) calc(var(--u) * 7) calc(var(--u) * 8), transparent calc(var(--u) * 8)),
+      var(--_cap, linear-gradient(transparent, transparent)),
+      var(--_x1, none),
+      var(--_x2, none);
+    background-size: auto, auto, auto, calc(var(--u) * 8) calc(var(--u) * 8), calc(var(--u) * 8) calc(var(--u) * 8);
+    background-position: 0 0, 0 0, 0 0, 0 0, 0 calc(var(--u) * 8);
+    background-repeat: repeat, no-repeat, no-repeat, repeat-x, repeat-x;
+    image-rendering: pixelated;
+    box-shadow: inset 0 var(--u) 0 var(--edge), inset 0 calc(var(--u) * -1) 0 var(--edge);
+  }
+  .bl-strata[data-vfx-play='wipe'] {
+    --vfx-dur: calc(var(--dur-sm) * 12);
+    animation-timing-function: steps(12, end);
+  }
+  .bl-strata[data-layer='grass'] {
+    --_t2: var(--bl-dirt-2);
+    --_cap: linear-gradient(var(--bl-grass-1) 0 calc(var(--u) * 2), var(--bl-grass-3) calc(var(--u) * 2) calc(var(--u) * 3), transparent calc(var(--u) * 3));
+    --_x1: var(--bl-tex-dirt);
+    --_x2: var(--bl-tex-dirt);
+  }
+  .bl-strata[data-layer='dirt'] { --_t2: var(--bl-stone-3); --_x1: var(--bl-tex-dirt); --_x2: var(--bl-tex-stone); }
+  .bl-strata[data-layer='stone'] { --_t2: var(--bl-stone-3); --_x1: var(--bl-tex-stone); --_x2: var(--bl-tex-ore); }
+  .bl-strata[data-layer='deep'] { --_t2: var(--bl-deep-2); --_x1: var(--bl-tex-ore); --_x2: var(--bl-tex-deep); }
+  .bl-strata[data-layer='bedrock'] { --_t2: var(--bl-bedrock-2); --_x1: var(--bl-tex-deep); --_x2: var(--bl-tex-bedrock); }
+
+  /* the ground you dig through: each level's own pixel texture (ground.ts) under a dark scrim, darker as you go down */
+  .bl-section[data-y] {
+    background-color: var(--bg);
+    background-image: linear-gradient(var(--_scrim), var(--_scrim)), var(--_tex, none);
+    background-size: auto, calc(var(--u) * 32) calc(var(--u) * 32);
+    image-rendering: pixelated;
+  }
+  .bl-section[data-y='48'] { --_tex: var(--bl-tex-dirt); --_scrim: color-mix(in srgb, var(--bg) 80%, transparent); }
+  .bl-section[data-y='32'] { --_tex: var(--bl-tex-stone); --_scrim: color-mix(in srgb, var(--bg) 82%, transparent); }
+  .bl-section[data-y='16'] { --_tex: var(--bl-tex-ore); --_scrim: color-mix(in srgb, var(--bg) 82%, transparent); }
+  .bl-section[data-y='8'] { --_tex: var(--bl-tex-deep); --_scrim: color-mix(in srgb, var(--bg) 78%, transparent); }
+  .bl-section[data-y='0'] { --_tex: var(--bl-tex-bedrock); --_scrim: color-mix(in srgb, var(--bg) 72%, transparent); }
+  .bl-section[data-y='64'] { background: none; }
+}

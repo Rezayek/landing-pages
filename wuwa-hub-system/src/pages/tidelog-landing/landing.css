@@ -1,0 +1,1069 @@
+/*
+ * Echo Atlas landing. The header and the hero sit on the system's night band (--band-*); the sections below follow the
+ * visitor's theme. Every value is a system token or a page token from ./tokens.css.
+ */
+[data-page='tidelog-landing'] {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+/* --- header: mark, the top bar with the resonance cap, the quiet action ------------------------------------------ */
+.tl-header {
+  --frame-fill: var(--band-surface);
+  --frame-border: var(--band-line);
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-2) var(--page-inline);
+  background: color-mix(in srgb, var(--band-bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-block-end: 1px solid color-mix(in srgb, var(--band-line) 60%, transparent);
+  color: var(--band-ink);
+}
+.tl-header .ea-logo {
+  color: var(--band-ink);
+}
+.tl-header .ea-capnav {
+  justify-self: center;
+  max-inline-size: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tl-header__action {
+  color: var(--band-accent);
+  font-size: var(--step--1);
+  white-space: nowrap;
+}
+
+/* --- S1 hero: the Echo orbit ---------------------------------------------------------------------------------------- */
+.tl-hero {
+  --frame-fill: var(--band-surface);
+  --frame-border: var(--band-line);
+  --frame-edge: var(--band-accent);
+  --_el: var(--el-spectro);
+  position: relative;
+  display: grid;
+  align-content: end;
+  min-block-size: calc(var(--hero-min) - var(--tap-min) - 2 * var(--space-2));
+  padding: var(--space-8) var(--page-inline) var(--space-9);
+  overflow: hidden;
+  background: var(--band-bg);
+  color: var(--band-ink);
+}
+.tl-hero .ea-link {
+  color: var(--band-accent);
+}
+/* the resonance field, low on the copy side only, so it never sits over her */
+.tl-hero__field {
+  z-index: 1;
+  --field-dot: color-mix(in srgb, var(--_el) 42%, transparent);
+  mask-image: radial-gradient(45% 45% at 14% 92%, #000 20%, transparent 70%);
+}
+/* the stage: the game's moonlit key art of her, full-bleed (agreed round 1, A5: depth and a light source), in a box
+   that exists before the image; a neutral scrim keeps the copy side and the foot of the stage readable */
+.tl-hero__figure {
+  position: absolute;
+  inset: 0;
+  inset-inline-start: var(--hero-art-inset, 0);
+  z-index: 0;
+  /* the art's left edge feathers into the night band, so the box edge never shows as a seam while it drifts */
+  mask-image: linear-gradient(90deg, transparent, #000 10%);
+  pointer-events: none;
+}
+.tl-hero__figure img {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  max-inline-size: none;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: var(--hero-art-x) 40%;
+  /* the art fades in, then drifts very slowly (round 3, the person's pick: slow lantern light) */
+  animation:
+    ea-route var(--dur-hero) var(--ease-enter) both,
+    tl-art-drift calc(var(--dur-field) * 5) var(--ease-standard) var(--dur-hero) infinite alternate;
+  --_from: 0px;
+  --_rise: 0px;
+}
+/* the drift moves the art's framing inside its box (object-position), so the image never grows past the stage */
+@keyframes tl-art-drift {
+  to {
+    object-position: calc(var(--hero-art-x) - 3%) 36%;
+  }
+}
+/* lantern light: a soft warm glow breathing over the moon and the lanterns, under the scrim */
+.tl-hero__glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(14% 20% at 63% 20%, color-mix(in srgb, var(--band-accent) 34%, transparent), transparent 70%),
+    radial-gradient(8% 12% at 86% 9%, color-mix(in srgb, var(--band-accent) 40%, transparent), transparent 70%),
+    radial-gradient(5% 8% at 31% 12%, color-mix(in srgb, var(--band-accent) 30%, transparent), transparent 70%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: tl-glow calc(var(--dur-field) * 1.25) var(--ease-standard) var(--dur-hero) infinite alternate;
+}
+@keyframes tl-glow {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 0.75;
+  }
+}
+.tl-hero__figure::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(42% 30% at 30% 72%, color-mix(in srgb, var(--band-bg) 85%, transparent), transparent),
+    linear-gradient(90deg, var(--band-bg) 0%, color-mix(in srgb, var(--band-bg) 92%, transparent) 44%, transparent 68%),
+    linear-gradient(transparent 64%, color-mix(in srgb, var(--band-bg) 60%, transparent) 84%, var(--band-bg) 100%);
+}
+/* gold traces from each plate toward her, over the art and stopping short of her; drawn on as the plates settle */
+.tl-traces {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.tl-traces path {
+  fill: none;
+  stroke: color-mix(in srgb, var(--band-accent) 70%, transparent);
+  stroke-width: 1px;
+  /* a non-scaling stroke dashes in screen pixels: one dash longer than any trace, drawn on by its offset */
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  /* each trace draws once its plate has landed (round 4: after the plates, as agreed) */
+  animation: tl-trace var(--dur-3xl) var(--ease-enter) both;
+  animation-delay: calc(var(--dur-hero) * 0.5 + var(--i) * var(--stagger-scene) * 2 + var(--dur-4xl));
+}
+/* the re-socketed plate's trace redraws bright (round 4, D2) */
+.tl-traces path.tl-trace--flash {
+  stroke: var(--band-accent);
+  stroke-width: 2px;
+  animation-delay: 0ms;
+}
+/* a gold light crosses the art once on a re-socket */
+.tl-hero__light {
+  position: absolute;
+  inset: 0;
+  /* a bright band crossing the art over a warm wash of the whole art, held long enough that any still of the pass shows
+     it (round 5: the round 4 band was too faint and too quick to read in a frame) */
+  background:
+    linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--band-accent) 75%, transparent) 50%, transparent 70%) no-repeat,
+    color-mix(in srgb, var(--band-accent) 22%, transparent);
+  background-size: 70% 100%, 100% 100%;
+  mix-blend-mode: screen;
+  animation: tl-light var(--dur-tune) var(--ease-sweep) both;
+}
+@keyframes tl-light {
+  from {
+    background-position: -70% 0, 0 0;
+    opacity: 0;
+  }
+  12%,
+  70% {
+    opacity: 1;
+  }
+  to {
+    background-position: 170% 0, 0 0;
+    opacity: 0;
+  }
+}
+@keyframes tl-trace {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+/* above the copy and the readout, so an open tray is never under them */
+.tl-orbit {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+}
+.tl-orbit__slot {
+  position: absolute;
+  inset-inline-start: var(--x);
+  inset-block-start: var(--y);
+  translate: -50% -50%;
+  pointer-events: auto;
+  /* backwards only: once settled the socket holds no transform, so on phones its tray is placed against the whole row.
+     Each plate lands over 600 ms, 120 ms after the one before, as the art arrives (round 3: the entrance is the cue) */
+  --_rise: var(--travel-lg);
+  animation: ea-route var(--dur-4xl) var(--ease-enter) backwards;
+  animation-delay: calc(var(--dur-hero) * 0.5 + var(--i) * var(--stagger-scene) * 2);
+}
+.tl-orbit__slot[data-open] {
+  z-index: 1;
+}
+/* a plate is a socket: a frame whose one button (the name) opens its tray; the button's ::after covers the plate */
+.tl-slot {
+  --notch: var(--notch-control);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-block-size: var(--tap-min);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-2);
+  border: 0;
+  background: none;
+  color: var(--band-ink);
+  font: inherit;
+  font-size: var(--step-0);
+  text-align: start;
+  cursor: pointer;
+}
+.tl-slot:has([aria-expanded='true']) {
+  --frame-border: var(--band-accent);
+  --ea-lit: 1;
+}
+.tl-slot:has(.tl-slot__btn:active) {
+  translate: 0 1px;
+}
+.tl-slot:has(.tl-slot__btn:focus-visible) {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+.tl-slot__btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: var(--weight-strong);
+  text-align: start;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.tl-slot__btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.tl-slot__btn:focus-visible {
+  outline: none;
+}
+.tl-slot .ea-ripple {
+  border-color: var(--band-accent);
+}
+.tl-slot__text {
+  display: grid;
+}
+.tl-slot__text small {
+  color: var(--band-muted);
+  font-size: var(--step--1);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+/* the cost numeral shows only on the phone sockets; on desktop the stat line carries it */
+.tl-slot__cost {
+  display: none;
+}
+/* the socket's tray: that cost's main stats, under the plate and never over her */
+.tl-tray {
+  --notch: var(--notch-control);
+  --frame-fill: var(--band-surface);
+  --_rise: calc(var(--travel-sm) * -1);
+  position: absolute;
+  inset-block-start: calc(100% + var(--space-2));
+  inset-inline: 0;
+  z-index: 4;
+  display: grid;
+  gap: var(--space-2);
+  min-inline-size: 15rem;
+  padding: var(--space-3);
+  background: var(--band-surface);
+  color: var(--band-ink);
+  font-size: var(--step--1);
+  animation: ea-route var(--dur-md) var(--ease-enter) backwards;
+}
+.tl-tray__head,
+.tl-tray__rule {
+  margin: 0;
+  color: var(--band-muted);
+}
+.tl-tray__head strong {
+  color: var(--band-ink);
+}
+.tl-tray__options {
+  display: grid;
+  gap: var(--space-1);
+}
+.tl-tray__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-block-size: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--band-line);
+  background: none;
+  color: var(--band-ink);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color var(--dur-sm) var(--ease-standard);
+}
+.tl-tray__option[aria-pressed='true'] {
+  border-color: var(--band-accent);
+  border-inline-start-width: 3px;
+  color: var(--band-accent);
+}
+@media (hover: hover) {
+  .tl-tray__option:hover {
+    border-color: color-mix(in srgb, var(--band-accent) 60%, transparent);
+  }
+}
+.tl-tray__option:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+/* the build's readout under her: cost pips, set ticks, the crit numbers and the link */
+.tl-readout {
+  --notch: var(--notch-control);
+  --frame-fill: color-mix(in srgb, var(--band-surface) 88%, transparent);
+  /* in the stage's empty top-left, clear of her, the plates and the copy below (round 2) */
+  position: absolute;
+  inset-block-start: var(--space-7);
+  inset-inline-start: var(--page-inline);
+  z-index: 3;
+  /* one width in every state, so it does not change when Reset enables (round 3) */
+  inline-size: min(26rem, 32vw);
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: var(--band-ink);
+  font-size: var(--step--1);
+}
+.tl-readout__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+.tl-readout__label {
+  font-family: var(--font-display);
+  font-weight: var(--weight-strong);
+}
+.tl-readout__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, auto));
+  gap: var(--space-2) var(--space-6);
+  margin: 0;
+}
+.tl-readout__stats dt {
+  color: var(--band-muted);
+}
+.tl-readout__stats dd {
+  margin: 0;
+}
+.tl-readout__num {
+  font-family: var(--font-display);
+  font-stretch: var(--stretch-display);
+  font-size: var(--step-1);
+  font-weight: var(--weight-strong);
+  font-variant-numeric: tabular-nums;
+}
+.tl-pips {
+  display: flex;
+  gap: var(--space-1);
+  padding-block: var(--space-1);
+}
+.tl-pips i {
+  inline-size: var(--space-2);
+  block-size: var(--space-3);
+  background: color-mix(in srgb, var(--band-ink) 18%, transparent);
+  transform: skewX(-20deg);
+}
+.tl-pips[data-kind='set'] i {
+  inline-size: var(--space-4);
+}
+.tl-pips i[data-on] {
+  background: var(--band-accent);
+}
+.tl-hero :is(.ea-btn[data-variant='quiet'], .ea-tag) {
+  color: var(--band-accent);
+}
+/* the entrance beat (round 2, the person's pick): one ring at each plate as it lands, after its trace begins */
+.tl-slot__pulse {
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--band-accent);
+  opacity: 0;
+  pointer-events: none;
+  clip-path: polygon(0 0, calc(100% - var(--notch-control)) 0, 100% var(--notch-control), 100% 100%, 0 100%);
+  animation: tl-pulse var(--dur-ripple) var(--ease-enter) forwards;
+  animation-delay: calc(var(--dur-hero) * 0.5 + var(--i, 0) * var(--stagger-scene) * 2 + var(--dur-4xl));
+}
+@keyframes tl-pulse {
+  from {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.12, 1.4);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tl-slot__pulse,
+  .tl-hero__glow,
+  .tl-hero__light {
+    display: none;
+  }
+  .tl-hero__figure img {
+    animation: ea-route var(--dur-reduced) linear both;
+  }
+  .tl-orbit__slot,
+  .tl-traces path {
+    animation-duration: var(--dur-reduced);
+    animation-delay: 0ms;
+  }
+}
+:root[data-motion='reduced'] :is(.tl-slot__pulse, .tl-hero__glow, .tl-hero__light) {
+  display: none;
+}
+:root[data-motion='reduced'] .tl-hero__figure img {
+  animation: ea-route var(--dur-reduced) linear both;
+}
+:root[data-motion='reduced'] :is(.tl-orbit__slot, .tl-traces path) {
+  animation-duration: var(--dur-reduced);
+  animation-delay: 0ms;
+}
+.tl-orbit__slot:nth-child(2) .tl-slot__pulse { --i: 1; }
+.tl-orbit__slot:nth-child(3) .tl-slot__pulse { --i: 2; }
+.tl-orbit__slot:nth-child(4) .tl-slot__pulse { --i: 3; }
+.tl-orbit__slot:nth-child(5) .tl-slot__pulse { --i: 4; }
+.tl-readout__error {
+  margin: 0;
+  color: var(--negative);
+  font-size: var(--step--1);
+}
+.tl-readout__hint {
+  margin: 0;
+  flex-basis: 100%;
+  color: var(--band-muted);
+  font-size: var(--step--1);
+}
+.tl-readout__copy {
+  min-block-size: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--band-ink);
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--band-ink) 40%, transparent);
+  text-underline-offset: 0.25em;
+  min-inline-size: 5.5em;
+  text-align: start;
+  cursor: pointer;
+}
+.tl-readout__copy:active {
+  translate: 0 1px;
+}
+.tl-readout__fallback {
+  display: grid;
+  gap: var(--space-1);
+  max-inline-size: 18rem;
+}.tl-hero__copy {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  gap: var(--space-4);
+  max-inline-size: var(--hero-copy-w);
+}
+.tl-hero__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--hero-title-size);
+  font-stretch: var(--stretch-display);
+  font-weight: var(--weight-title);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
+  text-wrap: balance;
+}
+.tl-hero__sub {
+  margin: 0;
+  max-inline-size: 46ch;
+  color: var(--band-muted);
+  font-size: var(--step-0);
+  line-height: var(--leading-body);
+}
+.tl-hero .tl-note {
+  color: var(--band-muted);
+}
+
+/* --- shared section parts ------------------------------------------------------------------------------------------- */
+.tl-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-6);
+}
+.tl-note,
+.tl-caption {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+.tl-section {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  max-inline-size: calc(76rem + 2 * var(--gutter));
+  margin-inline: auto;
+  padding: var(--space-8) var(--gutter);
+  scroll-margin-block-start: calc(var(--tap-min) + 2 * var(--space-2));
+}
+.tl-section__head {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-3);
+  max-inline-size: var(--measure);
+}
+.tl-section__sub {
+  max-inline-size: 60ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--step-0);
+  line-height: var(--leading-body);
+}
+
+/* --- S2 build ----------------------------------------------------------------------------------------------------- */
+/* the ghost runs to the window edge and slides in from beyond it; the section clips it so the page never scrolls sideways */
+.tl-build {
+  overflow-x: clip;
+}
+.tl-build > :not(.tl-build__ghost) {
+  position: relative;
+  z-index: 1;
+}
+.tl-build__ghost {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  inline-size: var(--build-ghost-w);
+  aspect-ratio: 1;
+  opacity: 0.12;
+  pointer-events: none;
+  filter: grayscale(1);
+  mask-image: linear-gradient(#000 40%, transparent);
+}
+.tl-build__ghost img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+}
+
+/* --- S3 planner --------------------------------------------------------------------------------------------------- */
+.tl-planner__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+  gap: var(--space-7);
+  align-items: start;
+}
+.tl-planner__slots {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+.tl-planner__cost {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: var(--weight-strong);
+  font-variant-numeric: tabular-nums;
+}
+.tl-planner__kpis {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* --- railed sections (S3, S4, round 2): the heading and the section's readout in a rail beside the working part ---- */
+.tl-railed {
+  grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+  align-items: start;
+  column-gap: var(--space-8);
+}
+.tl-railed--end {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+}
+.tl-railed--end > .tl-rail {
+  order: 2;
+}
+.tl-rail {
+  position: sticky;
+  inset-block-start: calc(var(--tap-min) + var(--space-7));
+  display: grid;
+  gap: var(--space-5);
+}
+.tl-team-readout {
+  --notch: var(--notch-control);
+  --frame-fill: var(--surface);
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-4);
+  font-size: var(--step--1);
+}
+.tl-team-readout dt {
+  color: var(--muted);
+}
+.tl-team-readout dd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: var(--space-1) 0 0;
+}
+.tl-team-readout__member span {
+  color: var(--muted);
+}
+
+/* --- S2 build: the panel and "Also in her build" beside it ------------------------------------------------------- */
+.tl-build__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 17rem);
+  gap: var(--space-5);
+  align-items: start;
+}
+.tl-also {
+  --notch: var(--notch-card);
+  --frame-fill: var(--surface);
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+.tl-also__title,
+.tl-also__sub {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  font-weight: var(--weight-strong);
+}
+.tl-also__sub {
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+.tl-also__weapon {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.tl-also__weapon div {
+  display: grid;
+}
+.tl-also__weapon span {
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+.tl-also__forte {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: forte;
+  font-size: var(--step--1);
+}
+.tl-also__forte li {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  counter-increment: forte;
+}
+.tl-also__forte li::before {
+  content: counter(forte);
+  color: var(--accent-ink);
+  font-family: var(--font-display);
+  font-weight: var(--weight-strong);
+  font-variant-numeric: tabular-nums;
+}
+/* skill icons are the game's white glyphs: they sit on a night plate, as in the game's Forte screen */
+.tl-also__forte .ea-gicon {
+  background: var(--band-bg);
+}
+.tl-also__level {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.tl-also__more {
+  justify-self: start;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* --- S5 banners: the convene screen, a full-bleed night band in both themes ---------------------------------------- */
+.tl-band {
+  --_el: var(--el-spectro);
+  position: relative;
+  background: var(--bg);
+  color: var(--ink);
+}
+.tl-band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, var(--field-dot) 1px, transparent 1.4px);
+  background-size: var(--field-pitch) var(--field-pitch);
+  mask-image: radial-gradient(70% 90% at 80% 60%, #000 10%, transparent 70%);
+  pointer-events: none;
+}
+.tl-banners__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr));
+  gap: var(--space-5);
+}
+
+/* --- S6 start: one roster row of portrait plates, and the plain facts beside the closing button -------------------- */
+.tl-start {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tl-start a,
+.tl-start a * {
+  text-decoration: none;
+}
+.tl-close {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-3) var(--space-7);
+}
+.tl-close .tl-caption {
+  grid-column: 1 / -1;
+}
+.tl-facts {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+.tl-facts li {
+  padding-inline-start: var(--space-4);
+  border-inline-start: 2px solid var(--accent-edge);
+}
+
+/* --- S3 planner: the targets stay in view beside the slots while editing ------------------------------------------- */
+.tl-planner__kpis {
+  position: sticky;
+  inset-block-start: calc(var(--tap-min) + var(--space-8));
+}
+/* --- section arrival: each section settles in once, the first time it enters (Page.tsx arms it and marks
+   data-seen). Its parts come one after another: the title block, then the content, then the actions; lists inside
+   (planner slots, banner cards, start cards) follow item by item. Without JS nothing is hidden. ----------------- */
+[data-armed] :is(.tl-section, .tl-footer):not([data-seen]) > :not(.tl-build__ghost) {
+  opacity: 0;
+}
+[data-armed] :is(.tl-section, .tl-footer)[data-seen]:not([data-settled]) > :not(.tl-build__ghost) {
+  --_rise: var(--travel-lg);
+  animation: ea-route var(--dur-route-in) var(--ease-enter) both;
+  animation-delay: calc(var(--_n, 0) * var(--stagger-scene) * 2);
+}
+[data-armed] [data-seen] > :nth-child(2) { --_n: 1; }
+[data-armed] [data-seen] > :nth-child(3) { --_n: 2; }
+[data-armed] [data-seen] > :nth-child(4) { --_n: 3; }
+[data-armed] [data-seen] > :nth-child(5) { --_n: 4; }
+[data-armed] [data-seen] > :nth-child(n + 6) { --_n: 5; }
+[data-armed] [data-seen]:not([data-settled]) :is(.ea-slots, .tl-start, .tl-banners__list) > * {
+  animation: ea-route var(--dur-route-in) var(--ease-enter) both;
+  animation-delay: calc(var(--dur-md) + var(--_k, 0) * var(--stagger-scene));
+}
+[data-armed] [data-seen] :is(.ea-slots, .tl-start, .tl-banners__list) > :nth-child(2) { --_k: 1; }
+[data-armed] [data-seen] :is(.ea-slots, .tl-start, .tl-banners__list) > :nth-child(3) { --_k: 2; }
+[data-armed] [data-seen] :is(.ea-slots, .tl-start, .tl-banners__list) > :nth-child(4) { --_k: 3; }
+[data-armed] [data-seen] :is(.ea-slots, .tl-start, .tl-banners__list) > :nth-child(5) { --_k: 4; }
+[data-armed] [data-seen] :is(.ea-slots, .tl-start, .tl-banners__list) > :nth-child(6) { --_k: 5; }
+[data-armed] [data-seen] :is(.ea-slots, .tl-start, .tl-banners__list) > :nth-child(n + 7) { --_k: 6; }
+
+/* --- between sections: the hero hands over to the page as it scrolls away. A gold seam runs along its lower edge
+   (drawn by the scroll where scroll-driven animation exists, shown whole elsewhere); Jinhsi and her orbit drift up
+   and fade, and her ghost comes in behind S2. Distances are the travel tokens, which are 0 under reduced motion. --- */
+.tl-hero::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 4;
+  block-size: 1px;
+  background: linear-gradient(90deg, var(--band-accent), color-mix(in srgb, var(--band-accent) 30%, transparent) 45%, transparent 80%);
+  transform-origin: 0 50%;
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .tl-hero {
+      view-timeline: --tl-hero block;
+    }
+    .tl-hero::after {
+      animation: ea-draw linear both;
+      animation-timeline: --tl-hero;
+      animation-range: exit 0% exit 45%;
+    }
+    .tl-hero__figure {
+      animation: tl-hero-leave linear both;
+      animation-timeline: --tl-hero;
+      animation-range: exit 0% exit 100%;
+    }
+    .tl-orbit {
+      animation: tl-orbit-leave linear both;
+      animation-timeline: --tl-hero;
+      animation-range: exit 0% exit 70%;
+    }
+    .tl-readout {
+      animation: tl-orbit-leave linear both;
+      animation-timeline: --tl-hero;
+      animation-range: exit 0% exit 70%;
+    }
+    .tl-hero__copy {
+      animation: tl-copy-leave linear both;
+      animation-timeline: --tl-hero;
+      animation-range: exit 10% exit 80%;
+    }
+    .tl-build__ghost {
+      animation: tl-ghost-arrive linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+  }
+}
+@keyframes tl-hero-leave {
+  to {
+    opacity: 0.35;
+    translate: 0 calc(var(--travel-lg) * -2);
+    scale: 1.04;
+  }
+}
+@keyframes tl-orbit-leave {
+  to {
+    opacity: 0;
+    translate: 0 calc(var(--travel-lg) * -6);
+  }
+}
+@keyframes tl-copy-leave {
+  to {
+    opacity: 0.2;
+    translate: 0 calc(var(--travel-lg) * -1);
+  }
+}
+@keyframes tl-ghost-arrive {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+:root[data-motion='reduced'] :is(.tl-hero__figure, .tl-orbit, .tl-hero__copy, .tl-build__ghost),
+:root[data-motion='reduced'] .tl-hero::after {
+  animation: none;
+}
+
+/* --- footer ------------------------------------------------------------------------------------------------------- */
+.tl-footer {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--page-inline) var(--space-9);
+  border-block-start: 1px solid var(--line);
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+.tl-footer p {
+  margin: 0;
+  max-inline-size: var(--measure);
+}
+
+/* --- tablet and phone ------------------------------------------------------------------------------------------- */
+@media (max-width: 64rem) {
+  .tl-build__grid,
+  .tl-railed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tl-header__action {
+    display: none;
+  }
+  .tl-header {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .tl-header .ea-capnav {
+    justify-self: end;
+  }
+}
+@media (max-width: 52rem) {
+  .tl-header {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding-block: var(--space-2) 0;
+  }
+  /* on phones the four short items fit one row: the bar spans the width with tighter spacing */
+  .tl-header .ea-capnav {
+    justify-self: stretch;
+  }
+  .tl-header .ea-capnav__list {
+    justify-content: space-between;
+    flex: 1;
+    gap: var(--space-4);
+    padding-inline: var(--space-2);
+  }
+  /* "Team" is a short word: every item keeps a 44 px wide target */
+  .tl-header .ea-capnav__list a {
+    justify-content: center;
+    min-inline-size: var(--tap-min);
+  }
+  .tl-hero {
+    align-content: start;
+    min-block-size: 0;
+    padding-block: 0 var(--space-8);
+    gap: var(--space-5);
+  }
+  /* full width, the key art cropped onto her under the moon, fading into the band under the sockets */
+  .tl-hero__figure {
+    position: relative;
+    inset: auto;
+    block-size: var(--hero-figure-phone);
+    margin-inline: calc(var(--page-inline) * -1);
+    overflow: hidden;
+    margin-block-end: calc(var(--space-6) * -1);
+  }
+  .tl-hero__figure img {
+    object-position: var(--hero-art-x-phone) 30%;
+  }
+  .tl-hero__figure::after {
+    background: linear-gradient(transparent 60%, var(--band-bg) 100%);
+  }
+  .tl-hero__field {
+    display: none;
+  }
+  /* five compact sockets in one row that always fits: the Echo and its cost numeral on a notched plate; the name is
+     in the button's label and in the tray it opens */
+  .tl-orbit {
+    position: relative;
+    inset: auto;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-2);
+    pointer-events: auto;
+  }
+  .tl-orbit__slot {
+    position: static;
+    translate: none;
+  }
+  .tl-slot {
+    justify-content: center;
+    inline-size: 100%;
+    gap: 0;
+    padding: var(--space-2);
+    background: color-mix(in srgb, var(--band-bg) 70%, transparent);
+  }
+  .tl-slot__cost {
+    display: block;
+    position: absolute;
+    inset-block-start: var(--space-1);
+    inset-inline-start: var(--space-2);
+    color: var(--band-accent);
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: var(--weight-strong);
+    font-variant-numeric: tabular-nums;
+  }
+  /* the name and stat line are not drawn on the socket (the label carries them); the button still covers the plate */
+  .tl-slot__text small {
+    display: none;
+  }
+  .tl-slot__btn {
+    font-size: 0;
+  }
+  /* the tray opens under the whole row and pushes the copy down, never over the button (round 4, D6) */
+  .tl-tray {
+    min-inline-size: 0;
+  }
+  .tl-orbit:has(.tl-orbit__slot[data-open]) {
+    margin-block-end: 16rem;
+  }
+  .tl-traces {
+    display: none;
+  }
+  /* action first (round 2, the person's pick): art, sockets, the H1 and the gold button, then the readout as one row */
+  .tl-hero__copy {
+    order: 2;
+  }
+  .tl-readout {
+    position: relative;
+    inset: auto;
+    order: 3;
+    inline-size: auto;
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+  /* the frame holds its content at every width: two stat columns on phones and tablets (round 3) */
+  .tl-readout__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2) var(--space-4);
+    font-size: var(--step--1);
+  }
+  .tl-readout__num {
+    font-size: var(--step-0);
+  }
+  .tl-pips {
+    gap: 2px;
+  }
+  .tl-pips i {
+    inline-size: var(--space-1);
+  }
+  .tl-pips[data-kind='set'] i {
+    inline-size: var(--space-2);
+  }
+  /* the H1 is shorter on phones ("Builds, laid out like the game."), so it holds two lines there; the game's name is
+     hidden visually only, so the heading says the same to a screen reader at every width */
+  .tl-hero__game {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .tl-hero__builds {
+    text-transform: capitalize;
+  }  .tl-planner__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tl-rail {
+    position: static;
+  }
+  .tl-planner__kpis {
+    position: static;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  }
+  /* three plates a row at 390, two at 320, so every name and weapon reads whole */
+  .tl-start {
+    grid-template-columns: repeat(auto-fill, minmax(6.25rem, 1fr));
+  }
+  .tl-close {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tl-build__ghost {
+    display: none;
+  }
+}

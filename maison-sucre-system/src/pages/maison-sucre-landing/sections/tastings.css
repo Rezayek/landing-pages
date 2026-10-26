@@ -1,0 +1,221 @@
+/*
+ * S8 Tastings: the booking in a lace well, the quote behind a quiet link. Tokens only. Mobile first from 320 px:
+ * everything stacks; from 56rem the calendar sits beside the day's times and the details.
+ */
+.ts {
+  padding: var(--gap-section) var(--gutter);
+}
+.ts__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  max-inline-size: var(--container);
+  margin-inline: auto;
+}
+.ts__head {
+  display: grid;
+  gap: var(--space-3);
+}
+.ts__head h2 {
+  margin: 0;
+  font-size: var(--step-3);
+}
+.ts__head .ms-beads {
+  inline-size: min(100%, 15rem);
+}
+.ts__sub {
+  margin: 0;
+  max-inline-size: var(--measure);
+  font-size: var(--step-1);
+  color: var(--muted);
+}
+
+/* the lace well: the system's device; here only its padding follows the screen */
+.ts__well,
+.ts__qform,
+.ts__sent {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-4);
+  margin-block-start: var(--space-2); /* room for the scallop above the edge */
+}
+.ts__cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+.ts__cal,
+.ts__stack {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+.ts__stack {
+  align-content: start;
+}
+.ts__times {
+  min-inline-size: 0;
+  border-radius: var(--radius-control);
+}
+.ts__times:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+
+.ts__act {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+}
+.ts__note {
+  margin: 0;
+  flex: 1 1 14rem;
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+
+/* a text link that opens something: a button that reads as the system's link */
+.ts__linkbtn {
+  appearance: none;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.ts__chev {
+  display: inline-flex;
+  transition: transform var(--dur-select) var(--ease-enter);
+}
+.ts__chev[data-open] {
+  transform: rotate(180deg);
+}
+
+/* the booking card replaces the well in place; the Change or cancel link sits under it */
+.ts__done {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+  max-inline-size: 40rem;
+}
+.ts__done > .ms-booking {
+  inline-size: 100%;
+}
+
+/* the quote: closed behind the link; the wrapper is the #quote anchor */
+.ts__quote {
+  scroll-margin-block-start: calc(var(--sticky-top) + var(--space-5));
+}
+.ts__quote[hidden],
+.ts__quote > [hidden] {
+  display: none;
+}
+.ts__qform,
+.ts__sent {
+  max-inline-size: 48rem;
+}
+.ts__qform h3 {
+  margin: 0;
+  font-size: var(--step-2);
+}
+.ts__qgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+.ts__sent-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-variation-settings: var(--font-display-settings);
+  font-weight: var(--weight-heading);
+  font-size: var(--step-1);
+}
+.ts__sent p {
+  margin: 0;
+}
+
+@media (min-width: 30rem) {
+  .ts__well,
+  .ts__qform,
+  .ts__sent {
+    padding: var(--inset-card);
+  }
+}
+
+@media (min-width: 56rem) {
+  .ts__cols {
+    grid-template-columns: minmax(18rem, 22rem) minmax(0, 1fr);
+    column-gap: var(--space-7);
+  }
+  .ts__well,
+  .ts__qform,
+  .ts__sent {
+    padding: var(--space-6);
+  }
+}
+
+/* a tall still in the right column beside the booked card and the open quote form, from 64rem: the cake fills the
+   side the form leaves; below that the form has the width to itself and the still stays out */
+.ts__still {
+  display: none;
+}
+@media (min-width: 64rem) {
+  .ts__done,
+  .ts__qwrap:not([hidden]) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 26rem);
+    column-gap: var(--space-7);
+    align-items: start;
+    max-inline-size: none;
+  }
+  .ts__done > :not(.ts__still),
+  .ts__qwrap > :not(.ts__still) {
+    grid-column: 1;
+  }
+  .ts__still {
+    position: relative;
+    display: block;
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    margin: 0;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background: var(--sunken);
+  }
+  .ts__still img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  .ts__credit {
+    position: absolute;
+    inset-block-end: var(--space-2);
+    inset-inline-end: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-1);
+    background: color-mix(in srgb, var(--raised) 85%, transparent);
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+}
+
+/* under 360 px the inline calendar bleeds to the screen edges with no gaps, so each of the seven days is about 45 px
+   wide (the tap floor) instead of 36 */
+@media (max-width: 359px) {
+  .ts__cal .ms-date__pop[data-inline] {
+    margin-inline: calc(-1 * (var(--gutter) + var(--space-4)));
+  }
+  .ts__cal .ms-date__grid {
+    gap: 0;
+  }
+}

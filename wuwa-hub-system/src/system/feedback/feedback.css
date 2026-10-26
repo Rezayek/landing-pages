@@ -1,0 +1,1067 @@
+/*
+ * Reference styles for the feedback components. Phase 10 of the workflow restyles them with the project's tokens.
+ *
+ * How the colours work: section 1 maps every `--fb-*` knob to a role in the system's tokens.css (`--surface`,
+ * `--ink`, `--accent`, `--positive-ink`, …) with a neutral fallback, so the components look right before the
+ * system has tokens and take the real ones the moment tokens.css defines the roles. The role names are the contract
+ * of tokens.css; when a project renames or adds one, edit the left-hand sides of section 1 and nothing else.
+ * Components never use a colour, size, duration or curve of their own: only `--fb-*`.
+ *
+ * Motion: the loading motion (spin, slide, pulse) is state, so under reduced motion it slows or goes static
+ * instead of vanishing, and every result still appears (section 9). There is no global kill switch. The block runs
+ * for the system setting and for <html data-motion="reduced"> (the in-app switch).
+ *
+ * Everything sits in the `components` layer so Tailwind utilities and page CSS can still override it.
+ */
+
+@layer components {
+  /* 1. Token map ------------------------------------------------------------------------------------------------ */
+  :where(.fb) {
+    /* colour roles */
+    --fb-bg: var(--surface, #ffffff);
+    --fb-raised: var(--raised, var(--fb-bg));
+    --fb-sunken: var(--sunken, #eceef1);
+    --fb-ink: var(--ink, #15181d);
+    --fb-muted: var(--muted, #535b68);
+    --fb-line: var(--line, #dde1e6);
+    --fb-line-strong: var(--line-strong, #7d8591);
+    --fb-accent: var(--accent, #2f66e0);
+    --fb-on-accent: var(--on-accent, #ffffff);
+    --fb-accent-ink: var(--accent-ink, #1d4499);
+    --fb-info: var(--info, #2f66e0);
+    --fb-info-ink: var(--info-ink, #1d4499);
+    --fb-info-bg: var(--info-bg, #eaf1ff);
+    --fb-positive: var(--positive, #23804f);
+    --fb-positive-ink: var(--positive-ink, #1a6b40);
+    --fb-positive-bg: var(--positive-bg, #e8f6ee);
+    --fb-warning: var(--warning, #9a6200);
+    --fb-warning-ink: var(--warning-ink, #7a4a00);
+    --fb-warning-bg: var(--warning-bg, #fdf3e1);
+    --fb-negative: var(--negative, #c8342c);
+    --fb-on-negative: var(--on-negative, #ffffff);
+    --fb-negative-ink: var(--negative-ink, #a12a23);
+    --fb-negative-bg: var(--negative-bg, #fdeceb);
+    --fb-focus: var(--focus, #2453bd);
+    --fb-disabled: var(--disabled-opacity, 0.38);
+    --fb-overlay-border: var(--overlay-border, 1px solid var(--fb-line-strong));
+    --fb-shadow: var(--shadow-overlay, 0 2px 4px rgb(14 16 20 / 0.08), 0 18px 40px -12px rgb(14 16 20 / 0.24));
+    /* a translucent wash that reads on any ground, in either theme */
+    --fb-wash: color-mix(in srgb, var(--fb-ink) 8%, transparent);
+    --fb-skeleton: var(--skeleton-bg, color-mix(in srgb, var(--fb-ink) 9%, transparent));
+
+    /* type, shape, size */
+    --fb-font: var(--font-body, system-ui, sans-serif);
+    --fb-text: var(--step-0, 1rem);
+    --fb-text-sm: var(--step--1, 0.875rem);
+    --fb-text-lg: var(--step-1, 1.25rem);
+    --fb-leading: var(--leading-body, 1.5);
+    --fb-radius: var(--radius-control, 8px);
+    --fb-radius-card: var(--radius-card, 12px);
+    --fb-radius-full: var(--radius-full, 999px);
+    --fb-control-h: var(--control-h, 40px);
+    --fb-tap: var(--tap-min, 44px);
+    --fb-target: var(--target-min, 24px);
+    --fb-icon-sm: var(--icon-sm, 16px);
+    --fb-icon-md: var(--icon-md, 20px);
+    --fb-icon-lg: var(--icon-lg, 24px);
+    --fb-focus-width: var(--focus-width, 2px);
+    --fb-focus-offset: var(--focus-offset, 2px);
+    --fb-toast-gap: var(--toast-gap, 8px);
+    --fb-z-toast: var(--z-toast, 500);
+
+    /* motion: durations by role, curves, the press scale and the travel */
+    --fb-dur-press: var(--dur-press, 100ms);
+    --fb-dur-swap: var(--dur-swap, 200ms);
+    --fb-dur-toast-in: var(--dur-toast-in, 250ms);
+    --fb-dur-toast-out: var(--dur-toast-out, 200ms);
+    --fb-ease-enter: var(--ease-enter, cubic-bezier(0, 0, 0, 1));
+    --fb-ease-move: var(--ease-standard, cubic-bezier(0.2, 0, 0, 1));
+    --fb-ease-exit: var(--ease-exit, cubic-bezier(0.3, 0, 1, 1));
+    --fb-press-scale: var(--press-scale, 0.97);
+    --fb-travel: var(--travel-sm, 8px);
+
+    /* loading motion; section 9 slows or stops these under reduced motion */
+    --fb-spin-ms: 800ms;
+    --fb-slide-ms: 1400ms;
+    --fb-pulse-ms: 1600ms;
+    --fb-skeleton-anim: fb-pulse;
+    --fb-progress-ms: 300ms;
+    /* opacity of a region that is refreshing (guides/interaction.md: 0.6 to 0.7). Dimmed text is measured at its
+       dimmed contrast, so muted text drops under 4.5:1 at this value: keep anything that must stay readable in ink. */
+    --fb-dim: var(--stale-opacity, 0.7);
+  }
+
+  /* Dark fallbacks, written twice with the same values (system setting, and <html data-theme="dark">). They only
+     matter while the system's tokens.css does not define the roles. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) :where(.fb) {
+      --fb-bg: var(--surface, #15181d);
+      --fb-sunken: var(--sunken, #090a0d);
+      --fb-ink: var(--ink, #f6f7f8);
+      --fb-muted: var(--muted, #9aa2ae);
+      --fb-line: var(--line, #262b33);
+      --fb-accent: var(--accent, #6b98f7);
+      --fb-on-accent: var(--on-accent, #0e1014);
+      --fb-accent-ink: var(--accent-ink, #8fb3ff);
+      --fb-info: var(--info, #6b98f7);
+      --fb-info-ink: var(--info-ink, #8fb3ff);
+      --fb-info-bg: var(--info-bg, #14285e);
+      --fb-positive: var(--positive, #7fd6a4);
+      --fb-positive-ink: var(--positive-ink, #7fd6a4);
+      --fb-positive-bg: var(--positive-bg, #123d27);
+      --fb-warning: var(--warning, #ffcf7a);
+      --fb-warning-ink: var(--warning-ink, #ffcf7a);
+      --fb-warning-bg: var(--warning-bg, #4a3000);
+      --fb-negative: var(--negative, #ff9b95);
+      --fb-negative-ink: var(--negative-ink, #ff9b95);
+      --fb-negative-bg: var(--negative-bg, #4a1613);
+      --fb-on-negative: var(--on-negative, #0e1014);
+      --fb-focus: var(--focus, #8fb3ff);
+      --fb-shadow: var(--shadow-overlay, 0 2px 4px rgb(0 0 0 / 0.4), 0 18px 40px -12px rgb(0 0 0 / 0.6));
+    }
+  }
+  :root[data-theme='dark'] :where(.fb) {
+    --fb-bg: var(--surface, #15181d);
+    --fb-sunken: var(--sunken, #090a0d);
+    --fb-ink: var(--ink, #f6f7f8);
+    --fb-muted: var(--muted, #9aa2ae);
+    --fb-line: var(--line, #262b33);
+    --fb-accent: var(--accent, #6b98f7);
+    --fb-on-accent: var(--on-accent, #0e1014);
+    --fb-accent-ink: var(--accent-ink, #8fb3ff);
+    --fb-info: var(--info, #6b98f7);
+    --fb-info-ink: var(--info-ink, #8fb3ff);
+    --fb-info-bg: var(--info-bg, #14285e);
+    --fb-positive: var(--positive, #7fd6a4);
+    --fb-positive-ink: var(--positive-ink, #7fd6a4);
+    --fb-positive-bg: var(--positive-bg, #123d27);
+    --fb-warning: var(--warning, #ffcf7a);
+    --fb-warning-ink: var(--warning-ink, #ffcf7a);
+    --fb-warning-bg: var(--warning-bg, #4a3000);
+    --fb-negative: var(--negative, #ff9b95);
+    --fb-negative-ink: var(--negative-ink, #ff9b95);
+    --fb-negative-bg: var(--negative-bg, #4a1613);
+    --fb-on-negative: var(--on-negative, #0e1014);
+    --fb-focus: var(--focus, #8fb3ff);
+    --fb-shadow: var(--shadow-overlay, 0 2px 4px rgb(0 0 0 / 0.4), 0 18px 40px -12px rgb(0 0 0 / 0.6));
+  }
+
+  /* 2. Shared ---------------------------------------------------------------------------------------------------- */
+  .fb-sr {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .fb-icon {
+    flex: none;
+    font-size: var(--fb-icon-sm);
+  }
+  .fb :focus-visible,
+  .fb:focus-visible {
+    outline: var(--fb-focus-width) solid var(--fb-focus);
+    outline-offset: var(--fb-focus-offset);
+  }
+
+  /* 3. Spinner --------------------------------------------------------------------------------------------------- */
+  .fb-spinner {
+    --_size: var(--fb-icon-md);
+    --_ring: 2px;
+    display: inline-block;
+    flex: none;
+    inline-size: var(--_size);
+    block-size: var(--_size);
+    box-sizing: border-box;
+    border: var(--_ring) solid color-mix(in srgb, currentColor 25%, transparent);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: fb-spin var(--fb-spin-ms) linear infinite;
+  }
+  .fb-spinner[data-size='sm'] {
+    --_size: var(--fb-icon-sm);
+  }
+  .fb-spinner[data-size='lg'] {
+    --_size: 2rem;
+    --_ring: 3px;
+  }
+
+  /* 4. Skeleton -------------------------------------------------------------------------------------------------- */
+  .fb-skeleton {
+    display: block;
+    border-radius: calc(var(--fb-radius) / 2);
+    background: var(--fb-skeleton);
+    animation: var(--fb-skeleton-anim) var(--fb-pulse-ms) ease-in-out infinite;
+  }
+  .fb-skeleton[data-variant='circle'] {
+    border-radius: 50%;
+  }
+  /* Each text line takes 1.5em, the height of a line of body text, so a skeleton paragraph equals the real one.
+     A heading bar is thicker and shorter. */
+  .fb-skeleton-text {
+    display: block;
+  }
+  .fb-skeleton-text > .fb-skeleton {
+    block-size: 0.9em;
+    margin-block: 0.3em;
+  }
+  .fb-skeleton-text[data-variant='heading'] > .fb-skeleton {
+    inline-size: 45%;
+    block-size: 1.15em;
+    margin-block: 0.175em;
+  }
+
+  /* 5. Progress -------------------------------------------------------------------------------------------------- */
+  .fb-progress {
+    display: grid;
+    gap: 0.5rem;
+    color: var(--fb-ink);
+    font-family: var(--fb-font);
+  }
+  .fb-progress__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: var(--fb-text-sm);
+  }
+  .fb-progress__detail {
+    color: var(--fb-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .fb-progress__row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .fb-progress__track {
+    position: relative;
+    flex: 1;
+    block-size: 0.5rem;
+    overflow: hidden;
+    border-radius: var(--fb-radius-full);
+    background: var(--fb-sunken);
+    box-shadow: inset 0 0 0 1px var(--fb-line);
+  }
+  .fb-progress__fill {
+    position: absolute;
+    inset: 0;
+    background: var(--fb-accent);
+    transform: scaleX(var(--fb-progress, 0));
+    transform-origin: 0 50%;
+    transition: transform var(--fb-progress-ms) var(--fb-ease-move);
+  }
+  .fb-progress__fill[data-indeterminate] {
+    inset-inline-end: auto;
+    inline-size: 40%;
+    transform: none;
+    transition: none;
+    animation: fb-slide var(--fb-slide-ms) var(--fb-ease-move) infinite;
+  }
+
+  /* 6. Button ---------------------------------------------------------------------------------------------------- */
+  .fb-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-block-size: var(--fb-control-h);
+    min-inline-size: var(--fb-target);
+    padding: 0 1.25rem;
+    border: 1px solid var(--_line, transparent);
+    border-radius: var(--fb-radius);
+    background: var(--_bg, var(--fb-bg));
+    color: var(--_ink, var(--fb-ink));
+    font: inherit;
+    font-family: var(--fb-font);
+    font-size: var(--fb-text);
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      transform var(--fb-dur-press) var(--fb-ease-enter),
+      background-color var(--fb-dur-press) ease,
+      border-color var(--fb-dur-press) ease,
+      color var(--fb-dur-press) ease,
+      box-shadow var(--fb-dur-press) ease;
+  }
+  .fb-btn[data-variant='primary'] {
+    --_bg: var(--fb-accent);
+    --_ink: var(--fb-on-accent);
+    --_line: transparent;
+    min-block-size: max(var(--fb-control-h), var(--fb-tap));
+  }
+  .fb-btn[data-variant='secondary'] {
+    --_bg: var(--fb-bg);
+    --_ink: var(--fb-ink);
+    --_line: var(--fb-line-strong);
+  }
+  .fb-btn[data-variant='ghost'] {
+    --_bg: transparent;
+    --_ink: var(--fb-ink);
+    --_line: transparent;
+  }
+  .fb-btn[data-variant='danger'] {
+    --_bg: var(--fb-negative);
+    --_ink: var(--fb-on-negative);
+    --_line: transparent;
+  }
+  /* Success and error read from text, icon and border as well as colour; they replace the variant's fill. */
+  .fb-btn[data-state='success'] {
+    --_bg: var(--fb-bg);
+    --_ink: var(--fb-positive-ink);
+    --_line: var(--fb-positive-ink);
+  }
+  .fb-btn[data-state='error'] {
+    --_bg: var(--fb-bg);
+    --_ink: var(--fb-negative-ink);
+    --_line: var(--fb-negative-ink);
+  }
+  .fb-btn[data-state='disabled'] {
+    --_bg: color-mix(in srgb, var(--fb-ink) 8%, transparent);
+    --_ink: color-mix(in srgb, var(--fb-ink) calc(var(--fb-disabled) * 100%), transparent);
+    --_line: transparent;
+  }
+  .fb-btn[aria-disabled='true'] {
+    cursor: not-allowed;
+  }
+  .fb-btn[data-state='pending'] {
+    cursor: progress;
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--_ink) 10%, transparent);
+  }
+  /* State layers: hover 8%, pressed 10% plus a small scale. Focus is a ring (section 2), not a layer. */
+  @media (hover: hover) {
+    .fb-btn:hover:not([aria-disabled='true']) {
+      box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--_ink) 8%, transparent);
+    }
+  }
+  .fb-btn[data-preview='hover'] {
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--_ink) 8%, transparent);
+  }
+  .fb-btn:active:not([aria-disabled='true']),
+  .fb-btn[data-preview='pressed'] {
+    transform: scale(var(--fb-press-scale));
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--_ink) 10%, transparent);
+  }
+  .fb-btn[data-preview='focus'] {
+    outline: var(--fb-focus-width) solid var(--fb-focus);
+    outline-offset: var(--fb-focus-offset);
+  }
+  /* Every label sits in one grid cell: the widest sets the width, and the button never jumps. */
+  .fb-btn__labels {
+    display: inline-grid;
+  }
+  .fb-btn__label {
+    display: inline-flex;
+    grid-area: 1 / 1;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+  .fb-btn__label[data-on='false'] {
+    visibility: hidden;
+  }
+
+  /* 7. Toast ----------------------------------------------------------------------------------------------------- */
+  .fb-toasts {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: var(--fb-toast-bottom, max(1rem, env(safe-area-inset-bottom)));
+    z-index: var(--fb-z-toast);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--fb-toast-gap);
+    padding-inline: 1rem;
+    pointer-events: none;
+  }
+  @media (min-width: 40rem) {
+    .fb-toasts {
+      inset-inline: auto 1rem;
+      align-items: flex-end;
+    }
+  }
+  .fb-toast {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 0.75rem;
+    box-sizing: border-box;
+    inline-size: min(26rem, 100%);
+    padding: 0.25rem 0.25rem 0.25rem 1rem;
+    border: var(--fb-overlay-border);
+    border-radius: var(--fb-radius);
+    background: var(--fb-raised);
+    color: var(--fb-ink);
+    box-shadow: var(--fb-shadow);
+    font-family: var(--fb-font);
+    font-size: var(--fb-text-sm);
+    line-height: var(--fb-leading);
+    pointer-events: auto;
+    touch-action: pan-y;
+    transform: translateX(var(--fb-swipe, 0px));
+    animation: fb-toast-in var(--fb-dur-toast-in) var(--fb-ease-enter) both;
+  }
+  .fb-toast[data-state='closing'] {
+    animation: fb-toast-out var(--fb-dur-toast-out) var(--fb-ease-enter) forwards;
+  }
+  .fb-toast[data-swiping] {
+    animation: none;
+    opacity: calc(1 - var(--fb-swipe-fade, 0));
+  }
+  .fb-toast__icon {
+    display: inline-flex;
+    font-size: var(--fb-icon-md);
+  }
+  .fb-toast__icon:empty {
+    display: none;
+  }
+  .fb-toast:not(:has(.fb-toast__icon > *)) {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .fb-toast[data-tone='info'] .fb-toast__icon {
+    color: var(--fb-info-ink);
+  }
+  .fb-toast[data-tone='success'] .fb-toast__icon {
+    color: var(--fb-positive-ink);
+  }
+  .fb-toast[data-tone='warning'] .fb-toast__icon {
+    color: var(--fb-warning-ink);
+  }
+  .fb-toast[data-tone='error'] .fb-toast__icon {
+    color: var(--fb-negative-ink);
+  }
+  .fb-toast__text {
+    margin: 0;
+    padding-block: 0.625rem;
+    text-wrap: pretty;
+  }
+  .fb-toast__buttons {
+    display: inline-flex;
+    align-items: center;
+  }
+  .fb-toast__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--fb-tap);
+    min-inline-size: var(--fb-tap);
+    padding: 0 0.625rem;
+    border: 0;
+    border-radius: calc(var(--fb-radius) - 2px);
+    background: transparent;
+    color: var(--fb-accent-ink);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .fb-toast__close {
+    color: var(--fb-muted);
+    font-size: var(--fb-icon-md);
+  }
+  @media (hover: hover) {
+    .fb-toast__button:hover {
+      background: var(--fb-wash);
+    }
+  }
+
+  /* 8. Messages, states, regions --------------------------------------------------------------------------------- */
+  .fb-msg {
+    --_fill: var(--fb-info);
+    --_tone: var(--fb-info-ink);
+    --_bg: var(--fb-info-bg);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 0.75rem;
+    align-items: start;
+    box-sizing: border-box;
+    padding: 0.75rem 0.5rem 0.75rem 1rem;
+    border: 1px solid var(--_fill);
+    border-radius: var(--fb-radius-card);
+    background: var(--_bg);
+    color: var(--fb-ink);
+    font-family: var(--fb-font);
+    font-size: var(--fb-text-sm);
+    line-height: var(--fb-leading);
+  }
+  .fb-msg[data-tone='success'] {
+    --_fill: var(--fb-positive);
+    --_tone: var(--fb-positive-ink);
+    --_bg: var(--fb-positive-bg);
+  }
+  .fb-msg[data-tone='warning'] {
+    --_fill: var(--fb-warning);
+    --_tone: var(--fb-warning-ink);
+    --_bg: var(--fb-warning-bg);
+  }
+  .fb-msg[data-tone='error'] {
+    --_fill: var(--fb-negative);
+    --_tone: var(--fb-negative-ink);
+    --_bg: var(--fb-negative-bg);
+  }
+  .fb-msg__icon {
+    display: inline-flex;
+    padding-block: 0.125rem;
+    color: var(--_tone);
+    font-size: var(--fb-icon-md);
+  }
+  .fb-msg__title {
+    display: block;
+    color: var(--_tone);
+    font-weight: 600;
+  }
+  .fb-msg__text {
+    text-wrap: pretty;
+  }
+  .fb-msg__action {
+    margin-block-start: 0.5rem;
+  }
+  .fb-msg__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--fb-tap);
+    min-inline-size: var(--fb-tap);
+    margin-block: -0.5rem;
+    border: 0;
+    border-radius: calc(var(--fb-radius) - 2px);
+    background: transparent;
+    color: var(--fb-muted);
+    font-size: var(--fb-icon-md);
+    cursor: pointer;
+  }
+  @media (hover: hover) {
+    .fb-msg__close:hover {
+      background: var(--fb-wash);
+    }
+  }
+
+  .fb-state {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 0.75rem;
+    box-sizing: border-box;
+    min-block-size: var(--fb-region-min, 12rem);
+    padding: 2rem 1.25rem;
+    border: 1px dashed var(--fb-line-strong);
+    border-radius: var(--fb-radius-card);
+    color: var(--fb-ink);
+    font-family: var(--fb-font);
+    text-align: center;
+  }
+  .fb-state[data-kind='error'] {
+    border-style: solid;
+    border-color: var(--fb-negative);
+  }
+  .fb-state__icon {
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border-radius: 50%;
+    background: var(--fb-wash);
+    color: var(--fb-muted);
+    font-size: var(--fb-icon-lg);
+  }
+  .fb-state[data-kind='error'] .fb-state__icon {
+    background: var(--fb-negative-bg);
+    color: var(--fb-negative-ink);
+  }
+  .fb-state[data-kind='cleared'] .fb-state__icon {
+    background: var(--fb-positive-bg);
+    color: var(--fb-positive-ink);
+  }
+  .fb-state__title {
+    margin: 0;
+    font-size: var(--fb-text-lg);
+    font-weight: 600;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+  .fb-state__body {
+    margin: 0;
+    max-inline-size: 38ch;
+    color: var(--fb-muted);
+    font-size: var(--fb-text-sm);
+    line-height: var(--fb-leading);
+    text-wrap: pretty;
+  }
+  .fb-state__filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .fb-chip {
+    padding: 0.25rem 0.625rem;
+    border: 1px solid var(--fb-line-strong);
+    border-radius: var(--fb-radius-full);
+    color: var(--fb-ink);
+    font-size: var(--fb-text-sm);
+  }
+  .fb-state__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  /* The reserve, the content and the cover share one grid cell: the region is as tall as the tallest of them. */
+  .fb-region {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-block-size: var(--fb-region-min, 0);
+  }
+  .fb-region > :is(.fb-region__reserve, .fb-region__content, .fb-region__cover) {
+    grid-area: 1 / 1;
+    min-inline-size: 0;
+  }
+  .fb-region__reserve {
+    visibility: hidden;
+  }
+  .fb-region__reserve * {
+    animation: none !important;
+  }
+  .fb-region[data-covered='true'] > .fb-region__content {
+    visibility: hidden;
+  }
+  .fb-region__cover {
+    display: grid;
+  }
+  /* the 8 s notice: laid over the top of the region, so it moves nothing */
+  .fb-region__slow {
+    position: absolute;
+    inset-block-start: 0.75rem;
+    inset-inline: 0.75rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--fb-line-strong);
+    background: var(--fb-bg);
+    color: var(--fb-ink);
+    font-size: var(--fb-text-sm);
+    box-shadow: var(--fb-shadow);
+  }
+  .fb-region__content:focus-visible {
+    outline: var(--fb-focus-width) solid var(--fb-focus);
+    outline-offset: var(--fb-focus-offset);
+  }
+  .fb-region__content:focus:not(:focus-visible) {
+    outline: none;
+  }
+  .fb-region__content {
+    transition: opacity var(--fb-dur-swap) ease;
+  }
+  /* old results while new ones load: dimmed and greyed, so they read as "not current" on any surface */
+  .fb-region[data-stale='true'] > .fb-region__content {
+    opacity: var(--fb-dim);
+    filter: grayscale(0.85);
+  }
+  .fb-region__bar {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 1;
+    block-size: 3px;
+    overflow: hidden;
+    border-radius: var(--fb-radius-full);
+    background: color-mix(in srgb, var(--fb-accent) 20%, transparent);
+  }
+  .fb-region__bar > span {
+    display: block;
+    inline-size: 40%;
+    block-size: 100%;
+    background: var(--fb-accent);
+    animation: fb-slide var(--fb-slide-ms) var(--fb-ease-move) infinite;
+  }
+
+  /* 9. Reduced motion -------------------------------------------------------------------------------------------- */
+  /* Slow what carries state, stop what only decorates, drop the travel and the press scale, keep every result.
+     Written twice with the same values: the system setting, and <html data-motion="reduced">. */
+  @media (prefers-reduced-motion: reduce) {
+    :root :where(.fb) {
+      --fb-spin-ms: 2400ms;
+      --fb-slide-ms: 3200ms;
+      --fb-skeleton-anim: none;
+      --fb-progress-ms: 0ms;
+      --fb-press-scale: 1;
+      --fb-travel: 0px;
+    }
+  }
+  :root[data-motion='reduced'] :where(.fb) {
+    --fb-spin-ms: 2400ms;
+    --fb-slide-ms: 3200ms;
+    --fb-skeleton-anim: none;
+    --fb-progress-ms: 0ms;
+    --fb-press-scale: 1;
+    --fb-travel: 0px;
+  }
+}
+
+@keyframes fb-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+@keyframes fb-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+@keyframes ea-scan {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+@keyframes fb-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+@keyframes fb-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--fb-travel));
+  }
+}
+@keyframes fb-toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(calc(var(--fb-travel) / 2));
+  }
+}
+
+/* 10. Echo Atlas skin (phase 10): the Resonance Terminal look on top of the reference behaviour ----------------- */
+/* Notched frames (FOUNDATIONS.md §6), the waveform for every loader, gold only for primary and progress. Shape and
+   motion read tokens only; the frame technique is the one in ../ea.css (.ea-frame): a line layer and a fill layer
+   behind the content, so the focus ring and the text are never clipped. */
+@layer components {
+  :where(.fb) {
+    --fb-font: var(--font-body);
+    --fb-radius: var(--radius-control);
+    --fb-radius-card: var(--radius-card);
+  }
+
+  /* Waveform loader */
+  .fb.fb-spinner {
+    --_w: var(--icon-md);
+    inline-size: calc(var(--_w) * 1.2);
+    block-size: calc(var(--_w) * 0.6);
+    border: 0;
+    border-radius: 0;
+    animation: none;
+  }
+  .fb.fb-spinner[data-size='sm'] {
+    --_w: var(--icon-sm);
+  }
+  .fb.fb-spinner[data-size='lg'] {
+    --_w: var(--icon-lg);
+  }
+
+  /* Skeleton: a quiet block that tunes in (ea-skel-tune, three breaths, then still under 5 s); no sweep. The
+     draw-on frame for whole cards and panels is .ea-skel in ea.css. */
+  .fb.fb-skeleton,
+  .fb-skeleton-text > .fb-skeleton {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-1);
+    animation: ea-skel-tune var(--dur-tune) var(--ease-standard) 3 both;
+  }
+  .fb.fb-skeleton::after,
+  .fb-skeleton-text > .fb-skeleton::after {
+    content: none;
+  }
+  .fb.fb-skeleton[data-variant='circle'] {
+    border-radius: 50%;
+  }
+
+  /* Progress: a hairline track, a gold fill, a tuning leading edge */
+  .fb-progress .fb-progress__track {
+    block-size: 2px;
+    overflow: visible;
+    border-radius: 0;
+    background: var(--line);
+    box-shadow: none;
+  }
+  .fb-progress .fb-progress__fill {
+    background: var(--accent-edge);
+  }
+  /* Indeterminate fill and the refresh bar: a band that sweeps inside a full-width layer (a moving gradient), so
+     nothing ever reaches past the track and no parent has to clip it */
+  .fb-progress .fb-progress__fill[data-indeterminate],
+  .fb-region .fb-region__bar > span {
+    inset-inline-end: 0;
+    inline-size: 100%;
+    background: linear-gradient(90deg, transparent 35%, var(--accent-edge) 35% 65%, transparent 65%) 100% 0 / 250% 100% no-repeat;
+    animation: ea-scan var(--fb-slide-ms) var(--fb-ease-move) infinite;
+  }
+  .fb-progress__edge {
+    --_w: var(--icon-lg);
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: max(calc(var(--_w) * 1.2), calc(var(--fb-progress, 0) * 100%));
+    color: var(--accent-edge);
+    transform: translate(-100%, -50%);
+    transition: inset-inline-start var(--fb-progress-ms) var(--fb-ease-move);
+  }
+
+  /* Buttons: notched frame, layers drawn in the fill, the edge lights on hover and focus */
+  .fb.fb-btn {
+    --_n: var(--notch-control);
+    --_layer: transparent;
+    isolation: isolate;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    font-size: var(--step--1);
+    font-weight: var(--weight-strong);
+    letter-spacing: var(--tracking-label);
+    transition:
+      transform var(--fb-dur-press) var(--fb-ease-enter),
+      color var(--fb-dur-press) var(--fb-ease-enter),
+      --ea-lit var(--dur-draw) var(--ease-enter);
+  }
+  .fb.fb-btn::before,
+  .fb.fb-btn::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .fb.fb-btn::before {
+    inset: 0;
+    background: linear-gradient(
+      225deg,
+      var(--frame-edge) 0 calc(var(--_n) * 1.6 * var(--ea-lit)),
+      var(--_line, transparent) calc(var(--_n) * 1.6 * var(--ea-lit))
+    );
+    clip-path: polygon(0 0, calc(100% - var(--_n)) 0, 100% var(--_n), 100% 100%, 0 100%);
+    padding: 1px;
+    box-sizing: border-box;
+    mask:
+      linear-gradient(
+        225deg,
+        transparent calc(var(--_n) * 0.7071 - 1px),
+        #000 calc(var(--_n) * 0.7071 - 1px) calc(var(--_n) * 0.7071 + 0.5px),
+        transparent calc(var(--_n) * 0.7071 + 0.5px)
+      ),
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: add, exclude;
+  }
+  .fb.fb-btn::after {
+    inset: 1px;
+    background: linear-gradient(var(--_layer), var(--_layer)), var(--_bg, transparent);
+    clip-path: polygon(0 0, calc(100% - var(--_n) + 0.59px) 0, 100% calc(var(--_n) - 0.59px), 100% 100%, 0 100%);
+  }
+  .fb.fb-btn[data-variant='primary'] {
+    --_line: var(--accent-edge);
+  }
+  .fb.fb-btn[data-variant='ghost'] {
+    --_bg: transparent;
+  }
+  .fb.fb-btn[data-state='pending'] {
+    box-shadow: none;
+    --_layer: color-mix(in srgb, var(--_ink) 10%, transparent);
+  }
+  @media (hover: hover) {
+    .fb.fb-btn:hover:not([aria-disabled='true']) {
+      box-shadow: none;
+      --_layer: color-mix(in srgb, var(--_ink) 8%, transparent);
+      --ea-lit: 1;
+    }
+  }
+  .fb.fb-btn[data-preview='hover'] {
+    box-shadow: none;
+    --_layer: color-mix(in srgb, var(--_ink) 8%, transparent);
+    --ea-lit: 1;
+  }
+  .fb.fb-btn:focus-visible,
+  .fb.fb-btn[data-preview='focus'] {
+    --ea-lit: 1;
+  }
+  .fb.fb-btn:active:not([aria-disabled='true']),
+  .fb.fb-btn[data-preview='pressed'] {
+    box-shadow: none;
+    --_layer: color-mix(in srgb, var(--_ink) 10%, transparent);
+  }
+  /* settle and detune: the wave and the result icon share one cell; the wave plays, then the icon takes over */
+  .fb-btn__result {
+    display: inline-grid;
+    place-items: center;
+  }
+  .fb-btn__result > * {
+    grid-area: 1 / 1;
+  }
+  .fb-btn__result > .ea-wave {
+    --_w: var(--icon-sm);
+    animation: fb-result-out var(--dur-success-swap) var(--ease-enter) var(--dur-xl) forwards;
+  }
+  .fb-btn__result > .ea-wave + * {
+    animation: fb-result-in var(--dur-success-swap) var(--ease-enter) var(--dur-xl) both;
+  }
+
+  /* Toasts and messages: notched frames */
+  .fb.fb-toast {
+    --_n: var(--notch-card);
+    position: relative;
+    isolation: isolate;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+  .fb.fb-toast::before,
+  .fb.fb-msg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--_frame-line, var(--line));
+    clip-path: polygon(0 0, calc(100% - var(--_n)) 0, 100% var(--_n), 100% 100%, 0 100%);
+    padding: 1px;
+    box-sizing: border-box;
+    mask:
+      linear-gradient(
+        225deg,
+        transparent calc(var(--_n) * 0.7071 - 1px),
+        #000 calc(var(--_n) * 0.7071 - 1px) calc(var(--_n) * 0.7071 + 0.5px),
+        transparent calc(var(--_n) * 0.7071 + 0.5px)
+      ),
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: add, exclude;
+  }
+  .fb.fb-toast::after,
+  .fb.fb-msg::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    background: var(--_frame-fill, var(--raised));
+    clip-path: polygon(0 0, calc(100% - var(--_n) + 0.59px) 0, 100% calc(var(--_n) - 0.59px), 100% 100%, 0 100%);
+  }
+  .fb.fb-msg {
+    --_n: var(--notch-control);
+    --_frame-line: var(--_fill);
+    --_frame-fill: var(--_bg);
+    position: relative;
+    isolation: isolate;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  /* Empty and error states: the resonance field behind, a hairline frame */
+  .fb.fb-state {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 0;
+  }
+  .fb.fb-state::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(circle, var(--field-dot) 1px, transparent 1.4px);
+    background-size: var(--field-pitch) var(--field-pitch);
+    mask-image: radial-gradient(60% 70% at 50% 40%, #000 15%, transparent 70%);
+  }
+  .fb.fb-state[data-kind='error'] {
+    border-color: var(--negative);
+  }
+  .fb.fb-state[data-kind='error']::before {
+    display: none;
+  }
+  .fb-state .fb-state__icon {
+    border-radius: 0;
+    clip-path: polygon(0 0, calc(100% - var(--notch-control)) 0, 100% var(--notch-control), 100% 100%, 0 100%);
+  }
+  .fb-state .fb-state__title {
+    font-family: var(--font-display);
+    font-stretch: var(--stretch-title);
+    font-weight: var(--weight-title);
+  }
+  .fb.fb-chip,
+  .fb-state .fb-chip {
+    border-radius: var(--radius-tag);
+  }
+
+  /* Refresh bar: a waveform line instead of a sliding block */
+  .fb-region .fb-region__bar {
+    block-size: 2px;
+    border-radius: 0;
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+}
+
+@keyframes fb-result-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes fb-result-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Reduced motion for the skin: the result swap is a plain swap, the skeleton line does not pass */
+@media (prefers-reduced-motion: reduce) {
+  .fb-btn__result > .ea-wave {
+    display: none;
+  }
+  .fb-btn__result > .ea-wave + *,
+  .fb.fb-skeleton::after,
+  .fb-skeleton-text > .fb-skeleton::after {
+    animation: none;
+  }
+}
+:root[data-motion='reduced'] .fb-btn__result > .ea-wave {
+  display: none;
+}
+:root[data-motion='reduced'] :is(.fb-btn__result > .ea-wave + *, .fb.fb-skeleton::after, .fb-skeleton-text > .fb-skeleton::after) {
+  animation: none;
+}
+
+/* The toast region never widens the page */
+@layer components {
+  .fb.fb-toasts {
+    box-sizing: border-box;
+    max-inline-size: 100vw;
+  }
+}
+/* The progress track lets the wave edge ride above and below it, but clips sideways (the indeterminate fill slides) */
+@layer components {
+  .fb-progress .fb-progress__track {
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+}

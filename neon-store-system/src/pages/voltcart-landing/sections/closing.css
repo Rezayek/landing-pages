@@ -1,0 +1,218 @@
+/* voltcart-landing: the closing sections (S5 payment, S6 questions, S7 final) and the footer. Tokens only. Text sits on
+   .vl-panel (opaque scrim); the street shows between the blocks. Mobile first. */
+
+/* S5 Payment: a calm chapter. It sits above the street (and above S4 when S4 pins: the curtain). -------------------- */
+.vl-payment {
+  z-index: 1;
+}
+.vl-payment__panel {
+  display: grid;
+  gap: var(--space-7);
+}
+.vl-payment__checks {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+}
+.vl-checks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* One check: the cable runs down the left; the index sits on it. */
+.vl-check {
+  --_index: 2.75rem;
+  --_pad: var(--space-4);
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--_index) minmax(0, 1fr);
+  column-gap: var(--space-4);
+  padding-block: var(--_pad);
+}
+.vl-check__rail {
+  position: relative;
+  display: block;
+}
+.vl-check__index,
+.vl-check__lit {
+  display: grid;
+  place-items: center;
+  inline-size: var(--_index);
+  block-size: var(--_index);
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--step--1);
+  letter-spacing: var(--tracking-tag);
+  clip-path: polygon(0 0, calc(100% - var(--cut-2)) 0, 100% var(--cut-2), 100% 100%, var(--cut-2) 100%, 0 calc(100% - var(--cut-2)));
+}
+.vl-check__index {
+  position: relative;
+  z-index: 1;
+  background: var(--line-strong);
+  color: var(--muted);
+}
+/* The index is an outlined plate: the sunken face sits inside a 1px edge. */
+.vl-check__index::before,
+.vl-check__lit::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  background: var(--sunken);
+  clip-path: inherit;
+  z-index: -1;
+}
+.vl-check__lit {
+  position: absolute;
+  inset: 0;
+  background: var(--focus);
+  color: var(--focus);
+  z-index: 1;
+  text-shadow: 0 0 var(--space-3) var(--focus); /* taste-skill-ignore: a lit check glows: emitted neon, the person's brief */
+}
+.vl-check__lit::before {
+  z-index: -1;
+}
+/* The cable: a track from this index down to the next, and its fill. */
+.vl-check__track {
+  position: absolute;
+  inset-inline-start: calc(var(--_index) / 2 - 1px);
+  inset-block-start: calc(var(--_index) / 2);
+  inline-size: 2px;
+  block-size: calc(100% + var(--_pad) * 2);
+  background: var(--line-strong);
+}
+.vl-check__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--focus);
+  box-shadow: 0 0 var(--space-3) var(--focus); /* taste-skill-ignore: the cable segment glows when it fills */
+  transform-origin: top;
+}
+.vl-check__text {
+  align-self: center;
+  max-inline-size: 48ch;
+  font-size: var(--step-1);
+  line-height: var(--leading-body);
+  color: var(--ink);
+}
+@media (min-width: 64rem) {
+  .vl-payment__panel {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+  .vl-check {
+    --_index: 3.25rem;
+  }
+}
+
+/* S6 Questions: a reading place, no entrance motion. ------------------------------------------------------------- */
+.vl-questions__panel {
+  max-inline-size: 45rem;
+  margin-inline: auto;
+  display: grid;
+  gap: var(--space-6);
+}
+.vl-questions__list {
+  display: grid;
+}
+.vl-questions__answer {
+  max-inline-size: 60ch;
+  font-size: var(--step-0);
+  line-height: var(--leading-body);
+  color: var(--muted);
+}
+
+/* S7 Final: the street's end. -------------------------------------------------------------------------------------- */
+.vl-final {
+  padding-block-end: calc(var(--chapter-gap) * 1.5);
+}
+.vl-final__panel {
+  max-inline-size: 58rem;
+  display: grid;
+  gap: var(--space-5);
+}
+.vl-final__panel .vl-sub {
+  margin-block-start: 0;
+}
+.vl-final__kiosk {
+  margin-block-start: var(--space-3);
+}
+.vl-final__more {
+  display: flex;
+}
+.vl-final__more a {
+  min-block-size: var(--tap-min);
+}
+.vl-final__more a:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+
+/* Footer: fully opaque, above the street. --------------------------------------------------------------------------- */
+.vl-footer {
+  position: relative;
+  z-index: 2;
+  background: var(--bg);
+  border-block-start: 1px solid var(--line);
+  padding-block: var(--space-7) var(--space-8);
+  color: var(--muted);
+  font-size: var(--step--1);
+  line-height: var(--leading-body);
+}
+.vl-footer__inner {
+  display: grid;
+  gap: var(--space-6);
+}
+.vl-footer__brand {
+  color: var(--ink);
+}
+.vl-footer__brand .vc-logo {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tap-min);
+}
+.vl-footer__text {
+  display: grid;
+  gap: var(--space-2);
+  max-inline-size: 60ch;
+}
+.vl-footer__nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-4);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.vl-footer__nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--tap-min);
+  min-inline-size: var(--tap-min);
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  text-decoration-color: var(--line-strong);
+}
+.vl-footer__nav a:hover {
+  text-decoration-color: var(--focus);
+}
+.vl-footer__nav a:focus-visible,
+.vl-footer__brand a:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+@media (min-width: 64rem) {
+  .vl-footer__inner {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: start;
+    column-gap: var(--space-8);
+  }
+  .vl-footer__nav ul {
+    justify-content: flex-end;
+    max-inline-size: 28rem;
+  }
+}

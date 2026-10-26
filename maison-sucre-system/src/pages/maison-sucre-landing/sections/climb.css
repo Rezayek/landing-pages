@@ -1,0 +1,108 @@
+/* The climb: the film pinned behind five screens; the hero and the chapter cards scroll over it (MOTION.md). */
+[data-page='maison-sucre-landing'] .climb { position: relative; isolation: isolate; }
+
+[data-page='maison-sucre-landing'] .climb__stage {
+  position: sticky;
+  inset-block-start: 0;
+  block-size: 100svh;
+  z-index: -1;
+  overflow: hidden;
+}
+/* the text side of the frame is kept readable: a soft shade from the left on desktop, from the bottom on phones */
+[data-page='maison-sucre-landing'] .climb__shade {
+  position: absolute;
+  inset: 0;
+  background: var(--climb-shade);
+  pointer-events: none;
+}
+[data-page='maison-sucre-landing'] .climb__credit {
+  position: absolute;
+  inset-block-end: var(--space-4);
+  inset-inline-start: var(--climb-edge);
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-1);
+  background: color-mix(in srgb, var(--raised) 85%, transparent); /* a chip, like the gallery credits: readable on any frame */
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+[data-page='maison-sucre-landing'] .climb__railbar {
+  position: sticky;
+  inset-block-start: calc(100svh - var(--space-5)); /* the rail stands on this line and is drawn upward, so it never leaves the climb */
+  block-size: 0;
+  z-index: 2;
+}
+[data-page='maison-sucre-landing'] .climb__rail {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-end: var(--climb-edge);
+  max-inline-size: calc(100% - 2 * var(--gutter));
+}
+
+[data-page='maison-sucre-landing'] .climb__hero,
+[data-page='maison-sucre-landing'] .climb__chapter {
+  min-block-size: 100svh;
+  display: grid;
+  align-items: center;
+  padding: calc(var(--space-10) + var(--space-6)) var(--climb-edge) var(--space-10);
+}
+/* the hero, not the stage, carries the one-screen overlap: a sticky box is limited by its margin edge, so a negative
+   margin on the stage let the film hang over the section after the climb */
+[data-page='maison-sucre-landing'] .climb__hero { align-content: center; gap: var(--space-4); margin-block-start: -100svh; }
+[data-page='maison-sucre-landing'] .climb__h1 {
+  margin: 0;
+  font-size: min(var(--step-display), 5.25rem); /* capped so both lines end over the curtain's light side, not the window */
+  line-height: 1.02;
+  max-inline-size: 7.8em; /* em, not ch: ch follows the face's zero, so the column narrowed under the fallback font and the lines reflowed on swap */
+  color: var(--ink);
+}
+[data-page='maison-sucre-landing'] .climb__piping { inline-size: min(100%, 16rem); }
+[data-page='maison-sucre-landing'] .climb__sub { margin: 0; max-inline-size: 34ch; color: var(--ink); font-size: var(--step-1); }
+[data-page='maison-sucre-landing'] .climb__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-5); }
+[data-page='maison-sucre-landing'] .climb__note { margin: 0; color: var(--muted); font-size: var(--step--1); }
+[data-page='maison-sucre-landing'] .climb__hint { margin: var(--space-4) 0 0; color: var(--muted); font-size: var(--step--1); }
+
+[data-page='maison-sucre-landing'] .climb__card {
+  display: grid;
+  gap: var(--space-3);
+  max-inline-size: 30rem;
+  padding: var(--space-6);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+[data-page='maison-sucre-landing'] .climb__title { margin: 0; font-size: var(--step-3); line-height: 1.1; }
+/* the numeral floats beside the first line only, so the title keeps the card's full width below it */
+[data-page='maison-sucre-landing'] .climb__head { display: flow-root; }
+[data-page='maison-sucre-landing'] .climb__num { float: inline-start; margin: 0.3em var(--space-3) 0 0; font-size: var(--step-1); }
+[data-page='maison-sucre-landing'] .climb__body { margin: 0; color: var(--ink); }
+[data-page='maison-sucre-landing'] .climb__small { margin: 0; color: var(--muted); font-size: var(--step--1); }
+
+@media (max-width: 900px) and (orientation: portrait) {
+  [data-page='maison-sucre-landing'] .climb__hero,
+  [data-page='maison-sucre-landing'] .climb__chapter { align-items: end; padding-block-end: calc(var(--space-10) + var(--space-8)); }
+  [data-page='maison-sucre-landing'] .climb__card { max-inline-size: none; }
+  [data-page='maison-sucre-landing'] .climb__rail { inset-inline-start: var(--gutter); }
+  [data-page='maison-sucre-landing'] .climb__credit { inset-block-start: var(--space-3); inset-block-end: auto; inset-inline: auto var(--gutter); }
+  /* the phone hero reads on the page ground at the bottom; the cake stays clear above it */
+  [data-page='maison-sucre-landing'] .climb__hero { max-inline-size: none; background: var(--climb-hero-phone); }
+  [data-page='maison-sucre-landing'] .climb__sub { font-size: var(--step-0); }
+  /* the text block sits low, just above the rail, so the cake keeps the upper half of the screen */
+  [data-page='maison-sucre-landing'] .climb__hero { padding-block: var(--space-10) calc(var(--tap-min) + var(--space-7)); gap: var(--space-3); }
+  [data-page='maison-sucre-landing'] .climb__h1 { font-size: var(--step-3); }
+  [data-page='maison-sucre-landing'] .climb__hint { display: none; }
+  /* the numeral stays within the title's first line box (35 px here), so only that line runs beside it */
+  [data-page='maison-sucre-landing'] .climb__num { margin-block-start: 0.15em; font-size: var(--step-0); }
+}
+/* 320-359 px: a smaller H1, so the text block fits between the cake and the rail */
+@media (max-width: 359px) {
+  [data-page='maison-sucre-landing'] .climb__h1 { font-size: var(--step-2); }
+  [data-page='maison-sucre-landing'] .climb__hero { gap: var(--space-2); }
+  [data-page='maison-sucre-landing'] .climb__hero .ms-link { font-size: var(--step--1); } /* the price link on one line, clear of the rail */
+}
+/* short portrait screens (320 × 640 and the like): the hero text block must fit between the cake and the rail, so the
+   note goes (the booking section says it again), the sub steps down and the ground under the text starts higher */
+@media (max-width: 900px) and (orientation: portrait) and (max-height: 720px) {
+  [data-page='maison-sucre-landing'] .climb__hero { padding-block-end: calc(var(--tap-min) + var(--space-6)); background: var(--climb-hero-phone-short); }
+  [data-page='maison-sucre-landing'] .climb__hero .climb__note { display: none; }
+  [data-page='maison-sucre-landing'] .climb__sub { font-size: var(--step--1); }
+}

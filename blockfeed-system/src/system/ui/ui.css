@@ -1,0 +1,1077 @@
+/*
+ * The Blockfeed UI primitives. Everything here is built from three pieces: a one-unit frame, a lit top-left edge and a
+ * shaded bottom-right edge (the bevel), cut from `box-shadow: inset` so it scales with --u. Colours, sizes and times come
+ * from tokens.css roles only. A control draws its bevel into --bf-bevel and its focus ring into --bf-ring; the two are
+ * composed in one `box-shadow`, so a focused control keeps its bevel.
+ */
+/* --bf-gap is set on one stack or row to change its own gap; it must not leak into the rows and stacks nested inside */
+@property --bf-gap {
+  syntax: '*';
+  inherits: false;
+}
+
+@layer components {
+  :root {
+    /* a one-unit notch cut from each corner of a panel: the only "rounding" in the system */
+    --notch-path: polygon(
+      0 var(--u),
+      var(--u) var(--u),
+      var(--u) 0,
+      calc(100% - var(--u)) 0,
+      calc(100% - var(--u)) var(--u),
+      100% var(--u),
+      100% calc(100% - var(--u)),
+      calc(100% - var(--u)) calc(100% - var(--u)),
+      calc(100% - var(--u)) 100%,
+      var(--u) 100%,
+      var(--u) calc(100% - var(--u)),
+      0 calc(100% - var(--u))
+    );
+  }
+
+  /* ----- layout helpers ------------------------------------------------------------------------------------------ */
+  .bf-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bf-gap, var(--space-3));
+    min-inline-size: 0;
+  }
+  .bf-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--bf-gap, var(--space-2));
+    min-inline-size: 0;
+  }
+  .bf-row--nowrap {
+    flex-wrap: nowrap;
+  }
+  .bf-grow {
+    flex: 1 1 0;
+    min-inline-size: 0;
+  }
+  .bf-sr {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+  /* text straight on the dark ground: light ink with the game's one-unit shadow */
+  .bf-title {
+    margin: 0;
+    color: var(--bg-ink);
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-shadow: var(--u) var(--u) 0 var(--text-shadow);
+  }
+  .bf-muted {
+    color: var(--muted);
+  }
+  .bf-subtle {
+    color: var(--subtle);
+  }
+  .bf-num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ----- panel, well, rule --------------------------------------------------------------------------------------- */
+  .bf-panel {
+    --bf-bevel: inset 0 0 0 var(--u) var(--edge), inset calc(var(--u) * 3) calc(var(--u) * 3) 0 var(--hi),
+      inset calc(var(--u) * -3) calc(var(--u) * -3) 0 var(--sh);
+    position: relative;
+    min-inline-size: 0;
+    padding: var(--bf-pad, var(--inset-card));
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--bf-bevel);
+    clip-path: var(--notch-path);
+  }
+  .bf-panel[data-tone='raised'] {
+    background: var(--raised);
+  }
+  .bf-panel[data-flush] {
+    --bf-pad: calc(var(--u) * 3);
+  }
+  .bf-panel[data-bare] {
+    --bf-pad: 0;
+  }
+  /* a panel that floats keeps a hard shadow: the wrapper carries the filter, because a clip-path would cut it */
+  .bf-lift {
+    filter: drop-shadow(var(--shadow-raised));
+    min-inline-size: 0;
+  }
+  .bf-lift[data-level='overlay'] {
+    filter: drop-shadow(var(--shadow-overlay));
+  }
+  .bf-panel__title {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--step-0);
+    font-weight: 700;
+    line-height: var(--leading-heading);
+    color: var(--muted);
+  }
+  .bf-well {
+    min-inline-size: 0;
+    padding: var(--bf-pad, var(--space-3));
+    background: var(--sunken);
+    color: var(--ink);
+    box-shadow: inset var(--u) var(--u) 0 var(--slot-dark), inset calc(var(--u) * -1) calc(var(--u) * -1) 0 var(--slot-light);
+  }
+  .bf-well[data-dark] {
+    background: var(--field);
+    color: var(--field-ink);
+  }
+  .bf-rule {
+    block-size: calc(var(--u) * 2);
+    margin: var(--space-2) 0;
+    border: 0;
+    background: linear-gradient(var(--line) 0 var(--u), var(--hi) var(--u) 100%);
+  }
+
+  /* ----- button -------------------------------------------------------------------------------------------------- */
+  .bf-btn {
+    --b-face: var(--face);
+    --b-hi: var(--face-hi);
+    --b-sh: var(--face-sh);
+    --b-ink: var(--face-ink);
+    --b-hover: var(--face-hover);
+    --b-shadow: var(--text-shadow);
+    --bf-bevel: inset 0 0 0 var(--u) var(--line-strong), inset calc(var(--u) * 2) calc(var(--u) * 2) 0 0 var(--b-hi),
+      inset calc(var(--u) * -2) calc(var(--u) * -3) 0 0 var(--b-sh);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-block-size: var(--control-h);
+    min-inline-size: var(--control-h);
+    padding: 0 var(--inset-control);
+    border: 0;
+    background: var(--b-face);
+    color: var(--b-ink);
+    font: inherit;
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: var(--u) var(--u) 0 var(--b-shadow);
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: var(--bf-bevel), var(--bf-ring, 0 0 0 0 transparent);
+    --icon-shadow: var(--b-shadow);
+  }
+  .bf-btn[data-variant='primary'] {
+    --b-face: var(--accent);
+    --b-hi: var(--accent-hi);
+    --b-sh: var(--accent-sh);
+    --b-ink: var(--on-accent);
+    --b-hover: var(--accent-hover);
+    --b-shadow: var(--accent-shadow);
+  }
+  .bf-btn[data-variant='danger'] {
+    --b-face: var(--negative);
+    --b-hi: var(--negative-hi);
+    --b-sh: var(--negative-sh);
+    --b-ink: var(--on-negative);
+    --b-hover: var(--negative-hi);
+    --b-shadow: var(--negative-shadow);
+  }
+  .bf-btn[data-variant='ghost'] {
+    --b-face: transparent;
+    --b-ink: var(--ink);
+    --b-shadow: transparent;
+    --b-hover: var(--hover-bg);
+    --bf-bevel: 0 0 0 0 transparent;
+  }
+  .bf-btn[data-size='sm'] {
+    min-block-size: calc(var(--u) * 14);
+    min-inline-size: calc(var(--u) * 14);
+    padding: 0 var(--space-3);
+    font-size: var(--step--1);
+  }
+  .bf-btn[data-size='lg'] {
+    min-block-size: var(--tap-min);
+    padding: 0 var(--space-5);
+    font-size: var(--step-1);
+  }
+  .bf-btn[data-block] {
+    display: flex;
+    inline-size: 100%;
+  }
+  .bf-btn[data-icon] {
+    padding: 0;
+    inline-size: var(--control-h);
+  }
+  .bf-btn[data-size='sm'][data-icon] {
+    inline-size: calc(var(--u) * 14);
+  }
+  @media (hover: hover) {
+    .bf-btn:not(:disabled, [aria-disabled='true']):hover {
+      background: var(--b-hover);
+      --bf-bevel: inset 0 0 0 var(--u) var(--select), inset calc(var(--u) * 2) calc(var(--u) * 2) 0 0 var(--b-hi),
+        inset calc(var(--u) * -2) calc(var(--u) * -3) 0 0 var(--b-sh);
+    }
+    .bf-btn[data-variant='ghost']:not(:disabled, [aria-disabled='true']):hover {
+      --bf-bevel: 0 0 0 0 transparent;
+      text-decoration: underline;
+      text-decoration-thickness: var(--u);
+      text-underline-offset: calc(var(--u) * 2);
+    }
+  }
+  .bf-btn:not(:disabled, [aria-disabled='true']):active,
+  .bf-btn[aria-pressed='true'] {
+    background: var(--face-pressed);
+    --bf-bevel: inset 0 0 0 var(--u) var(--line-strong), inset calc(var(--u) * 2) calc(var(--u) * 2) 0 0 var(--b-sh),
+      inset calc(var(--u) * -2) calc(var(--u) * -2) 0 0 var(--b-hi);
+  }
+  .bf-btn[data-variant='primary']:not(:disabled):active,
+  .bf-btn[data-variant='primary'][aria-pressed='true'] {
+    background: var(--accent);
+  }
+  .bf-btn:not(:disabled, [aria-disabled='true']):active {
+    transform: translateY(var(--press-travel));
+  }
+  .bf-btn:focus-visible {
+    outline: none;
+    --bf-ring: 0 0 0 var(--u) var(--focus-2), 0 0 0 calc(var(--u) * 2) var(--focus);
+  }
+  .bf-btn:disabled,
+  .bf-btn[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: var(--disabled-opacity);
+  }
+
+  /* ----- slot, grid, hotbar -------------------------------------------------------------------------------------- */
+  .bf-slot {
+    --bf-bevel: inset var(--u) var(--u) 0 var(--slot-dark), inset calc(var(--u) * -1) calc(var(--u) * -1) 0 var(--slot-light);
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: var(--slot-w, var(--slot));
+    block-size: var(--slot-h, var(--slot));
+    padding: 0;
+    border: 0;
+    background: var(--sunken);
+    color: var(--ink);
+    font: inherit;
+    box-shadow: var(--bf-bevel), var(--bf-ring, 0 0 0 0 transparent);
+  }
+  button.bf-slot,
+  a.bf-slot {
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .bf-slot:focus-visible {
+    outline: none;
+    --bf-ring: 0 0 0 var(--u) var(--focus-2), 0 0 0 calc(var(--u) * 2) var(--focus);
+    z-index: 2;
+  }
+  @media (hover: hover) {
+    :is(button, a).bf-slot:hover::after,
+    .bf-slot[data-hot]::after {
+      content: '';
+      position: absolute;
+      inset: var(--u);
+      background: var(--hover-bg);
+      pointer-events: none;
+    }
+  }
+  .bf-slot[aria-selected='true'],
+  .bf-slot[aria-current='page'],
+  .bf-slot[aria-pressed='true'] {
+    z-index: 1;
+    box-shadow: var(--bf-bevel), 0 0 0 var(--u) var(--edge), 0 0 0 calc(var(--u) * 3) var(--select),
+      0 0 0 calc(var(--u) * 4) var(--edge), var(--bf-ring, 0 0 0 0 transparent);
+  }
+  .bf-slot__count {
+    position: absolute;
+    inset-inline-end: calc(var(--u) * 1);
+    inset-block-end: 0;
+    color: var(--select);
+    font-size: var(--step--1);
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: var(--u) var(--u) 0 var(--text-shadow);
+    pointer-events: none;
+  }
+  .bf-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 9), var(--slot-w, var(--slot)));
+    inline-size: max-content;
+    max-inline-size: 100%;
+  }
+  .bf-hotbar {
+    display: inline-flex;
+    padding: calc(var(--u) * 2);
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: inset 0 0 0 var(--u) var(--edge), inset calc(var(--u) * 2) calc(var(--u) * 2) 0 var(--hi),
+      inset calc(var(--u) * -2) calc(var(--u) * -2) 0 var(--sh);
+    clip-path: var(--notch-path);
+  }
+  .bf-hotbar .bf-slot {
+    --slot-w: calc(var(--u) * 20);
+    --slot-h: calc(var(--u) * 20);
+    margin: 0;
+  }
+  .bf-hotbar__key {
+    position: absolute;
+    inset-inline-start: calc(var(--u) * 1);
+    inset-block-start: 0;
+    color: var(--subtle);
+    font-size: var(--size-hint);
+    line-height: 1;
+    pointer-events: none;
+  }
+  /* a badge on an icon repeats the count that is already in the accessible name, so it may use the 5u hint size */
+  .bf-hotbar .bf-count,
+  .bf-bell__count .bf-count {
+    min-inline-size: calc(var(--u) * 8);
+    block-size: calc(var(--u) * 8);
+    font-size: var(--size-hint);
+  }
+  .bf-hotbar .bf-count {
+    position: absolute;
+    inset-inline-end: calc(var(--u) * -1);
+    inset-block-start: calc(var(--u) * -2);
+  }
+
+  /* ----- tooltip ------------------------------------------------------------------------------------------------- */
+  .bf-tipwrap {
+    position: relative;
+    display: inline-flex;
+    min-inline-size: 0;
+  }
+  /* the tooltip lives in the top layer (see float.ts), so no panel's notched clip can cut it */
+  .bf-tip {
+    inset: auto;
+    margin: 0;
+    inline-size: max-content;
+    max-inline-size: min(calc(var(--u) * 120), calc(100vw - var(--u) * 8));
+    padding: calc(var(--u) * 3) calc(var(--u) * 4);
+    border: 0;
+    overflow: visible;
+    background: var(--tip-bg);
+    color: var(--tip-ink);
+    font-size: var(--step--1);
+    line-height: 1.4;
+    text-align: start;
+    text-shadow: var(--u) var(--u) 0 var(--tip-shadow);
+    box-shadow: inset 0 0 0 var(--u) var(--tip-edge);
+    clip-path: var(--notch-path);
+    pointer-events: none;
+  }
+  .bf-tip__name {
+    display: block;
+    color: var(--tier-common);
+    font-size: var(--step-0);
+    font-weight: 700;
+  }
+  .bf-tip__name[data-tier='uncommon'] {
+    color: var(--tier-uncommon);
+  }
+  .bf-tip__name[data-tier='rare'] {
+    color: var(--tier-rare);
+  }
+  .bf-tip__name[data-tier='epic'] {
+    color: var(--tier-epic);
+  }
+  .bf-tip__line {
+    display: block;
+    color: var(--tip-muted);
+  }
+  .bf-tip__line[data-tone='good'] {
+    color: var(--tier-uncommon);
+  }
+  .bf-tip__line[data-tone='info'] {
+    color: var(--tier-rare);
+  }
+  .bf-tip__line[data-tone='ink'] {
+    color: var(--tip-ink);
+  }
+  .bf-tip__gap {
+    display: block;
+    block-size: calc(var(--u) * 3);
+  }
+
+  /* ----- tabs, segmented ----------------------------------------------------------------------------------------- */
+  .bf-tabs {
+    min-inline-size: 0;
+  }
+  .bf-tablist {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--u);
+    padding-inline: calc(var(--u) * 3);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .bf-tab {
+    --bf-bevel: inset 0 var(--u) 0 var(--line-strong), inset var(--u) 0 0 var(--line-strong),
+      inset calc(var(--u) * -1) 0 0 var(--line-strong), inset 0 calc(var(--u) * 2) 0 0 var(--hi);
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--space-2);
+    min-block-size: var(--control-h);
+    padding: 0 var(--inset-control);
+    border: 0;
+    background: var(--sunken);
+    color: var(--ink);
+    font: inherit;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: var(--bf-bevel), var(--bf-ring, 0 0 0 0 transparent);
+  }
+  .bf-tab[aria-selected='true'] {
+    z-index: 3;
+    margin-block-end: calc(var(--u) * -3);
+    padding-block-end: calc(var(--u) * 3);
+    background: var(--surface);
+  }
+  .bf-tab:not([aria-selected='true']) {
+    margin-block-start: calc(var(--u) * 2);
+    min-block-size: calc(var(--control-h) - var(--u) * 2);
+    color: var(--muted);
+  }
+  @media (hover: hover) {
+    .bf-tab:not([aria-selected='true']):hover {
+      color: var(--ink);
+      background: color-mix(in srgb, var(--sunken), var(--select) 22%);
+    }
+  }
+  .bf-tab:focus-visible {
+    outline: none;
+    --bf-ring: 0 0 0 var(--u) var(--focus-2), 0 0 0 calc(var(--u) * 2) var(--focus);
+  }
+  .bf-tabpanel {
+    min-inline-size: 0;
+  }
+  .bf-tabpanel:focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+  .bf-seg {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--u);
+  }
+  .bf-seg > .bf-btn[aria-pressed='true'] {
+    --b-face: var(--accent);
+    background: var(--accent);
+    --b-ink: var(--on-accent);
+    --b-shadow: var(--accent-shadow);
+  }
+
+  /* ----- fields -------------------------------------------------------------------------------------------------- */
+  .bf-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-inline-size: 0;
+  }
+  .bf-label {
+    color: var(--ink);
+    font-size: var(--step--1);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .bf-hint,
+  .bf-error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-1);
+    margin: 0;
+    font-size: var(--step--1);
+    line-height: 1.3;
+  }
+  .bf-hint {
+    color: var(--muted);
+  }
+  .bf-error {
+    color: var(--negative-ink);
+    font-weight: 700;
+  }
+  .bf-input {
+    --bf-bevel: inset 0 0 0 var(--u) var(--field-edge);
+    inline-size: 100%;
+    min-block-size: var(--control-h);
+    padding: 0 var(--inset-control);
+    border: 0;
+    border-radius: 0;
+    background: var(--field);
+    color: var(--field-ink);
+    font: inherit;
+    line-height: 1.2;
+    caret-color: var(--xp);
+    box-shadow: var(--bf-bevel), var(--bf-ring, 0 0 0 0 transparent);
+  }
+  textarea.bf-input {
+    padding-block: var(--space-2);
+    min-block-size: calc(var(--u) * 36);
+    resize: vertical;
+  }
+  .bf-input::placeholder {
+    color: var(--field-hint);
+    opacity: 1;
+  }
+  .bf-input:focus-visible {
+    outline: none;
+    --bf-bevel: inset 0 0 0 var(--u) var(--select);
+    --bf-ring: 0 0 0 var(--u) var(--focus-2), 0 0 0 calc(var(--u) * 2) var(--focus);
+  }
+  .bf-input[aria-invalid='true'] {
+    --bf-bevel: inset 0 0 0 var(--u) var(--field-bad), inset 0 0 0 calc(var(--u) * 2) var(--field);
+  }
+  .bf-input:disabled {
+    opacity: var(--disabled-opacity);
+    cursor: not-allowed;
+  }
+  .bf-inputwrap {
+    position: relative;
+    display: flex;
+    min-inline-size: 0;
+  }
+  .bf-inputwrap > .bf-input {
+    padding-inline-start: calc(var(--u) * 17);
+  }
+  .bf-inputwrap__icon {
+    position: absolute;
+    inset-inline-start: var(--space-3);
+    inset-block: 0;
+    display: grid;
+    place-items: center;
+    color: var(--field-hint);
+    pointer-events: none;
+  }
+  .bf-count-hint {
+    margin-inline-start: auto;
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+
+  .bf-select {
+    position: relative;
+    display: inline-flex;
+    min-inline-size: 0;
+  }
+  .bf-select > select {
+    appearance: none;
+    inline-size: 100%;
+    padding-inline-end: calc(var(--u) * 14);
+  }
+  .bf-select__icon {
+    position: absolute;
+    inset-inline-end: var(--space-3);
+    inset-block: 0;
+    display: grid;
+    place-items: center;
+    color: var(--b-ink, var(--face-ink));
+    pointer-events: none;
+  }
+  .bf-select > select.bf-btn {
+    justify-content: flex-start;
+    text-align: start;
+  }
+  .bf-select > select option {
+    background: var(--field);
+    color: var(--field-ink);
+  }
+
+  .bf-check {
+    position: relative;
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    min-block-size: var(--target-min);
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .bf-check__box {
+    --bf-bevel: inset 0 0 0 var(--u) var(--field-edge);
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: calc(var(--u) * 10);
+    block-size: calc(var(--u) * 10);
+    background: var(--field);
+    color: var(--xp);
+    box-shadow: var(--bf-bevel), var(--bf-ring, 0 0 0 0 transparent);
+  }
+  .bf-check > input:focus-visible + .bf-check__box {
+    --bf-bevel: inset 0 0 0 var(--u) var(--select);
+    --bf-ring: 0 0 0 var(--u) var(--focus-2), 0 0 0 calc(var(--u) * 2) var(--focus);
+  }
+  .bf-check > input:disabled + .bf-check__box,
+  .bf-check > input:disabled ~ .bf-check__text {
+    opacity: var(--disabled-opacity);
+  }
+  .bf-check__text {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--u) * 1);
+    padding-block-start: calc(var(--u) * 1);
+    line-height: 1.2;
+  }
+
+  .bf-fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .bf-fieldset > legend {
+    padding: 0;
+    margin-block-end: var(--space-1);
+  }
+  .bf-check__dot {
+    inline-size: calc(var(--u) * 4);
+    block-size: calc(var(--u) * 4);
+    background: currentColor;
+  }
+
+  .bf-toggle {
+    --bf-bevel: inset 0 0 0 var(--u) var(--field-edge);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    inline-size: 100%;
+    min-block-size: var(--control-h);
+    padding: 0 var(--inset-control);
+    border: 0;
+    background: var(--field);
+    color: var(--field-ink);
+    font: inherit;
+    font-weight: 700;
+    text-align: start;
+    cursor: pointer;
+    box-shadow: var(--bf-bevel), var(--bf-ring, 0 0 0 0 transparent);
+  }
+  .bf-toggle:focus-visible {
+    outline: none;
+    --bf-bevel: inset 0 0 0 var(--u) var(--select);
+    --bf-ring: 0 0 0 var(--u) var(--focus-2), 0 0 0 calc(var(--u) * 2) var(--focus);
+  }
+  .bf-toggle__state {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--field-bad);
+  }
+  .bf-toggle[aria-checked='true'] .bf-toggle__state {
+    color: var(--xp);
+  }
+  .bf-toggle:disabled {
+    opacity: var(--disabled-opacity);
+    cursor: not-allowed;
+  }
+
+  .bf-range {
+    appearance: none;
+    inline-size: 100%;
+    block-size: var(--control-h);
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+  .bf-range::-webkit-slider-runnable-track {
+    block-size: calc(var(--u) * 8);
+    background: var(--field);
+    box-shadow: inset 0 0 0 var(--u) var(--field-edge);
+  }
+  .bf-range::-moz-range-track {
+    block-size: calc(var(--u) * 8);
+    background: var(--field);
+    box-shadow: inset 0 0 0 var(--u) var(--field-edge);
+  }
+  .bf-range::-webkit-slider-thumb {
+    appearance: none;
+    inline-size: calc(var(--u) * 6);
+    block-size: calc(var(--u) * 14);
+    margin-block-start: calc(var(--u) * -3);
+    border: 0;
+    border-radius: 0;
+    background: var(--face);
+    box-shadow: inset 0 0 0 var(--u) var(--line-strong), inset calc(var(--u) * 2) calc(var(--u) * 2) 0 0 var(--face-hi),
+      inset calc(var(--u) * -2) calc(var(--u) * -3) 0 0 var(--face-sh);
+  }
+  .bf-range::-moz-range-thumb {
+    inline-size: calc(var(--u) * 6);
+    block-size: calc(var(--u) * 14);
+    border: 0;
+    border-radius: 0;
+    background: var(--face);
+    box-shadow: inset 0 0 0 var(--u) var(--line-strong), inset calc(var(--u) * 2) calc(var(--u) * 2) 0 0 var(--face-hi),
+      inset calc(var(--u) * -2) calc(var(--u) * -3) 0 0 var(--face-sh);
+  }
+  .bf-range:focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  /* ----- tag, count, avatar, level, xp, ping --------------------------------------------------------------------- */
+  .bf-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--u) * 2);
+    min-block-size: calc(var(--u) * 14);
+    padding: 0 calc(var(--u) * 3);
+    background: var(--sunken);
+    color: var(--ink);
+    font-size: var(--step--1);
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    box-shadow: inset 0 0 0 var(--u) var(--line-strong);
+  }
+  .bf-tag[data-tone='version'] {
+    background: var(--field);
+    color: var(--field-ink);
+    box-shadow: inset 0 0 0 var(--u) var(--field-edge);
+  }
+  .bf-tag[data-tone='positive'] {
+    background: var(--positive-bg);
+    color: var(--positive-ink);
+    box-shadow: inset 0 0 0 var(--u) var(--positive);
+  }
+  .bf-tag[data-tone='negative'] {
+    background: var(--negative-bg);
+    color: var(--negative-ink);
+    box-shadow: inset 0 0 0 var(--u) var(--negative);
+  }
+  .bf-tag[data-tone='warning'] {
+    background: var(--warning-bg);
+    color: var(--warning-ink);
+    box-shadow: inset 0 0 0 var(--u) var(--warning);
+  }
+  .bf-tag[data-tone='info'] {
+    background: var(--info-bg);
+    color: var(--info-ink);
+    box-shadow: inset 0 0 0 var(--u) var(--info);
+  }
+  .bf-tag[data-tone='accent'] {
+    background: var(--accent-bg);
+    color: var(--accent-ink);
+    box-shadow: inset 0 0 0 var(--u) var(--accent);
+  }
+  button.bf-tag {
+    cursor: pointer;
+    border: 0;
+    font-family: inherit;
+    min-block-size: calc(var(--u) * 14);
+  }
+  button.bf-tag:focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+  button.bf-tag[aria-pressed='true'] {
+    background: var(--accent);
+    color: var(--on-accent);
+    box-shadow: inset 0 0 0 var(--u) var(--line-strong);
+  }
+  .bf-count {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: calc(var(--u) * 12);
+    block-size: calc(var(--u) * 12);
+    padding: 0 calc(var(--u) * 2);
+    background: var(--negative);
+    color: var(--on-negative);
+    font-size: var(--step--1);
+    font-weight: 700;
+    line-height: 1;
+    box-shadow: 0 0 0 var(--u) var(--edge);
+  }
+  .bf-avatar {
+    position: relative;
+    display: inline-block;
+    flex: none;
+    line-height: 0;
+    background: var(--sunken);
+    box-shadow: 0 0 0 var(--u) var(--edge);
+    margin: var(--u);
+  }
+  .bf-avatar__presence {
+    position: absolute;
+    inset-inline-end: calc(var(--u) * -2);
+    inset-block-end: calc(var(--u) * -2);
+    inline-size: calc(var(--u) * 4);
+    block-size: calc(var(--u) * 4);
+    background: var(--positive);
+    box-shadow: 0 0 0 var(--u) var(--edge);
+  }
+  .bf-avatar__presence[data-state='away'] {
+    background: var(--warning);
+  }
+  .bf-avatar__presence[data-state='off'] {
+    background: var(--presence-off);
+  }
+  /* the level number is green like the game's, in the green that reads on the surface it sits on (--accent-ink is dark
+     on Stone and light on Deepslate); the game's black outline is for text on the world, which is not our case */
+  .bf-level {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--accent-ink);
+    font-size: var(--step--1);
+    line-height: 1;
+  }
+  .bf-xp {
+    --p: 0;
+    position: relative;
+    display: block;
+    block-size: calc(var(--u) * 6);
+    min-inline-size: calc(var(--u) * 24);
+    background: var(--xp-empty);
+    box-shadow: inset 0 0 0 var(--u) var(--edge), inset 0 calc(var(--u) * -1) 0 0 var(--xp-lip);
+  }
+  .bf-xp__fill {
+    position: absolute;
+    inset-block: var(--u);
+    inset-inline-start: var(--u);
+    inline-size: calc((100% - var(--u) * 2) * var(--p));
+    background: var(--xp);
+    box-shadow: inset 0 var(--u) 0 0 rgb(255 255 255 / 0.5), inset 0 calc(var(--u) * -1) 0 0 var(--xp-dark);
+    transition: inline-size var(--dur-xl) steps(6, end);
+  }
+  .bf-xp__fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(90deg, transparent 0 calc(var(--u) * 5), rgb(0 0 0 / 0.28) calc(var(--u) * 5) calc(var(--u) * 6));
+  }
+  .bf-xp[data-indeterminate] .bf-xp__fill {
+    inline-size: 38%;
+    transition: none;
+    animation: bf-xp-slide var(--dur-loop-slide) steps(12, end) infinite;
+  }
+  @keyframes bf-xp-slide {
+    from {
+      inset-inline-start: var(--u);
+    }
+    to {
+      inset-inline-start: 62%;
+    }
+  }
+  .bf-ping {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: var(--u);
+    block-size: calc(var(--u) * 8);
+    color: var(--ping-good);
+  }
+  .bf-ping > i {
+    inline-size: calc(var(--u) * 2);
+    background: currentColor;
+  }
+  .bf-ping > i:nth-child(1) { block-size: calc(var(--u) * 2); }
+  .bf-ping > i:nth-child(2) { block-size: calc(var(--u) * 3); }
+  .bf-ping > i:nth-child(3) { block-size: calc(var(--u) * 5); }
+  .bf-ping > i:nth-child(4) { block-size: calc(var(--u) * 6); }
+  .bf-ping > i:nth-child(5) { block-size: calc(var(--u) * 8); }
+  .bf-ping > i[data-off] {
+    background: var(--ping-off);
+  }
+  .bf-ping[data-quality='mid'] {
+    color: var(--ping-mid);
+  }
+  .bf-ping[data-quality='bad'] {
+    color: var(--ping-bad);
+  }
+
+  /* ----- dialog, menu -------------------------------------------------------------------------------------------- */
+  dialog.bf-dialog {
+    inline-size: min(calc(var(--u) * 190), calc(100vw - var(--u) * 16));
+    max-block-size: calc(100dvh - var(--u) * 16);
+    margin: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    overflow: visible;
+  }
+  dialog.bf-dialog::backdrop {
+    background: var(--overlay);
+  }
+  .bf-dialog__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-block-size: calc(100dvh - var(--u) * 16);
+    overflow-y: auto;
+  }
+  .bf-dialog__title {
+    margin: 0;
+    font-size: var(--step-2);
+    line-height: var(--leading-heading);
+  }
+  .bf-dialog__actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(calc(var(--u) * 50), 1fr));
+    gap: var(--space-2);
+    margin-block-start: var(--space-2);
+  }
+  .bf-menuwrap {
+    position: relative;
+    display: inline-flex;
+  }
+  /* the shell is the popover and carries the hard shadow; the panel inside is the notched, bevelled shape */
+  .bf-menu {
+    inset: auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: visible;
+    background: transparent;
+    min-inline-size: calc(var(--u) * 80);
+    max-inline-size: calc(100vw - var(--u) * 8);
+    filter: drop-shadow(var(--shadow-overlay));
+  }
+  .bf-menu__panel {
+    padding: calc(var(--u) * 2);
+    background: var(--raised);
+    color: var(--ink);
+    box-shadow: inset 0 0 0 var(--u) var(--edge), inset calc(var(--u) * 2) calc(var(--u) * 2) 0 var(--hi),
+      inset calc(var(--u) * -2) calc(var(--u) * -2) 0 var(--sh);
+    clip-path: var(--notch-path);
+  }
+  .bf-menuitem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    inline-size: 100%;
+    min-block-size: var(--target-min);
+    padding: 0 var(--space-3);
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+  .bf-menuitem[data-danger] {
+    color: var(--negative-ink);
+  }
+  .bf-menuitem:hover,
+  .bf-menuitem:focus-visible {
+    outline: none;
+    background: var(--face-hover);
+    color: var(--face-ink);
+    text-shadow: var(--u) var(--u) 0 var(--text-shadow);
+  }
+
+  /* ----- scrollbars: a well and a button-face thumb, in units ---------------------------------------------------- */
+  * {
+    scrollbar-width: auto;
+  }
+  ::-webkit-scrollbar {
+    inline-size: calc(var(--u) * 6);
+    block-size: calc(var(--u) * 6);
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--field);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--face);
+    box-shadow: inset 0 0 0 var(--u) var(--edge), inset calc(var(--u) * 2) calc(var(--u) * 2) 0 0 var(--face-hi);
+  }
+}
+
+/* ----- motion (MOTION-SYSTEM.md): overlays rise into place in stepped frames; nothing scales -------------------------
+   Exits are instant: an overlay that leaves is gone on the next frame, the way a game screen closes. Under reduced
+   motion --travel-sm is 0 and the role durations fall to --dur-reduced, so this becomes a short stepped fade. */
+@layer components {
+  .bf-tip:popover-open {
+    animation: bf-rise var(--dur-tooltip-in) var(--ease-enter) both;
+  }
+  .bf-menu:popover-open {
+    animation: bf-rise var(--dur-popover-in) var(--ease-enter) both;
+  }
+  dialog.bf-dialog[open] {
+    animation: bf-rise var(--dur-modal-in) var(--ease-enter) both;
+  }
+  dialog.bf-dialog[open]::backdrop {
+    animation: bf-fade var(--dur-modal-in) var(--ease-enter) both;
+  }
+  @keyframes bf-rise {
+    from {
+      opacity: 0;
+      translate: 0 var(--travel-sm);
+    }
+  }
+  @keyframes bf-fade {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+/* ----- touch: every control reaches the 44 px floor on a coarse pointer, whatever its size variant ------------------- */
+@layer components {
+  @media (pointer: coarse) {
+    .bf-btn,
+    .bf-btn[data-size],
+    button.bf-slot,
+    a.bf-slot,
+    .bf-tab,
+    .bf-tab:not([aria-selected='true']),
+    button.bf-tag {
+      min-block-size: var(--tap-min);
+      min-inline-size: var(--tap-min);
+    }
+    .bf-btn[data-icon],
+    .bf-btn[data-size][data-icon] {
+      inline-size: var(--tap-min);
+    }
+  }
+}
+
+/* ----- touch, choices and links: the label is the target, at least 44 px on a coarse pointer ------------------------- */
+@layer components {
+  label:has(> input.bf-sr[type='radio'], > input.bf-sr[type='checkbox']) {
+    position: relative;
+  }
+  label > input.bf-sr:is([type='radio'], [type='checkbox']) {
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    margin: 0;
+    opacity: 0;
+    clip-path: none;
+    cursor: pointer;
+  }
+  @media (pointer: coarse) {
+    label:has(> input.bf-sr[type='radio'], > input.bf-sr[type='checkbox']) {
+      min-block-size: var(--tap-min);
+    }
+    button.bf-link {
+      min-block-size: var(--tap-min);
+    }
+  }
+  /* the saved mark beside a settings section */
+  .bf-saved {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin: 0;
+  }
+  .bf-saved[data-ok] {
+    color: var(--positive-ink);
+  }
+}

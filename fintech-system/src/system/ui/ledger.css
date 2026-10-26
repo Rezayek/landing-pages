@@ -1,0 +1,255 @@
+/* Ledger (COMPONENTS.md §Ledger): the household's written page. Tokens only. */
+@layer components {
+  .k-ledger {
+    --_row: 3.5rem;
+    margin: 0;
+    padding: var(--space-5) var(--space-5) var(--space-4);
+    border: var(--border) solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+    box-shadow: var(--shadow-raised);
+    font-variant-numeric: tabular-nums;
+    container-type: inline-size;
+  }
+  .k-ledger[data-compact] {
+    --_row: 2.75rem;
+    padding: var(--space-4);
+    box-shadow: none;
+    font-size: var(--step--1);
+  }
+  .k-ledger__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-3);
+    padding-block-end: var(--space-3);
+    border-block-end: calc(2 * var(--border)) solid var(--ink);
+  }
+  .k-ledger__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-heading);
+  }
+  .k-ledger[data-compact] .k-ledger__title {
+    font-size: var(--step-0);
+  }
+  .k-ledger__label {
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+  .k-ledger__lines {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* One ruled line: day, who, what, amount; actions wrap under it */
+  .k-ledger__line {
+    display: grid;
+    grid-template-columns: 2.5rem 4.25rem minmax(0, 1fr) auto;
+    gap: 0 var(--space-3);
+    align-items: center;
+    min-block-size: var(--_row);
+    padding-block: var(--space-2);
+    border-block-end: var(--border) solid var(--line);
+  }
+  .k-ledger[data-compact] .k-ledger__line {
+    grid-template-columns: 2.25rem 3.25rem minmax(0, 1fr) auto;
+    gap: 0 var(--space-2);
+  }
+  .k-ledger__day {
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+  .k-ledger__who {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: var(--weight-medium);
+  }
+  .k-ledger__what {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+    min-inline-size: 0;
+  }
+  .k-ledger__note {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--accent-ink);
+    font-size: var(--step--1);
+    font-weight: var(--weight-medium);
+  }
+  .k-ledger__amount {
+    text-align: end;
+    white-space: nowrap;
+  }
+  .k-ledger__actions {
+    display: flex;
+    flex-wrap: wrap;
+    grid-column: 3 / -1;
+    justify-content: flex-end;
+    gap: var(--gap-tight);
+    padding-block-start: var(--space-2);
+  }
+  .k-ledger__foot {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-block-start: var(--space-1);
+    padding-block-start: var(--space-3);
+    border-block-start: calc(3 * var(--border)) double var(--ink);
+    font-weight: var(--weight-medium);
+  }
+  .k-ledger__caption {
+    margin-block-start: var(--space-3);
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+  /* A line that waits on the reader: a tinted band, the inline edges reaching the card's padding */
+  .k-ledger__line[data-ask] {
+    margin-inline: calc(-1 * var(--space-3));
+    padding-inline: var(--space-3);
+    border-radius: var(--radius-control);
+    background: var(--accent-bg);
+  }
+  /* Stamp: a rubber-stamp mark beside the line's text, a deliberate yes */
+  .k-ledger__stamp {
+    display: inline-block;
+    padding: 0 var(--space-2);
+    border: calc(2 * var(--border)) solid var(--accent);
+    border-radius: var(--radius-tag);
+    color: var(--accent-ink);
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-style: italic;
+    font-weight: var(--weight-strong);
+    letter-spacing: 0.04em;
+    line-height: 1.6;
+    text-transform: uppercase;
+    transform: rotate(-6deg);
+    animation: k-ledger-stamp var(--dur-lg) var(--ease-enter-emphasized) both;
+  }
+  /* A stamp made in front of the reader is the moment: bigger, so it reads at a glance */
+  .k-ledger__line[data-fresh] .k-ledger__stamp {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--step-1);
+  }
+  @keyframes k-ledger-stamp {
+    from {
+      opacity: 0;
+      transform: scale(1.5) rotate(-14deg);
+    }
+  }
+  /* A waiting line: a dotted rule to be filled */
+  .k-ledger__blank {
+    flex: 1 1 4rem;
+    min-inline-size: 4rem;
+    block-size: 0;
+    border-block-end: calc(2 * var(--border)) dotted var(--line-strong);
+    transform-origin: left center;
+  }
+  @supports (animation-timeline: view()) {
+    .k-ledger__line[data-waiting] .k-ledger__blank {
+      animation: k-ledger-rule linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 40%;
+    }
+  }
+  @keyframes k-ledger-rule {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  /* Ledger line write: a clip on an inner span; the text is laid out and legible at every frame */
+  .k-ledger__ink {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+  }
+  .k-ledger[data-write] .k-ledger__ink {
+    animation: k-ledger-ink var(--dur-xl) var(--ease-enter) both;
+    animation-delay: calc(var(--i, 0) * var(--stagger-scene));
+  }
+  /* In a written-in ledger, a stamp lands after its line has been written */
+  .k-ledger[data-write] .k-ledger__stamp {
+    animation-delay: calc(var(--i, 0) * var(--stagger-scene) + var(--dur-xl) + var(--dur-lg));
+  }
+  .k-ledger__line[data-fresh] {
+    animation: k-ledger-fresh calc(var(--hold-success) + var(--dur-highlight-fade)) var(--ease-standard) both;
+  }
+  .k-ledger__line[data-fresh] .k-ledger__ink {
+    animation: k-ledger-ink var(--dur-xl) var(--ease-enter) both;
+  }
+  @keyframes k-ledger-ink {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes k-ledger-fresh {
+    0%,
+    60% {
+      background-color: var(--accent-bg);
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .k-ledger[data-write] .k-ledger__ink,
+    .k-ledger__line[data-fresh] .k-ledger__ink,
+    .k-ledger__line[data-waiting] .k-ledger__blank,
+    .k-ledger__stamp {
+      animation: none;
+    }
+    .k-ledger__line[data-fresh] {
+      animation: none;
+      background-color: var(--accent-bg);
+    }
+  }
+  :root[data-motion='reduced'] .k-ledger[data-write] .k-ledger__ink,
+  :root[data-motion='reduced'] .k-ledger__line[data-fresh] .k-ledger__ink,
+  :root[data-motion='reduced'] .k-ledger__line[data-waiting] .k-ledger__blank,
+  :root[data-motion='reduced'] .k-ledger__stamp {
+    animation: none;
+  }
+  :root[data-motion='reduced'] .k-ledger__line[data-fresh] {
+    animation: none;
+    background-color: var(--accent-bg);
+  }
+  /* Narrow ledgers: who and day share the first column, the amount stays at the end */
+  @container (max-width: 26rem) {
+    .k-ledger__line,
+    .k-ledger[data-compact] .k-ledger__line {
+      grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+      gap: 0 var(--space-2);
+    }
+    .k-ledger__who {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .k-ledger__what {
+      grid-column: 2;
+      grid-row: 2;
+      color: var(--muted);
+      font-size: var(--step--1);
+    }
+    .k-ledger__amount {
+      grid-column: 3;
+      grid-row: 1 / span 2;
+    }
+    .k-ledger__actions {
+      grid-column: 1 / -1;
+      grid-row: 3;
+    }
+  }
+}

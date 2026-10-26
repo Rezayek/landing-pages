@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#F5F2EC" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1A1917" media="(prefers-color-scheme: dark)" />
+    <title>Kitty</title>
+    <script>
+      // Apply the stored theme and contrast choice before first paint (guides/design-system.md §2, Themes).
+      try {
+        var t = localStorage.getItem('kitty-theme')
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t
+        var c = localStorage.getItem('kitty-contrast')
+        if (c === 'more') document.documentElement.dataset.contrast = 'more'
+        var m = localStorage.getItem('kitty-motion')
+        if (m === 'reduced') document.documentElement.dataset.motion = 'reduced'
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

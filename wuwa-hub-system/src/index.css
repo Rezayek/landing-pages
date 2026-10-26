@@ -1,0 +1,27 @@
+@import 'tailwindcss';
+
+/*
+ * Base resets for the whole project, nothing more. The design system lives in src/system/ (tokens.css, once phase 6
+ * has written it); each page brings its own tokens (src/pages/<slug>/tokens.css, scoped to [data-page="<slug>"],
+ * light and dark) and imports its own fonts in its Page.tsx, so they stay in that page's chunk.
+ *
+ * No global reduced-motion override belongs here. A blanket `animation-duration: 0.01ms !important` also removes the
+ * feedback people rely on (a spinner that shows work is going on, a state change that lands). Reduced motion is
+ * handled where the motion is: the tokens (--travel, --press-scale) and each component.
+ */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    margin: 0;
+    background: #fff;
+    color: #111;
+    font-family: system-ui, sans-serif;
+  }
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+}

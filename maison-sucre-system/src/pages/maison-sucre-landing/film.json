@@ -1,0 +1,58 @@
+{
+  "about": "The climb: one frame map read by blender/wedding_cake_film.py and by the page's film player. Re-time the film here only.",
+  "frames": 241,
+  "fps": 24,
+  "keys": [
+    {
+      "id": "hero",
+      "frame": 0,
+      "label": "The cake in its room"
+    },
+    {
+      "id": "board",
+      "frame": 60,
+      "label": "The board"
+    },
+    {
+      "id": "piping",
+      "frame": 120,
+      "label": "Piping"
+    },
+    {
+      "id": "flowers",
+      "frame": 180,
+      "label": "Sugar flowers"
+    },
+    {
+      "id": "topper",
+      "frame": 240,
+      "label": "The topper"
+    }
+  ],
+  "sets": {
+    "desktop": {
+      "size": [
+        1920,
+        1080
+      ],
+      "shiftX": -0.32,
+      "path": "/maison-sucre-landing/film/desktop/",
+      "focusX": 0,
+      "intro": {
+        "frames": 24,
+        "path": "/maison-sucre-landing/film/desktop-intro/"
+      }
+    },
+    "phone": {
+      "size": [
+        1080,
+        1920
+      ],
+      "shiftX": 0,
+      "path": "/maison-sucre-landing/film/phone/",
+      "stillsOnly": true
+    }
+  },
+  "ext": "webp",
+  "digits": 3
+}

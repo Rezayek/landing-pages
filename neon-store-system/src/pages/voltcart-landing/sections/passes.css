@@ -1,0 +1,105 @@
+/* S3 Battle passes: the billboard and the pass cards. Tokens only. The cards are Kiosk-shaped (system `vc-kiosk` classes
+   give the surface, cover, price and action); this file adds the board, the season line and the tier strip. */
+
+.vp-passes__head {
+  max-inline-size: 48rem;
+  margin-block-end: var(--space-7);
+}
+
+/* The billboard: looked at from below. The tilt is scrubbed in JS (rotateX, scale); this sets the eye and the hinge. */
+.vp-board {
+  perspective: 75rem;
+  perspective-origin: 50% 100%;
+}
+.vp-board__tilt {
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+.vp-passes__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+  list-style: none;
+  padding: 0;
+}
+.vp-passes__grid > li {
+  display: grid;
+}
+@media (min-width: 48rem) {
+  .vp-passes__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+}
+
+/* Card ------------------------------------------------------------------------------------------------------------ */
+.vp-pass {
+  min-inline-size: 0;
+}
+.vp-pass__season {
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--step--1);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* The catch, printed: when the season ends. */
+.vp-pass__ends {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+  padding-block: var(--space-2);
+  border-block: 1px solid var(--line);
+  font-size: var(--step--1);
+  font-weight: var(--weight-label);
+  color: var(--ink);
+}
+.vp-pass__ends-label {
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--step--2);
+  font-weight: var(--weight-body);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+  color: var(--focus);
+}
+
+/* Tier strip: a compact TierTrack. Reserved rows so the charge never shifts the card. */
+.vp-tiers {
+  display: grid;
+  gap: var(--space-1);
+  margin-block-start: var(--space-1);
+}
+.vp-tiers__title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-heading);
+  font-size: var(--step-0);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-tag);
+}
+.vp-tiers__scale {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--step--2);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.vp-tiers__note {
+  min-block-size: 2lh;
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+
+/* The key tab and slot need a stable height whether or not the pass is in the cart. */
+.vp-pass .vc-kiosk__action {
+  gap: 0;
+}

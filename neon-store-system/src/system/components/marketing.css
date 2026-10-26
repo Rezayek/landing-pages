@@ -1,0 +1,267 @@
+/* Marketing-page components (0.6.0, added for voltcart-landing): the Kiosk deal surface and the motion pause button.
+   Tokens only. Layer: components, after vc.css. */
+@layer components {
+  /* Kiosk ---------------------------------------------------------------------------------------------------------- */
+  .vc-kiosk {
+    --_cut: var(--cut-card);
+    --_edge: var(--line-strong);
+    --_face: var(--surface);
+    --_glow: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--inset-card);
+    color: var(--ink);
+    filter: drop-shadow(0 0 var(--space-5) var(--_glow));
+    transition: filter var(--dur-hover) var(--ease-standard);
+  }
+  .vc-kiosk::before {
+    transition: background-color var(--dur-hover) var(--ease-standard);
+  }
+  .vc-kiosk[data-size='lead'] {
+    --_edge: var(--focus);
+    --_glow: color-mix(in srgb, var(--focus) 28%, transparent);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .vc-kiosk:hover {
+      --_edge: var(--focus);
+    }
+  }
+  .vc-kiosk:focus-within {
+    --_edge: var(--focus);
+  }
+
+  /* One line of real data about the price ("Lowest in 90 days"): the focus cyan, never a decorative label. */
+  .vc-kiosk__meta {
+    font-size: var(--step--1);
+    font-weight: var(--weight-label);
+    color: var(--focus);
+  }
+
+  .vc-kiosk__cover {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    background: var(--sunken);
+  }
+  .vc-kiosk[data-size='lead'] .vc-kiosk__cover {
+    aspect-ratio: 16 / 9;
+  }
+  .vc-kiosk__cover img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    z-index: 1;
+  }
+  .vc-kiosk__cover[data-state='failed'] img {
+    display: none;
+  }
+  .vc-kiosk__plate {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: var(--space-3);
+    font-family: var(--font-display);
+    font-weight: var(--weight-heading);
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--subtle);
+  }
+
+  .vc-kiosk__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    flex: 1;
+  }
+  .vc-kiosk__title {
+    font-family: var(--font-display);
+    font-weight: var(--weight-heading);
+    font-size: var(--step-2);
+    line-height: var(--leading-heading);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-display);
+  }
+  .vc-kiosk[data-size='lead'] .vc-kiosk__title {
+    font-size: var(--step-3);
+  }
+  .vc-kiosk__tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+  }
+  .vc-kiosk__region {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+  .vc-kiosk__region .vc-icon {
+    inline-size: var(--icon-sm);
+    block-size: var(--icon-sm);
+  }
+  .vc-kiosk__price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-3);
+    margin-block-start: var(--space-2);
+  }
+  .vc-kiosk__now {
+    font-family: var(--font-display);
+    font-weight: var(--weight-heading);
+    font-size: var(--step-3);
+    line-height: 1;
+    color: var(--deal-ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .vc-kiosk[data-size='lead'] .vc-kiosk__now {
+    font-size: var(--step-display);
+  }
+  .vc-kiosk__list {
+    color: var(--subtle);
+    font-variant-numeric: tabular-nums;
+  }
+  .vc-kiosk__save {
+    color: var(--deal-ink);
+    font-size: var(--step--1);
+    font-weight: var(--weight-label);
+  }
+
+  .vc-kiosk__action {
+    margin-block-start: auto;
+    padding-block-start: var(--space-3);
+    display: grid;
+    gap: 0;
+  }
+  .vc-kiosk__action > .fb-btn,
+  .vc-kiosk__action > .fb-action {
+    inline-size: 100%;
+  }
+  .vc-kiosk__action .fb-btn {
+    inline-size: 100%;
+    justify-content: center;
+  }
+  .vc-kiosk__incart {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    min-block-size: var(--control-h);
+  }
+  .vc-kiosk__incart-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--positive-ink);
+    font-family: var(--font-display);
+    font-weight: var(--weight-heading);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-tag);
+  }
+
+  /* The dispense slot under the action, and the key tab that drops out of it. */
+  .vc-kiosk__slot {
+    position: relative;
+    display: block;
+    block-size: var(--space-6);
+    margin-block-start: var(--space-2);
+    border-block-start: 2px solid var(--line-strong);
+    overflow: hidden;
+  }
+  .vc-kiosk__keytab {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: var(--space-4);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    background: var(--band-bg);
+    color: var(--band-ink);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-tag);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%);
+  }
+  .vc-kiosk__keytab .vc-icon {
+    inline-size: var(--icon-sm);
+    block-size: var(--icon-sm);
+  }
+
+  .vc-kiosk__caption {
+    min-block-size: 1lh;
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+  .vc-kiosk__note {
+    font-size: var(--step--1);
+    color: var(--subtle);
+  }
+
+  /* Mini: one line at the end of a page. */
+  .vc-kiosk[data-size='mini'] .vc-kiosk__body {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: var(--space-5);
+  }
+  .vc-kiosk[data-size='mini'] .vc-kiosk__body > * {
+    grid-column: 1;
+  }
+  .vc-kiosk[data-size='mini'] .vc-kiosk__action {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    min-inline-size: 14rem;
+    padding: 0;
+  }
+  @media (max-width: 40rem) {
+    .vc-kiosk[data-size='mini'] .vc-kiosk__body {
+      grid-template-columns: 1fr;
+    }
+    .vc-kiosk[data-size='mini'] .vc-kiosk__action {
+      grid-column: 1;
+      grid-row: auto;
+      min-inline-size: 0;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .vc-kiosk {
+      border: 1px solid CanvasText;
+      filter: none;
+    }
+  }
+
+  /* Motion pause -------------------------------------------------------------------------------------------------- */
+  .vc-pause {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-block-size: var(--tap-min);
+    padding-inline: var(--space-2);
+    background: none;
+    border: 0;
+    color: var(--muted);
+    font: inherit;
+    font-size: var(--step--1);
+    cursor: pointer;
+    transition: color var(--dur-hover) var(--ease-standard);
+  }
+  .vc-pause:hover {
+    color: var(--ink);
+  }
+  .vc-pause:focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+  .vc-pause .vc-icon {
+    inline-size: var(--icon-sm);
+    block-size: var(--icon-sm);
+  }
+}

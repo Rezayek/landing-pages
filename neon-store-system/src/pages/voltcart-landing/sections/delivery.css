@@ -1,0 +1,192 @@
+/* S4 Delivery: the receipt (pinned on desktop) beside the four-step line. Tokens only. Heights are reserved: the rows
+   are a fixed height, the clock is tabular, and the receipt keeps its own status block. */
+
+.vd-delivery__head {
+  max-inline-size: 48rem;
+  margin-block-end: var(--space-7);
+}
+
+.vd-stage {
+  --vd-row: var(--space-8);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+@media (min-width: 64rem) {
+  .vd-stage {
+    --vd-row: var(--space-9);
+    grid-template-columns: minmax(0, 40rem) minmax(0, 1fr);
+    gap: var(--space-7);
+  }
+  /* S4 pin (MOTION.md): the receipt holds while the steps scroll past it. Layout only, so no reduced-motion version. */
+  .vd-receipt {
+    position: sticky;
+    inset-block-start: var(--space-9);
+  }
+}
+.vd-receipt {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* Steps ----------------------------------------------------------------------------------------------------------- */
+.vd-steps {
+  display: grid;
+  gap: var(--space-5);
+}
+.vd-steps__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  min-block-size: var(--tap-min);
+}
+.vd-tag {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--focus);
+  color: var(--focus);
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--step--2);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+}
+.vd-clock {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+}
+.vd-clock__label {
+  font-size: var(--step--2);
+  color: var(--muted);
+}
+.vd-clock__time {
+  min-inline-size: 4ch;
+  text-align: end;
+  font-family: var(--font-display);
+  font-weight: var(--weight-heading);
+  font-size: var(--step-3);
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.vd-list {
+  --vd-dot: var(--icon-md);
+  position: relative;
+}
+.vd-ol {
+  display: grid;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+/* The rail runs from the first dot's centre to the last; --p (0..1) fills it, set by the run's clock. */
+.vd-rail {
+  --p: 0;
+  position: absolute;
+  inset-block: calc(var(--vd-row) / 2) calc(var(--vd-row) / 2);
+  inset-inline-start: calc(var(--vd-dot) / 2);
+  inline-size: 2px;
+  margin-inline-start: -1px;
+  background: var(--line-strong);
+}
+.vd-rail::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--focus);
+  transform-origin: top;
+  transform: scaleY(var(--p));
+}
+.vd-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--vd-dot) 3.5rem minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--space-3);
+  block-size: var(--vd-row);
+  color: var(--muted);
+}
+.vd-step__dot {
+  display: grid;
+  place-items: center;
+  inline-size: var(--vd-dot);
+  block-size: var(--vd-dot);
+  border: 2px solid var(--line-strong);
+  background: var(--street-fog);
+  color: var(--street-fog);
+  transition:
+    background-color var(--dur-hover) var(--ease-standard),
+    border-color var(--dur-hover) var(--ease-standard);
+}
+.vd-step__dot .vc-icon {
+  inline-size: var(--icon-sm);
+  block-size: var(--icon-sm);
+}
+.vd-step__clock {
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--step--1);
+  letter-spacing: var(--tracking-tag);
+  font-variant-numeric: tabular-nums;
+}
+.vd-step__label {
+  font-family: var(--font-display);
+  font-weight: var(--weight-heading);
+  font-size: var(--step-1);
+  line-height: var(--leading-heading);
+  text-transform: uppercase;
+  text-wrap: balance;
+  transition: color var(--dur-hover) var(--ease-standard);
+}
+.vd-step[data-state='active'],
+.vd-step[data-state='done'] {
+  color: var(--ink);
+}
+.vd-step[data-state='active'] .vd-step__dot {
+  border-color: var(--focus);
+  background: var(--focus);
+}
+.vd-step[data-state='done'] .vd-step__dot {
+  border-color: var(--focus);
+  background: var(--focus);
+}
+.vd-step[data-state='active'] .vd-step__clock,
+.vd-step[data-state='done'] .vd-step__clock {
+  color: var(--focus);
+}
+
+.vd-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* The slow-code spec line (assumed policy). */
+.vd-slow {
+  display: grid;
+  gap: var(--space-2);
+  padding-block-start: var(--space-4);
+  border-block-start: 1px solid var(--line);
+  max-inline-size: 60ch;
+  font-size: var(--step--1);
+  line-height: var(--leading-body);
+  color: var(--muted);
+}
+
+@media (max-width: 40rem) {
+  .vd-step {
+    grid-template-columns: var(--vd-dot) 3rem minmax(0, 1fr);
+    column-gap: var(--space-2);
+  }
+  .vd-step__label {
+    font-size: var(--step-0);
+  }
+}

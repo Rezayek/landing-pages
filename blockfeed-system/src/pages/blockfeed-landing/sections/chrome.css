@@ -1,0 +1,96 @@
+/* Header, footer and the phone hotbar of blockfeed-landing. */
+@layer components {
+  .bl-header {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--z-sticky, 100);
+    background: var(--bg);
+    box-shadow: 0 var(--u) 0 var(--edge);
+  }
+  .bl-header__bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    align-items: center;
+    inline-size: min(100% - var(--space-4) * 2, calc(var(--u) * 600));
+    min-block-size: calc(var(--control-h) + var(--space-4));
+    margin-inline: auto;
+  }
+  .bl-header__home {
+    display: inline-flex;
+    min-block-size: var(--control-h);
+    align-items: center;
+    color: inherit;
+  }
+  .bl-header__nav {
+    display: flex;
+    gap: var(--space-4);
+    flex: 1 1 auto;
+  }
+  .bl-header__nav a,
+  .bl-footer a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--control-h);
+    min-inline-size: var(--tap-min);
+    color: var(--bg-ink);
+    text-decoration: none;
+  }
+  .bl-header__nav a:hover,
+  .bl-footer a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: var(--u);
+    text-underline-offset: calc(var(--u) * 2);
+  }
+  .bl-header :focus-visible,
+  .bl-footer a:focus-visible {
+    outline: var(--u) solid transparent;
+    box-shadow: 0 0 0 var(--u) var(--focus-2), 0 0 0 calc(var(--u) * 2) var(--focus);
+  }
+  .bl-header__clock {
+    color: var(--bg-muted);
+  }
+  .bl-header__note {
+    inline-size: min(100% - var(--space-4) * 2, calc(var(--u) * 600));
+    margin: 0 auto var(--space-2);
+  }
+  @media (max-width: 40rem) {
+    .bl-header__bar {
+      justify-content: space-between;
+    }
+    .bl-header__nav,
+    .bl-header__clock {
+      display: none;
+    }
+  }
+
+  .bl-phonebar {
+    display: none;
+  }
+  @media (max-width: 40rem) {
+    .bl-phonebar {
+      position: fixed;
+      inset-block-end: 0;
+      inset-inline: 0;
+      z-index: var(--z-sticky, 100);
+      display: flex;
+      justify-content: center;
+      padding: var(--space-2) var(--space-2) max(var(--space-2), env(safe-area-inset-bottom));
+      background: var(--bg);
+      box-shadow: 0 calc(var(--u) * -1) 0 var(--edge);
+    }
+    [data-page='blockfeed-landing'] {
+      padding-block-end: calc(var(--tap-min) + var(--space-5));
+    }
+  }
+
+  .bl-footer {
+    padding-block: var(--space-6);
+    background: color-mix(in srgb, var(--bg) 70%, var(--bl-bedrock-3));
+    color: var(--bg-muted);
+  }
+  .bl-footer p {
+    margin: 0;
+  }
+}

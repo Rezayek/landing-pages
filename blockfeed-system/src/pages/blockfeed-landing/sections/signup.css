@@ -1,0 +1,136 @@
+/*
+ * S6 Sign up: bedrock, the darkest ground. One notched panel with the form in it. Fields stack on phones and sit side
+ * by side from 40rem; the status slot under the button holds either the error summary or the design-study note, at a
+ * reserved height, so the panel never changes size.
+ */
+@layer components {
+  .bl-signup .bl-inner > * {
+    min-inline-size: 0;
+  }
+
+  .bl-signup__panel {
+    inline-size: 100%;
+  }
+
+  /* the form beside the plot it claims (critique round 4, V3/D4): an oak sign on a grass block that reads the name */
+  .bl-signup__split {
+    display: grid;
+    gap: var(--space-5);
+    align-items: center;
+  }
+  @media (min-width: 48rem) {
+    .bl-signup__split {
+      grid-template-columns: minmax(0, 1fr) calc(var(--u) * 150);
+    }
+  }
+  .bl-plot {
+    display: grid;
+    justify-items: center;
+    margin: 0;
+  }
+  @media (max-width: 47.99rem) {
+    .bl-plot {
+      display: none;
+    }
+  }
+  .bl-plot__sign {
+    display: grid;
+    gap: var(--u);
+    justify-items: center;
+    inline-size: calc(var(--u) * 130);
+    padding: var(--space-3) var(--space-2);
+    background:
+      repeating-linear-gradient(180deg, transparent 0 calc(var(--u) * 7), var(--bl-plank-2) calc(var(--u) * 7) calc(var(--u) * 8)),
+      var(--bl-plank-1);
+    color: var(--bl-bedrock-3);
+    text-align: center;
+    box-shadow: inset 0 0 0 var(--u) var(--bl-plank-3), inset calc(var(--u) * -2) calc(var(--u) * -2) 0 var(--bl-plank-2);
+  }
+  .bl-plot__line {
+    max-inline-size: 100%;
+    overflow: hidden;
+    font-size: var(--size-2);
+    line-height: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .bl-plot__line--small {
+    font-size: var(--size-0);
+  }
+  .bl-plot__post {
+    inline-size: calc(var(--u) * 8);
+    block-size: calc(var(--u) * 30);
+    background: linear-gradient(90deg, var(--bl-log-1) 0 50%, var(--bl-log-2) 50% 100%);
+  }
+  /* one grass block: top and side, flat-on like the sign */
+  .bl-plot__ground {
+    inline-size: calc(var(--u) * 150);
+    block-size: calc(var(--u) * 28);
+    background-image:
+      linear-gradient(var(--bl-grass-1) 0 calc(var(--u) * 6), var(--bl-grass-3) calc(var(--u) * 6) calc(var(--u) * 8), transparent calc(var(--u) * 8)),
+      var(--bl-tex-dirt, linear-gradient(var(--bl-dirt-1), var(--bl-dirt-2)));
+    background-size: auto, calc(var(--u) * 32) calc(var(--u) * 32);
+    image-rendering: pixelated;
+    box-shadow: inset 0 0 0 var(--u) var(--edge);
+  }
+  /* claimed: the sign glints once (the panel's own glint plays too) */
+  .bl-plot[data-claimed] .bl-plot__sign {
+    box-shadow: inset 0 0 0 var(--u) var(--xp), inset calc(var(--u) * -2) calc(var(--u) * -2) 0 var(--bl-plank-2);
+  }
+  .bl-signup__form {
+    display: grid;
+    gap: var(--space-5);
+  }
+  .bl-signup__fields {
+    display: grid;
+    gap: var(--space-4);
+    align-items: start;
+  }
+  .bl-signup__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+  }
+  .bl-signup__actions .fb-btn {
+    min-block-size: var(--tap-min);
+    max-inline-size: 100%;
+  }
+
+  /* the reserved slot: the summary and the note share it */
+  .bl-signup__status {
+    min-block-size: calc(var(--u) * 56);
+  }
+  .bl-signup__focus:focus {
+    outline: none;
+  }
+  .bl-signup__focus:focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+  .bl-signup__errors {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .bl-signup__errors a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: var(--u);
+  }
+
+  @media (min-width: 40rem) {
+    .bl-signup__fields {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+    .bl-signup__status {
+      min-block-size: calc(var(--u) * 36);
+    }
+  }
+}

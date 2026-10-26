@@ -1,0 +1,628 @@
+/* voltcart-landing: page layout. Tokens only (system + this page's tokens.css). Shared pieces first (the street layer,
+   chapters, panels, headings), then header, hero, deals, the cart and the alert. Sections built in parallel keep their
+   own stylesheet in ./sections/. */
+
+[data-page='voltcart-landing'] {
+  position: relative;
+  color: var(--ink);
+  background: var(--street-fog);
+  font-family: var(--font-body);
+  overflow-x: clip;
+}
+
+/* The street layer ------------------------------------------------------------------------------------------------ */
+.vl-street {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--street-fog);
+}
+.vl-street__poster,
+.vl-street__canvas,
+.vl-street__canvas canvas {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+}
+.vl-street__poster {
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+.vl-street__canvas {
+  opacity: 0;
+  transition: opacity var(--dur-3xl) var(--ease-standard);
+}
+.vl-street[data-ready] .vl-street__canvas {
+  opacity: 1;
+}
+/* A scene event (a deal picked, a code dispensed) glitches the street for a moment: the frame tears sideways and its
+   hue slips. The film is not mounted under reduced motion, so neither is this. */
+.vl-street[data-glitch] .vl-street__canvas {
+  animation: vl-street-glitch var(--dur-3xl) steps(6) both;
+}
+@keyframes vl-street-glitch {
+  20% {
+    transform: translateX(-1.2%) skewX(-2deg);
+    filter: hue-rotate(40deg) saturate(1.6);
+  }
+  40% {
+    transform: translateX(0.8%);
+    filter: hue-rotate(-30deg) contrast(1.3);
+  }
+  60% {
+    transform: translateX(-0.4%) skewX(1deg);
+    filter: hue-rotate(20deg);
+  }
+}
+/* A grade over the street: darker at the left and the foot, where text sits. */
+.vl-street__grade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, var(--street-scrim-soft) 0%, transparent 55%), /* taste-skill-ignore: a neutral scrim over the street film (the one allowed gradient) */
+    linear-gradient(0deg, var(--street-scrim-soft) 0%, transparent 35%); /* taste-skill-ignore: a neutral scrim over the street film */
+}
+.vl-street__tag {
+  position: absolute;
+  inset-block-end: var(--space-5);
+  inset-inline-end: var(--gutter);
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--step--2);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+  color: var(--focus);
+}
+
+/* Chapters: each section is a place on the street ---------------------------------------------------------------- */
+.vl-main {
+  position: relative;
+  z-index: 1;
+}
+.vl-wrap {
+  inline-size: min(100% - 2 * var(--gutter), var(--container));
+  margin-inline: auto;
+}
+.vl-chapter {
+  position: relative;
+  padding-block: var(--chapter-gap);
+  scroll-margin-top: var(--space-8);
+}
+/* An opaque panel for text over the street (motion.md: text over moving art sits on an opaque ground). */
+.vl-panel {
+  position: relative;
+  isolation: isolate;
+  padding: var(--space-6);
+}
+/* The ground is a layer, so the panel's cut never clips a dropdown or popover that opens from inside it. */
+.vl-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--street-scrim);
+  backdrop-filter: blur(6px);
+  clip-path: polygon(0 0, calc(100% - var(--cut-card)) 0, 100% var(--cut-card), 100% 100%, var(--cut-card) 100%, 0 calc(100% - var(--cut-card)));
+}
+.vl-h2 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-heading);
+  font-size: clamp(var(--step-3), 1.2rem + 3vw, 3.5rem);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.vl-h2:focus {
+  outline: none;
+}
+.vl-h2:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+.vl-word {
+  display: inline-block;
+  will-change: transform;
+}
+/* Narrow screens: the words stay set (the spread would cross the edge; round 1). */
+@media (max-width: 40rem) {
+  .vl-word {
+    transform: none !important;
+  }
+}
+.vl-sub {
+  max-inline-size: 60ch;
+  margin-block-start: var(--space-4);
+  font-size: var(--step-1);
+  line-height: var(--leading-body);
+  color: var(--muted);
+}
+
+/* Header ---------------------------------------------------------------------------------------------------------- */
+.vl-header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--z-sticky);
+  background: color-mix(in srgb, var(--street-fog) 86%, transparent);
+  backdrop-filter: blur(10px);
+  border-block-end: 1px solid var(--line);
+}
+.vl-header__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  min-block-size: var(--space-8);
+}
+.vl-header__nav ul {
+  display: flex;
+  gap: var(--space-1);
+  list-style: none;
+  padding: 0;
+}
+.vl-header__nav a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tap-min);
+  padding-inline: var(--space-3);
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-weight: var(--weight-label);
+  font-size: var(--step--1);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color var(--dur-hover) var(--ease-standard);
+}
+.vl-header__nav a:hover {
+  color: var(--ink);
+}
+.vl-header__nav a:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: calc(-1 * var(--focus-width));
+}
+.vl-header__end {
+  margin-inline-start: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.vl-header__menu {
+  display: none;
+}
+@media (max-width: 63.99rem) {
+  .vl-header__nav,
+  .vl-header__end > .vc-pause {
+    display: none;
+  }
+  .vl-header__menu {
+    display: inline-flex;
+  }
+}
+.vl-sheet {
+  position: fixed;
+  inset: var(--space-8) 0 auto 0;
+  z-index: var(--z-overlay);
+  background: var(--raised);
+  border-block: 1px solid var(--line);
+  padding: var(--space-4) var(--gutter) var(--space-6);
+}
+.vl-sheet ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+}
+.vl-sheet a {
+  display: flex;
+  align-items: center;
+  min-block-size: var(--space-8);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: var(--weight-heading);
+  font-size: var(--step-1);
+  text-transform: uppercase;
+  text-decoration: none;
+  border-block-end: 1px solid var(--line);
+}
+.vl-sheet a:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: calc(-1 * var(--focus-width));
+}
+
+/* Cart button and panel */
+.vl-cart-anchor {
+  position: relative;
+}
+.vl-cart-label {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+@media (max-width: 30rem) {
+  .vl-hide-narrow {
+    display: none;
+  }
+  .vl-header__bar {
+    gap: var(--space-3);
+  }
+}
+.vl-cartpanel {
+  position: absolute;
+  inset-block-start: calc(100% + var(--space-2));
+  inset-inline-end: 0;
+  z-index: var(--z-dropdown);
+  inline-size: min(26rem, calc(100vw - 2 * var(--gutter)));
+  max-block-size: min(70vh, 40rem);
+  overflow: auto;
+  --_cut: var(--cut-card);
+  --_edge: var(--line-strong);
+  --_face: var(--raised);
+  padding: var(--space-5);
+  display: grid;
+  gap: var(--space-4);
+  box-shadow: var(--shadow-overlay); /* taste-skill-ignore: the cart panel is a real overlay */
+}
+.vl-cartpanel__title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-heading);
+  font-size: var(--step-2);
+  text-transform: uppercase;
+}
+.vl-cartpanel__title:focus {
+  outline: none;
+}
+.vl-cartpanel__lines {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+.vl-cartline {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr auto;
+  gap: var(--space-3);
+  align-items: center;
+}
+.vl-cartline img {
+  inline-size: 4.5rem;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+.vl-cartline__name {
+  font-family: var(--font-display);
+  font-weight: var(--weight-heading);
+  text-transform: uppercase;
+}
+.vl-cartline__meta {
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+.vl-cartpanel__sum {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-1) var(--space-4);
+  border-block-start: 1px solid var(--line);
+  padding-block-start: var(--space-3);
+  font-variant-numeric: tabular-nums;
+}
+.vl-cartpanel__sum dd {
+  text-align: end;
+}
+.vl-cartpanel__save {
+  color: var(--deal-ink);
+}
+.vl-removed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+@media (max-width: 47.99rem) {
+  .vl-cartpanel {
+    position: fixed;
+    inset: auto 0 0 0;
+    inline-size: auto;
+    max-block-size: 80vh;
+  }
+}
+
+/* Hero ------------------------------------------------------------------------------------------------------------ */
+.vl-hero {
+  min-block-size: calc(100svh - var(--space-8));
+  display: grid;
+  align-items: center;
+  padding-block: var(--space-7) var(--space-8);
+}
+.vl-hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+  grid-template-areas: 'head kiosk' 'rest kiosk';
+  grid-template-rows: auto 1fr;
+  column-gap: var(--space-7);
+  align-items: end;
+}
+.vl-hero__h1 {
+  grid-area: head;
+  max-inline-size: 13ch;
+  font-family: var(--font-display);
+  font-weight: var(--weight-heading);
+  font-size: var(--hero-size);
+  line-height: 0.95;
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  text-wrap: balance;
+  text-shadow: 0 2px 24px var(--street-fog); /* taste-skill-ignore: a halo that keeps the headline readable over the moving film */
+  /* two lines reserved, so the display font arriving never moves the hero (round 1: CLS 0.055 at 1440) */
+  min-block-size: 1.9em;
+}
+.vl-hero__rest {
+  grid-area: rest;
+  align-self: start;
+  max-inline-size: 40rem;
+}
+.vl-hero__note {
+  margin-block-start: var(--space-4);
+  font-size: var(--step--1);
+  color: var(--ink);
+  text-shadow: 0 1px 10px var(--street-fog), 0 0 2px var(--street-fog); /* taste-skill-ignore: legibility over the moving film */
+}
+.vl-hero__kiosk {
+  grid-area: kiosk;
+  align-self: center;
+}
+.vl-hero__sub {
+  margin-block-start: var(--space-5);
+  max-inline-size: 34ch;
+  font-size: var(--step-1);
+  line-height: var(--leading-body);
+  color: var(--ink);
+  text-shadow: 0 1px 12px var(--street-fog); /* taste-skill-ignore: legibility over the moving film */
+}
+.vl-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-5);
+  margin-block-start: var(--space-6);
+}
+.vl-hero__link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tap-min);
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  text-decoration-color: var(--focus);
+}
+.vl-hero__link:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+.vl-prompt {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-block-start: var(--space-6);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--focus);
+  color: var(--focus);
+  font-size: var(--step--1);
+  box-shadow: 0 0 var(--space-4) -4px var(--focus), inset 0 0 var(--space-3) -6px var(--focus); /* taste-skill-ignore: the scroll prompt is a glowing sign (emitted neon, the person's brief) */
+  transition: opacity var(--dur-xl) var(--ease-standard);
+}
+.vl-prompt[data-gone] {
+  opacity: 0;
+}
+.vl-prompt__arrow {
+  display: inline-block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-motion='reduced']):not([data-motion-paused]) .vl-prompt__arrow {
+    animation: vl-prompt var(--dur-4xl) var(--ease-symmetric) 1.2s 2 both;
+  }
+}
+@keyframes vl-prompt {
+  50% {
+    transform: translateY(var(--travel-md));
+  }
+}
+
+/* Kiosk 01 powers on (MOTION.md hero sequence): the frame traces its cut edge and a scan passes the cover once. */
+.vl-hero__kiosk {
+  position: relative;
+}
+.vl-trace {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 2;
+}
+.vl-trace path {
+  fill: none;
+  stroke: var(--focus);
+  stroke-width: 2;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  opacity: 0;
+  filter: drop-shadow(0 0 6px var(--focus)); /* taste-skill-ignore: the kiosk's power-on trace is emitted neon light */
+}
+.vl-hero__kiosk .vc-kiosk__cover::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  block-size: 30%;
+  z-index: 2;
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--focus) 40%, transparent), transparent); /* taste-skill-ignore: the one scan line that passes the cover on power-on */
+  opacity: 0;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-motion='reduced']) .vl-trace path {
+    animation: vl-trace var(--dur-hero) var(--ease-enter-emphasized) 0.1s both;
+  }
+  :root:not([data-motion='reduced']) .vl-hero__kiosk .vc-kiosk__cover::after {
+    animation: vl-scan var(--dur-4xl) var(--ease-linear) 0.35s both;
+  }
+}
+@keyframes vl-trace {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 1;
+  }
+  80% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+@keyframes vl-scan {
+  0% {
+    transform: translateY(-100%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(340%);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 63.99rem) {
+  .vl-hero {
+    min-block-size: auto;
+    padding-block: var(--space-6) var(--space-7);
+  }
+  .vl-hero__grid {
+    grid-template-columns: 1fr;
+    grid-template-areas: 'head' 'kiosk' 'rest';
+    grid-template-rows: auto;
+    row-gap: var(--space-5);
+  }
+  .vl-hero__kiosk {
+    max-inline-size: 28rem;
+  }
+  /* Phones: the street behind is the picture; the kiosk keeps its price and action above the fold. */
+  .vl-hero__kiosk .vc-kiosk__cover {
+    display: none;
+  }
+  .vl-prompt {
+    display: none;
+  }
+}
+
+/* Deals ----------------------------------------------------------------------------------------------------------- */
+.vl-deals__head {
+  z-index: var(--z-dropdown);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-5) var(--space-7);
+  align-items: end;
+}
+.vl-deals__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--space-4);
+}
+.vl-deals__region {
+  min-inline-size: 15rem;
+}
+.vl-deals__result {
+  min-block-size: var(--tap-min);
+  margin-block: var(--space-3) var(--space-4);
+  padding: var(--space-1) var(--space-4);
+  background: var(--street-scrim);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--step--1);
+  letter-spacing: var(--tracking-tag);
+  text-transform: uppercase;
+}
+.vl-deals__result:focus {
+  outline: none;
+}
+.vl-deals__result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+}
+.vl-deals__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+  list-style: none;
+  padding: 0;
+}
+.vl-deals__grid > li {
+  display: grid;
+}
+.vl-deals__grid > li[data-lead] {
+  grid-column: 1 / -1;
+}
+.vl-lead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+.vl-lead__chart {
+  display: grid;
+  gap: var(--space-3);
+}
+.vl-lead__caption {
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+.vl-alert {
+  display: grid;
+  gap: var(--space-2);
+}
+.vl-alert__set {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  font-size: var(--step--1);
+  color: var(--positive-ink);
+}
+.vl-alert__form {
+  display: grid;
+  gap: var(--space-3);
+}
+.vl-alert__note {
+  font-size: var(--step--1);
+  color: var(--subtle);
+}
+@media (max-width: 63.99rem) {
+  .vl-deals__head {
+    grid-template-columns: 1fr;
+  }
+  .vl-deals__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .vl-lead {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 40rem) {
+  .vl-deals__grid {
+    grid-template-columns: 1fr;
+  }
+  .vl-deals__region {
+    min-inline-size: 0;
+    inline-size: 100%;
+  }
+  .vl-panel {
+    padding: var(--space-5) var(--space-4);
+  }
+}

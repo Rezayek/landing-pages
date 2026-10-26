@@ -1,0 +1,70 @@
+# Dependencies and builds
+node_modules/
+dist/
+dist-ssr/
+*.local
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editors and OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Python caches
+__pycache__/
+*.pyc
+
+# Local tooling and agent config
+.claude/
+CLAUDE.md
+.ui-ux/
+.taste-skill/
+ui-ux.config.json
+/*/.gitignore
+/*/.oxlintrc.json
+
+# Working notes, reviews and process docs (kept local)
+/*/README.md
+critique/
+design-src/
+/*/src/pages/*/BRIEF.md
+/*/src/pages/*/CONCEPT.md
+/*/src/pages/*/CRITIQUE.md
+/*/src/pages/*/DESIGN.md
+/*/src/pages/*/INSPIRATION.md
+/*/src/pages/*/MOTION.md
+/*/src/pages/*/STATUS.md
+/*/src/pages/*/TEARDOWN.md
+/*/src/pages/*/UX.md
+/*/src/pages/*/proof/
+/*/src/system/*.md
+/*/public/_proof/
+
+# 3D source scenes, scripts and downloads (only rendered output in public/ ships)
+blender/
+
+# Demo recording scratch
+demos/_raw/
+
+# Assets no page loads
+/neon-store-system/public/voltcart-landing/tex/
+/neon-store-system/public/brand/
+/fintech-system/public/brand/drafts/
+
+# Full demo videos are uploaded to GitHub separately; only the GIF previews live in the repo
+/demos/*.mp4

@@ -1,0 +1,715 @@
+/*
+ * System tokens for Blockfeed (FOUNDATIONS.md; format and rules in guides/design-system.md §2). Three tiers:
+ *   1. primitives: raw values; components never read them;
+ *   2. roles: what components read (colour, type, space, shape, elevation, density, motion);
+ *   3. component tokens: only for a part a theme must change that no role covers (COMPONENTS.md names each one).
+ * Dark re-points roles and leaves primitives alone. It is written twice with identical values: under the
+ * prefers-color-scheme media query (what the audit emulates), skipped when <html data-theme="light">, and under
+ * <html data-theme="dark"> for a toggle. Edit both blocks together. "light" is the Stone theme (gray inventory
+ * panels), "dark" is the Deepslate theme (dark panels): both sit on a dark backdrop, like the game's menus.
+ * Names are the contract: the feedback components, the /system page and every page template read these roles. Add a
+ * role, never rename one, and add a line to the SYSTEM.md changelog.
+ *
+ * THE PIXEL UNIT. Everything is a whole number of `--u` (one "GUI pixel"): `--u` is 2px at GUI scale 2 and 3px at
+ * GUI scale 3 (<html data-scale="3">). Lengths are `calc(var(--u) * n)`, so the whole interface scales like the
+ * game's GUI scale setting and every edge stays on the pixel grid. The text floor is 12px, so scale 1 does not exist.
+ * Import this file once, after Tailwind (`@import 'tailwindcss'` first), so the base rules at the end sit in the
+ * right layer.
+ */
+:root {
+  /* 1. Primitives ------------------------------------------------------------------------------------------- */
+  --u: 2px;
+
+  /* stone: the neutral ramp (cool, drawn for Blockfeed; not sampled from any game texture) */
+  --stone-0: #ffffff;
+  --stone-50: #f4f5f6;
+  --stone-100: #d6d8db;
+  --stone-200: #c4c6c9;
+  --stone-300: #9a9ca0;
+  --stone-400: #80838a;
+  --stone-500: #5b5e63;
+  --stone-600: #4a4c50;
+  --stone-700: #3a3c40;
+  --stone-800: #26282b;
+  --stone-850: #1c1d20;
+  --stone-900: #17181a;
+  --stone-950: #0d0e10;
+
+  /* moss: the brand accent (a deep emerald). 500 fills on light grounds, 400 on dark ones; 700 and 300 are text */
+  --moss-300: #7ee0a8;
+  --moss-400: #46c07e;
+  --moss-500: #1f7a4d;
+  --moss-600: #2a8556;
+  --moss-700: #145a38;
+  --moss-900: #1f4d36;
+  --moss-100: #a9d3bb;
+
+  /* status hues */
+  --lime-300: #a6e062;
+  --lime-400: #8fd44a;
+  --lime-600: #3f7a12;
+  --lime-700: #2d5a0c;
+  --lime-100: #c5dba9;
+  --lime-900: #2c4a14;
+  --red-300: #ffa8a2;
+  --red-400: #ff7b72;
+  --red-600: #b3261e;
+  --red-700: #8f1d17;
+  --red-100: #e9c0bb;
+  --red-900: #5c1a16;
+  --gold-300: #f5c453;
+  --gold-400: #f0b429;
+  --gold-600: #8f5400;
+  --gold-700: #6e4100;
+  --gold-100: #ecd29b;
+  --gold-900: #54390a;
+  --lapis-300: #aebdfc;
+  --lapis-400: #7d96f5;
+  --lapis-600: #2f4fb8;
+  --lapis-700: #26429c;
+  --lapis-100: #bfc9ee;
+  --lapis-900: #1e2c6b;
+
+  /* the world's own colours: used for the tooltip frame, the XP bar and the tier names, never for status */
+  --night-950: #140a22;
+  --amethyst-500: #3a1f78;
+  --amethyst-300: #d98cff;
+  --aqua-300: #5fe0f0;
+  --sun-300: #f6e45a;
+  --xp-400: #7fe03a;
+  --xp-700: #2f6d12;
+  --shadow-rgb: 0 0 0;
+
+  /* Jersey 10 is drawn on a 10-pixel em, so text is crisp when its size is a whole number of units per font pixel:
+     10u (one unit per font pixel) for everything you read, 15u and 20u for headlines. Nothing smaller than 10u (20 px at
+     scale 2) carries information; the only 5u text is a decorative key hint that repeats an accessible name. */
+  --family-display: 'Jersey 10', system-ui, sans-serif;
+  --family-body: 'Jersey 10', system-ui, sans-serif;
+  --size--1: calc(var(--u) * 10);
+  --size-0: calc(var(--u) * 10);
+  --size-1: calc(var(--u) * 10);
+  --size-2: calc(var(--u) * 15);
+  --size-3: calc(var(--u) * 20);
+  /* one title per screen (60 px at both GUI scales: 30 units, or 20 at scale 3) */
+  --size-4: calc(var(--u) * 30);
+  --size-display: calc(var(--u) * 20);
+  --size-hint: calc(var(--u) * 5);
+
+  /* spacing on the unit: 2u steps (4 px at scale 2) */
+  --space-1: calc(var(--u) * 2);
+  --space-2: calc(var(--u) * 4);
+  --space-3: calc(var(--u) * 6);
+  --space-4: calc(var(--u) * 8);
+  --space-5: calc(var(--u) * 12);
+  --space-6: calc(var(--u) * 16);
+  --space-7: calc(var(--u) * 24);
+  --space-8: calc(var(--u) * 32);
+  --space-9: calc(var(--u) * 48);
+  --space-10: calc(var(--u) * 64);
+
+  /* no rounding anywhere: a "corner" is a notch of one unit, cut from panels only */
+  --radius-0: 0;
+  --radius-1: 0;
+  --radius-2: 0;
+  --radius-3: 0;
+  --radius-4: 0;
+  --radius-full: 0;
+
+  /* 2. Roles: light (the Stone theme) ----------------------------------------------------------------------- */
+  /* surfaces: the ground is the dark backdrop; panels are the gray inventory; wells are the slot gray */
+  --bg: #2e3033;
+  --surface: var(--stone-200);
+  --raised: var(--stone-100);
+  --sunken: var(--stone-300);
+  --overlay: rgb(0 0 0 / 0.62);
+  /* the ground carries its own text roles: it is dark in both themes, so --ink (text on panels) cannot read there */
+  --bg-ink: var(--stone-0);
+  --bg-muted: #cdd0d4;
+  --bg-line: var(--stone-400);
+
+  /* text and lines: --line divides, --line-strong draws a control edge (3:1 on every panel) */
+  --ink: var(--stone-850);
+  --muted: #34363a;
+  --subtle: var(--stone-600);
+  --line: #8c8f93;
+  --line-strong: var(--stone-800);
+
+  /* accent: the primary action. --accent-ink is the text-safe version, --accent-bg a quiet container (selected rows) */
+  --accent: var(--moss-500);
+  --accent-hover: var(--moss-600);
+  --on-accent: var(--stone-0);
+  --accent-ink: var(--moss-700);
+  --accent-bg: var(--moss-100);
+  /* a filled control is a bevel too: a lit edge, a shaded edge and (on a light-on-dark fill) a text shadow */
+  --accent-hi: #5fc08f;
+  --accent-sh: #0f3f27;
+  --accent-shadow: #0f3f27;
+  --negative-hi: #e0675f;
+  --negative-sh: #5c130f;
+  --negative-shadow: #5c130f;
+
+  /* status: info, success (positive), warning, danger (negative). Each role is a set:
+       --x        fill, icon and border (3:1 on a panel), with --on-x as the text on it (4.5:1)
+       --x-ink    text on the panels and on --x-bg (4.5:1)
+       --x-bg     the quiet container
+     A status always shows an icon and a word as well as the colour (guides/craft.md Colour). */
+  --positive: var(--lime-600);
+  --on-positive: var(--stone-0);
+  --positive-ink: var(--lime-700);
+  --positive-bg: var(--lime-100);
+  --negative: var(--red-600);
+  --on-negative: var(--stone-0);
+  --negative-ink: var(--red-700);
+  --negative-bg: var(--red-100);
+  --warning: var(--gold-600);
+  --on-warning: var(--stone-0);
+  --warning-ink: var(--gold-700);
+  --warning-bg: var(--gold-100);
+  --info: var(--lapis-600);
+  --on-info: var(--stone-0);
+  --info-ink: var(--lapis-700);
+  --info-bg: var(--lapis-100);
+
+  /* focus, selection and state layers. The ring is two bands, one unit each (--focus outside, --focus-2 inside),
+     so one of them reads on any ground: --focus-2 is the inner band. */
+  --focus: var(--stone-950);
+  --focus-2: var(--stone-0);
+  --focus-width: var(--u);
+  --focus-offset: var(--u);
+  --selection-bg: var(--moss-500);
+  --selection-ink: var(--stone-0);
+  --hover-bg: color-mix(in srgb, var(--stone-0) 22%, transparent);
+  --pressed-bg: color-mix(in srgb, var(--stone-950) 16%, transparent);
+  --disabled-opacity: 0.5;
+
+  /* the bevel: every raised thing is an --edge frame, a --hi highlight on top and left and a --sh shadow on bottom
+     and right, one or two units thick (the game's own convention, drawn here with inset shadows) */
+  --edge: var(--stone-950);
+  --hi: var(--stone-0);
+  --sh: #7c7e82;
+  --face: var(--stone-500);
+  --face-hi: #8a8d92;
+  --face-sh: #3a3c40;
+  --face-hover: #6a7096;
+  --face-pressed: #4a4d52;
+  --face-ink: var(--stone-0);
+  --text-shadow: #2b2c2f;
+  --slot-dark: #3c3e42;
+  --slot-light: var(--stone-50);
+  --field: #0f1012;
+  --field-ink: var(--stone-50);
+  --field-hint: #a3a6ab;
+  --field-edge: #a3a6ab;
+
+  /* the world's fixed looks: the tooltip frame, the XP bar and tier names read the same in both themes */
+  --tip-bg: var(--night-950);
+  --tip-edge: var(--amethyst-500);
+  --tip-ink: #f5f1fb;
+  --tip-muted: #bdb3d0;
+  --tier-common: #f5f1fb;
+  --tier-uncommon: var(--sun-300);
+  --tier-rare: var(--aqua-300);
+  --tier-epic: var(--amethyst-300);
+  --xp: var(--xp-400);
+  --xp-dark: var(--xp-700);
+  --xp-empty: #1c1d20;
+  --xp-lip: #2f3236;
+  --tip-shadow: #2a2338;
+  --select: #ffffff; /* the selection frame and the hover edge: one white, whatever the theme */
+  --field-bad: #ff9a93; /* an error or an OFF state drawn on the black field */
+  --ping-good: var(--xp-400);
+  --ping-mid: var(--sun-300);
+  --ping-bad: #ff7b72;
+  --ping-off: #3c3e42;
+  --presence-off: #80838a;
+
+  /* data: six marks that never carry meaning alone (a letter, shape or pattern rides with each, FOUNDATIONS §2) */
+  --data-1: #2f4fb8;
+  --data-2: #1f7a4d;
+  --data-3: #8f5400;
+  --data-4: #b3261e;
+  --data-5: #6a3fb0;
+  --data-6: #1f7f8c;
+
+  /* depth: tone steps and bevels carry it; shadows are hard offsets with no blur (chunky), black at partial alpha */
+  --shadow-raised: calc(var(--u) * 2) calc(var(--u) * 2) 0 rgb(0 0 0 / 0.38);
+  --shadow-overlay: calc(var(--u) * 3) calc(var(--u) * 3) 0 rgb(0 0 0 / 0.5);
+  --overlay-border: var(--u) solid var(--edge);
+  --z-base: 0;
+  --z-sticky: 100;
+  --z-dropdown: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* type: six named steps on the unit */
+  --font-display: var(--family-display);
+  --font-body: var(--family-body);
+  --step--1: var(--size--1);
+  --step-0: var(--size-0);
+  --step-1: var(--size-1);
+  --step-2: var(--size-2);
+  --step-3: var(--size-3);
+  --step-4: var(--size-4);
+  --step-display: var(--size-display);
+  --leading-body: 1.4;
+  --leading-heading: 1.2;
+  --leading-display: 1.1;
+  --tracking-display: 0;
+  --measure: 65ch;
+
+  /* space: --gutter is 16 px on a phone at scale 2 */
+  --gap-tight: var(--space-2);
+  --gap-group: var(--space-5);
+  --gap-section: clamp(var(--space-7), 8vw, var(--space-9));
+  --inset-control: var(--space-3);
+  --inset-card: var(--space-4);
+  --gutter: clamp(calc(var(--u) * 8), 4vw, calc(var(--u) * 24));
+  --container: 75rem;
+  --sticky-top: 0px; /* height of a sticky header: scroll-padding keeps a focused control from sitting under it */
+  --sticky-bottom: 0px;
+
+  /* shape: no radius; a notch cuts one unit from each corner of a panel. --border is one unit. */
+  --radius-control: var(--radius-0);
+  --radius-card: var(--radius-0);
+  --radius-sheet: var(--radius-0);
+  --radius-tag: var(--radius-0);
+  --notch: var(--u);
+  --border: var(--u);
+
+  /* icons: one pixel set. 8u carries the 8-cell glyphs, 10u the 10-cell set, 20u the same set at double size */
+  --icon-sm: calc(var(--u) * 8);
+  --icon-md: calc(var(--u) * 10);
+  --icon-lg: calc(var(--u) * 20);
+  --slot: calc(var(--u) * 18);
+
+  /* targets and density: heights are roles, so a compact region changes them. Nothing goes under --target-min;
+     primary actions and every control on a coarse pointer are --tap-min or more. */
+  --target-min: calc(var(--u) * 12);
+  --tap-min: calc(var(--u) * 22);
+  --control-h: calc(var(--u) * 20);
+  --row-h: calc(var(--u) * 22);
+
+  /* Motion (phase 8, MOTION-SYSTEM.md; motion.ts carries the same values). Durations are the guide's scale. The
+     curves are steps: things move in whole frames, the way a game screen redraws, and travel is whole units, so a
+     moving edge always lands on the pixel grid. Nothing scales: scaling resamples pixel art. */
+  --dur-instant: 0ms;
+  --dur-xs: 50ms;
+  --dur-sm: 100ms;
+  --dur-md: 150ms;
+  --dur-lg: 200ms;
+  --dur-xl: 250ms;
+  --dur-2xl: 300ms;
+  --dur-3xl: 400ms;
+  --dur-4xl: 600ms;
+  --dur-hero: 800ms;
+  /* moving while visible: six frames */
+  --ease-standard: steps(6, end);
+  /* entering and in-place exits: the first frame already moved (the stepped form of decelerate) */
+  --ease-enter: steps(4, jump-start);
+  /* permanent exits: holds, then drops out in three frames */
+  --ease-exit: steps(3, end);
+  /* rare, expressive moments (a milestone): more frames, still stepped */
+  --ease-enter-emphasized: steps(8, jump-start);
+  --ease-exit-emphasized: steps(6, end);
+  /* loops and pulses: two states, like a blinking cursor */
+  --ease-symmetric: steps(2, jump-none);
+  /* by role: components read these, not the scale */
+  --dur-press: var(--dur-sm);
+  --dur-hover: var(--dur-sm);
+  --dur-tooltip-in: var(--dur-md);
+  --dur-tooltip-out: var(--dur-sm);
+  --dur-popover-in: var(--dur-md);
+  --dur-popover-out: var(--dur-sm);
+  --dur-modal-in: var(--dur-xl);
+  --dur-modal-out: var(--dur-lg);
+  --dur-sheet-in: var(--dur-3xl);
+  --dur-sheet-out: var(--dur-2xl);
+  --dur-toast-in: var(--dur-xl);
+  --dur-toast-out: var(--dur-lg);
+  --dur-disclosure: var(--dur-lg);
+  --dur-list-in: var(--dur-lg);
+  --dur-list-out: var(--dur-md);
+  --dur-tab: var(--dur-lg);
+  --dur-route-in: var(--dur-xl);
+  --dur-route-out: var(--dur-lg);
+  --dur-swap: var(--dur-lg);
+  --dur-success-swap: var(--dur-md);
+  --dur-scene: var(--dur-4xl);
+  --dur-reduced: var(--dur-sm);
+  /* the style's own effects (vfx/): pop a state, glint something new, pick up a gain, fill experience, shake a refusal */
+  --dur-pop: var(--dur-md);
+  --dur-glint: var(--dur-3xl);
+  --dur-pickup: var(--dur-3xl);
+  --dur-xp: var(--dur-2xl);
+  --dur-shake: var(--dur-2xl);
+  /* loops that carry status (spinner, indeterminate bars, skeleton blink); reduced motion slows or stops them in feedback.css */
+  --dur-loop-spin: 800ms;
+  --dur-loop-slide: 1400ms;
+  --dur-loop-pulse: 1600ms;
+  --hold-success: 1500ms;
+  --stagger-ui: 30ms;
+  --stagger-scene: 60ms;
+  /* how far things move, in whole units (8, 16, 24 px at GUI scale 2); 0 under reduced motion */
+  --travel-sm: calc(var(--u) * 4);
+  --travel-md: calc(var(--u) * 8);
+  --travel-lg: calc(var(--u) * 12);
+  /* nothing grows or shrinks: overlays rise by --travel-sm; a press sinks one unit */
+  --scale-from: 1;
+  --press-scale: 1;
+  --press-travel: var(--u);
+  /* the effect knobs vfx/ reads: the light is the experience lime, the second channel the rare-tier aqua */
+  --vfx-color: var(--xp);
+  --vfx-color-2: var(--tier-rare);
+  --vfx-strength: 1;
+
+  /* 3. Component tokens ---------------------------------------------------------------------------------------
+     Add one only for a part a theme must change that no role covers. A component token that aliases a density role
+     (--control-h, --row-h) would not follow a compact region, so components read those roles directly. */
+  --toast-gap: var(--space-2);
+  --skeleton-bg: var(--sunken);
+  --bg-image: var(--tex-stone, none); /* the backdrop tile, drawn by pixel/textures.ts at boot; the flat --bg shows until then */
+
+  /* The document, from the roles (browser surfaces: guides/craft.md Browser surfaces) */
+  color-scheme: light;
+  caret-color: var(--accent);
+  accent-color: var(--accent);
+  scrollbar-color: var(--stone-500) var(--stone-900);
+  scroll-padding-top: var(--sticky-top);
+  scroll-padding-bottom: var(--sticky-bottom);
+}
+
+/* GUI scale 3: every length is a multiple of --u, so this one line scales the whole interface */
+:root[data-scale='3'] {
+  --size-4: calc(var(--u) * 20);
+  --u: 3px;
+  /* 15u would be 4.5 device pixels per font pixel; 40 px is exactly 4 */
+  --size-2: calc(var(--u) * 13.3333);
+}
+
+/* 2. Roles: dark (the Deepslate theme), following the system setting unless <html data-theme="light"> */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: var(--stone-900);
+    --surface: var(--stone-700);
+    --raised: #484a4f;
+    --sunken: var(--stone-800);
+    --overlay: rgb(0 0 0 / 0.72);
+    --bg-ink: var(--stone-50);
+    --bg-muted: #b9bcc0;
+    --bg-line: var(--stone-400);
+    --ink: var(--stone-50);
+    --muted: #d0d2d6;
+    --subtle: #bec0c5;
+    --line: #5b5e63;
+    --line-strong: #9a9da2;
+    --accent: var(--moss-400);
+    --accent-hover: #5ad492;
+    --on-accent: #08170f;
+    --accent-ink: var(--moss-300);
+    --accent-bg: var(--moss-900);
+    --accent-hi: #8ee8b5;
+    --accent-sh: #1f7a4d;
+    --accent-shadow: transparent;
+    --negative-hi: #ffb0aa;
+    --negative-sh: #a83a33;
+    --negative-shadow: transparent;
+    --positive: var(--lime-400);
+    --on-positive: #10200a;
+    --positive-ink: var(--lime-300);
+    --positive-bg: var(--lime-900);
+    --negative: var(--red-400);
+    --on-negative: #2b0705;
+    --negative-ink: var(--red-300);
+    --negative-bg: var(--red-900);
+    --warning: var(--gold-400);
+    --on-warning: #251800;
+    --warning-ink: var(--gold-300);
+    --warning-bg: var(--gold-900);
+    --info: var(--lapis-400);
+    --on-info: #0b1233;
+    --info-ink: var(--lapis-300);
+    --info-bg: var(--lapis-900);
+    --focus: var(--stone-0);
+    --focus-2: var(--stone-950);
+    --selection-bg: var(--moss-400);
+    --selection-ink: #08170f;
+    --hover-bg: color-mix(in srgb, var(--stone-0) 14%, transparent);
+    --pressed-bg: color-mix(in srgb, var(--stone-950) 30%, transparent);
+    --edge: var(--stone-950);
+    --hi: #6a6d72;
+    --sh: #26282b;
+    --face: #50535a;
+    --face-hi: #7a7d84;
+    --face-sh: #2a2c30;
+    --face-hover: #5f6690;
+    --face-pressed: #404349;
+    --text-shadow: #0d0e10;
+    --slot-dark: #0e0e10;
+    --slot-light: #6a6d72;
+    --field: #0b0c0d;
+    --field-edge: #7a7d84;
+    --shadow-raised: calc(var(--u) * 2) calc(var(--u) * 2) 0 rgb(0 0 0 / 0.55);
+    --shadow-overlay: calc(var(--u) * 3) calc(var(--u) * 3) 0 rgb(0 0 0 / 0.7);
+    --data-1: #7d96f5;
+    --data-2: #46c07e;
+    --data-3: #f0b429;
+    --data-4: #ff7b72;
+    --data-5: #b794f6;
+    --data-6: #4fd0e0;
+    --skeleton-bg: var(--stone-800);
+  --bg-image: var(--tex-deepslate, none);
+    scrollbar-color: var(--stone-500) var(--stone-950);
+    color-scheme: dark;
+  }
+}
+
+/* 2. Roles: dark, when a toggle sets <html data-theme="dark">. Identical to the block above. */
+:root[data-theme='dark'] {
+  --bg: var(--stone-900);
+  --surface: var(--stone-700);
+  --raised: #484a4f;
+  --sunken: var(--stone-800);
+  --overlay: rgb(0 0 0 / 0.72);
+  --bg-ink: var(--stone-50);
+  --bg-muted: #b9bcc0;
+  --bg-line: var(--stone-400);
+  --ink: var(--stone-50);
+  --muted: #d0d2d6;
+  --subtle: #bec0c5;
+  --line: #5b5e63;
+  --line-strong: #9a9da2;
+  --accent: var(--moss-400);
+  --accent-hover: #5ad492;
+  --on-accent: #08170f;
+  --accent-ink: var(--moss-300);
+  --accent-bg: var(--moss-900);
+  --accent-hi: #8ee8b5;
+  --accent-sh: #1f7a4d;
+  --accent-shadow: transparent;
+  --negative-hi: #ffb0aa;
+  --negative-sh: #a83a33;
+  --negative-shadow: transparent;
+  --positive: var(--lime-400);
+  --on-positive: #10200a;
+  --positive-ink: var(--lime-300);
+  --positive-bg: var(--lime-900);
+  --negative: var(--red-400);
+  --on-negative: #2b0705;
+  --negative-ink: var(--red-300);
+  --negative-bg: var(--red-900);
+  --warning: var(--gold-400);
+  --on-warning: #251800;
+  --warning-ink: var(--gold-300);
+  --warning-bg: var(--gold-900);
+  --info: var(--lapis-400);
+  --on-info: #0b1233;
+  --info-ink: var(--lapis-300);
+  --info-bg: var(--lapis-900);
+  --focus: var(--stone-0);
+  --focus-2: var(--stone-950);
+  --selection-bg: var(--moss-400);
+  --selection-ink: #08170f;
+  --hover-bg: color-mix(in srgb, var(--stone-0) 14%, transparent);
+  --pressed-bg: color-mix(in srgb, var(--stone-950) 30%, transparent);
+  --edge: var(--stone-950);
+  --hi: #6a6d72;
+  --sh: #26282b;
+  --face: #50535a;
+  --face-hi: #7a7d84;
+  --face-sh: #2a2c30;
+  --face-hover: #5f6690;
+  --face-pressed: #404349;
+  --text-shadow: #0d0e10;
+  --slot-dark: #0e0e10;
+  --slot-light: #6a6d72;
+  --field: #0b0c0d;
+  --field-edge: #7a7d84;
+  --shadow-raised: calc(var(--u) * 2) calc(var(--u) * 2) 0 rgb(0 0 0 / 0.55);
+  --shadow-overlay: calc(var(--u) * 3) calc(var(--u) * 3) 0 rgb(0 0 0 / 0.7);
+  --data-1: #7d96f5;
+  --data-2: #46c07e;
+  --data-3: #f0b429;
+  --data-4: #ff7b72;
+  --data-5: #b794f6;
+  --data-6: #4fd0e0;
+  --skeleton-bg: var(--stone-800);
+  --bg-image: var(--tex-deepslate, none);
+  scrollbar-color: var(--stone-500) var(--stone-950);
+  color-scheme: dark;
+}
+
+/* More contrast: `product` scope ships this context. Roles whose pairs fall under 7:1 move to darker (Stone) or
+   lighter (Deepslate) primitives, and the bevel goes to full black and white. Selected by
+   `@media (prefers-contrast: more)` and by `[data-contrast='more']`, with identical values. */
+@media (prefers-contrast: more) {
+  :root:not([data-theme='dark']) {
+    --muted: var(--stone-850);
+    --subtle: #2b2d30;
+    --accent-ink: #0d3d25;
+    --positive-ink: #1e3d08;
+    --negative-ink: #6e130e;
+    --warning-ink: #4a2c00;
+    --info-ink: #1a2f73;
+    --line: var(--stone-700);
+    --sh: #4a4c50;
+    --face: #3a3c40;
+  }
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --muted: var(--stone-0);
+    --subtle: #e6e8ec;
+    --line: #9a9da2;
+    --hi: #9a9da2;
+    --face: #5b5e63;
+  }
+}
+@media (prefers-contrast: more) {
+  :root[data-theme='dark'] {
+    --muted: var(--stone-0);
+    --subtle: #e6e8ec;
+    --line: #9a9da2;
+    --hi: #9a9da2;
+    --face: #5b5e63;
+  }
+}
+:root[data-contrast='more']:not([data-theme='dark']) {
+  --muted: var(--stone-850);
+  --subtle: #2b2d30;
+  --accent-ink: #0d3d25;
+  --positive-ink: #1e3d08;
+  --negative-ink: #6e130e;
+  --warning-ink: #4a2c00;
+  --info-ink: #1a2f73;
+  --line: var(--stone-700);
+  --sh: #4a4c50;
+  --face: #3a3c40;
+}
+:root[data-contrast='more'][data-theme='dark'] {
+  --muted: var(--stone-0);
+  --subtle: #e6e8ec;
+  --line: #9a9da2;
+  --hi: #9a9da2;
+  --face: #5b5e63;
+}
+
+/* Density: one step is 2 units. A region or the whole document sets data-density="compact" (dense lists, moderation
+   queues). Controls are --tap-min or more on a coarse pointer, whatever the density. */
+[data-density='compact'] {
+  --control-h: calc(var(--u) * 18);
+  --row-h: calc(var(--u) * 20);
+}
+@media (pointer: coarse) {
+  :root,
+  [data-density] {
+    --control-h: var(--tap-min);
+    --row-h: var(--tap-min);
+  }
+}
+/* the display step steps up on wide screens, in whole units */
+@media (min-width: 64rem) {
+  :root {
+    --size-display: calc(var(--u) * 30);
+  }
+}
+
+/* Reduced motion keeps the state change and drops the travel (MOTION-SYSTEM.md, Reduced motion). Written twice, like
+   dark: the system setting, and the in-app switch <html data-motion="reduced"> that motion.ts reads too. The press
+   sink stays: it is one unit, a state, not travel. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --travel-sm: 0px;
+    --travel-md: 0px;
+    --travel-lg: 0px;
+    --scale-from: 1;
+    --press-scale: 1;
+    --stagger-ui: 0ms;
+    --stagger-scene: 0ms;
+    --dur-modal-in: var(--dur-reduced);
+    --dur-modal-out: var(--dur-reduced);
+    --dur-sheet-in: var(--dur-reduced);
+    --dur-sheet-out: var(--dur-reduced);
+    --dur-toast-in: var(--dur-reduced);
+    --dur-toast-out: var(--dur-reduced);
+    --dur-list-in: var(--dur-reduced);
+    --dur-list-out: var(--dur-reduced);
+    --dur-route-in: var(--dur-reduced);
+    --dur-route-out: var(--dur-reduced);
+    --dur-disclosure: var(--dur-reduced);
+    --dur-scene: var(--dur-reduced);
+  }
+}
+:root[data-motion='reduced'] {
+  --travel-sm: 0px;
+  --travel-md: 0px;
+  --travel-lg: 0px;
+  --scale-from: 1;
+  --press-scale: 1;
+  --stagger-ui: 0ms;
+  --stagger-scene: 0ms;
+  --dur-modal-in: var(--dur-reduced);
+  --dur-modal-out: var(--dur-reduced);
+  --dur-sheet-in: var(--dur-reduced);
+  --dur-sheet-out: var(--dur-reduced);
+  --dur-toast-in: var(--dur-reduced);
+  --dur-toast-out: var(--dur-reduced);
+  --dur-list-in: var(--dur-reduced);
+  --dur-list-out: var(--dur-reduced);
+  --dur-route-in: var(--dur-reduced);
+  --dur-route-out: var(--dur-reduced);
+  --dur-disclosure: var(--dur-reduced);
+  --dur-scene: var(--dur-reduced);
+}
+
+/* Document base, from the roles. It sits in the base layer so Tailwind utilities and component styles win. The
+   ground is dark in both themes, so the body reads --bg-ink; a panel resets its own text to --ink. */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background-color: var(--bg);
+    background-image: var(--bg-image);
+    background-size: calc(var(--u) * 32) calc(var(--u) * 32);
+    image-rendering: pixelated;
+    color: var(--bg-ink);
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    line-height: var(--leading-body);
+    font-kerning: none;
+    font-variant-numeric: tabular-nums;
+    /* one weight: a requested bold is not smeared into the glyphs; emphasis is colour, shadow and size */
+    font-synthesis: none;
+  }
+  ::selection {
+    background: var(--selection-bg);
+    color: var(--selection-ink);
+  }
+  :focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+  a {
+    text-underline-offset: calc(var(--u) * 1);
+    text-decoration-thickness: var(--u);
+  }
+  :is(h1, h2, h3) {
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: var(--leading-heading);
+    text-wrap: balance;
+  }
+  h1 {
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+  }
+  p {
+    text-wrap: pretty;
+  }
+  img,
+  svg,
+  canvas {
+    image-rendering: pixelated;
+  }
+}

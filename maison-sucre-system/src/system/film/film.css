@@ -1,0 +1,17 @@
+/* The film player (0.4.0). The poster, the canvas and the stills share one box and one cover crop. */
+@layer components {
+  .ms-film { position: absolute; inset: 0; overflow: hidden; background: var(--band-bg); }
+  .ms-film picture, .ms-film__poster, .ms-film__canvas, .ms-film__stills, .ms-film__stills img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+  .ms-film__poster, .ms-film__stills img { object-fit: cover; }
+  /* the canvas takes over from the poster without a jump: same box, a short cross-fade once it has drawn */
+  .ms-film__canvas { opacity: 0; transition: opacity var(--dur-swap) var(--ease-enter); }
+  .ms-film__canvas[data-ready] { opacity: 1; }
+  /* phones: the chapter stills cross-fade (state change only; under reduced motion the token makes it near-instant) */
+  .ms-film__stills img { opacity: 0; transition: opacity var(--dur-scene) var(--ease-standard); }
+  .ms-film__stills img[data-current] { opacity: 1; }
+}

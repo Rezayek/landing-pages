@@ -1,0 +1,791 @@
+/*
+ * Blockfeed's product components: the build card, comments, chat, profile, notifications, servers, the weekly challenge,
+ * the events calendar, moderation. They are made from the primitives in ui/ui.css and from roles in tokens.css only:
+ * every length is a multiple of --u, every colour is a role. Nothing here is rounded; panels keep the notch.
+ */
+@layer components {
+  :root {
+    /* the two-band focus ring for elements that have no bevel of their own */
+    --bf-ring-shadow: 0 0 0 var(--u) var(--focus-2), 0 0 0 calc(var(--u) * 2) var(--focus);
+  }
+
+  /* ----- a link that is a button -------------------------------------------------------------------------------- */
+  .bf-link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+    text-align: start;
+    cursor: pointer;
+  }
+  @media (hover: hover) {
+    .bf-link:hover {
+      text-decoration: underline;
+      text-decoration-thickness: var(--u);
+      text-underline-offset: calc(var(--u) * 2);
+    }
+  }
+  .bf-link:focus-visible,
+  .bf-tile:focus-visible,
+  .bf-note:focus-visible,
+  .bf-thread:focus-visible,
+  .bf-day:focus-visible,
+  .bf-chat:focus-visible {
+    outline: none;
+    box-shadow: var(--bf-focus-base, 0 0 0 0 transparent), var(--bf-ring-shadow);
+  }
+
+  /* ----- build screenshot, copy field ---------------------------------------------------------------------------- */
+  .bf-shot {
+    display: block;
+    padding: calc(var(--u) * 2);
+    background: var(--sunken);
+    box-shadow: inset var(--u) var(--u) 0 var(--slot-dark), inset calc(var(--u) * -1) calc(var(--u) * -1) 0 var(--slot-light);
+    line-height: 0;
+  }
+  .bf-shot__img {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 16 / 9;
+    image-rendering: pixelated;
+    box-shadow: 0 0 0 var(--u) var(--edge);
+    background: var(--field);
+  }
+  .bf-copy {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-inline-size: 0;
+    padding-inline-start: var(--space-3);
+    background: var(--field);
+    color: var(--field-ink);
+    box-shadow: inset 0 0 0 var(--u) var(--field-edge);
+  }
+  .bf-copy__label {
+    flex: none;
+    color: var(--field-hint);
+    font-size: var(--step--1);
+  }
+  .bf-copy__value {
+    flex: 1 1 0;
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* the copy answer, written beside the button it answers: "Copied", or how to copy by hand when the clipboard is blocked */
+  .bf-copy[data-copied] {
+    flex-wrap: wrap;
+  }
+  .bf-copy[data-copied]::after {
+    padding-inline-end: var(--space-2);
+    color: var(--tier-uncommon);
+    font-size: var(--step--1);
+  }
+  .bf-copy[data-copied='ok']::after {
+    content: 'Copied';
+  }
+  .bf-copy[data-copied='fail']::after {
+    content: 'Select the text and copy it';
+    flex-basis: 100%;
+    color: var(--field-bad);
+  }
+  .bf-copy .bf-btn[data-variant='ghost'] {
+    --b-ink: var(--field-ink);
+    --b-hover: color-mix(in srgb, var(--field-ink) 18%, transparent);
+  }
+
+  /* ----- build card, feed ---------------------------------------------------------------------------------------- */
+  .bf-feed {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--u) * 150)), 1fr));
+    gap: var(--space-4);
+    align-items: start;
+  }
+  .bf-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-block-end: calc(var(--u) * 5);
+  }
+  /* the words sit on the same inset as the picture inside its frame (3u panel pad + 2u shot frame), clear of the bevel */
+  .bf-card > :not(.bf-card__media) {
+    padding-inline: calc(var(--u) * 2);
+  }
+  .bf-card__media {
+    position: relative;
+  }
+  .bf-card__badge {
+    position: absolute;
+    inset-block-start: calc(var(--u) * 5);
+    inset-inline-start: calc(var(--u) * 5);
+  }
+  .bf-card__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+  }
+  .bf-card__by {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-inline-size: 0;
+  }
+  .bf-card__who {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    line-height: 1.2;
+  }
+  .bf-facts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--u);
+  }
+  .bf-card__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  /* ----- comments ------------------------------------------------------------------------------------------------ */
+  .bf-comment {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: start;
+  }
+  .bf-comment[data-reply] {
+    margin-inline-start: var(--space-6);
+    padding-inline-start: var(--space-3);
+    box-shadow: inset calc(var(--u) * 2) 0 0 var(--line);
+  }
+  .bf-comment__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-inline-size: 0;
+  }
+  .bf-comment__head {
+    gap: var(--space-2);
+  }
+  .bf-comment__text {
+    margin: 0;
+    max-inline-size: var(--measure);
+    overflow-wrap: anywhere;
+  }
+
+  /* ----- chat log, composer, inbox ------------------------------------------------------------------------------- */
+  .bf-chat {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--u) * 2);
+    max-block-size: calc(var(--u) * 140);
+    padding: var(--space-3);
+    overflow-y: auto;
+    background: var(--field);
+    color: var(--field-ink);
+    box-shadow: inset 0 0 0 var(--u) var(--field-edge);
+    --bf-focus-base: inset 0 0 0 var(--u) var(--field-edge);
+  }
+  .bf-chat__line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--space-2);
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+  .bf-chat__time {
+    color: var(--field-hint);
+    font-size: var(--step--1);
+  }
+  .bf-chat__name {
+    font-weight: 700;
+  }
+  .bf-chat__line[data-mine] .bf-chat__name {
+    color: var(--xp);
+  }
+  .bf-chat__text {
+    flex: 1 1 12ch;
+    min-inline-size: 0;
+  }
+  .bf-composer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-2);
+    align-items: center;
+  }
+  .bf-threads {
+    display: flex;
+    flex-direction: column;
+    gap: var(--u);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .bf-thread {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-3);
+    inline-size: 100%;
+    min-block-size: var(--row-h);
+    padding: var(--space-2) var(--space-3);
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+  @media (hover: hover) {
+    .bf-thread:hover {
+      background: var(--hover-bg);
+    }
+  }
+  .bf-thread[aria-current='true'] {
+    background: var(--sunken);
+    --bf-focus-base: inset 0 0 0 var(--u) var(--select);
+    box-shadow: inset 0 0 0 var(--u) var(--edge), inset 0 0 0 calc(var(--u) * 3) var(--select), inset 0 0 0 calc(var(--u) * 4) var(--edge);
+  }
+  /* on a slot well, text is --ink only (FOUNDATIONS.md §2): muted falls under 4.5:1 on Stone's slot gray */
+  .bf-thread[aria-current='true'] :is(.bf-thread__last, .bf-subtle, .bf-muted) {
+    color: var(--ink);
+  }
+  .bf-thread__text {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+  .bf-thread__name {
+    font-weight: 700;
+  }
+  .bf-thread__last {
+    overflow: hidden;
+    color: var(--muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .bf-thread__meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-1);
+    font-size: var(--step--1);
+  }
+
+  /* ----- profile, gallery ---------------------------------------------------------------------------------------- */
+  .bf-profile {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-5);
+    align-items: start;
+  }
+  .bf-profile__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    min-inline-size: 0;
+  }
+  .bf-profile__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-3);
+    line-height: var(--leading-heading);
+    overflow-wrap: anywhere;
+  }
+  .bf-profile__bio {
+    margin: 0;
+    max-inline-size: var(--measure);
+  }
+  .bf-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-6);
+    margin: 0;
+  }
+  .bf-stat {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+  .bf-stat__label {
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+  .bf-stat__value {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  @media (max-width: 40rem) {
+    .bf-profile {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .bf-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--u) * 70)), 1fr));
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .bf-tile {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--u) * 2);
+    inline-size: 100%;
+    padding: calc(var(--u) * 2);
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+  @media (hover: hover) {
+    .bf-tile:hover {
+      background: var(--hover-bg);
+    }
+  }
+  .bf-tile__title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .bf-tile__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+
+  /* ----- notifications: the advancement look ---------------------------------------------------------------------- */
+  .bf-notes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .bf-note {
+    --bf-focus-base: inset 0 0 0 var(--u) var(--edge);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-3);
+    inline-size: 100%;
+    padding: var(--space-3);
+    border: 0;
+    background: var(--raised);
+    color: var(--ink);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 var(--u) var(--edge), inset calc(var(--u) * 3) calc(var(--u) * 3) 0 var(--hi),
+      inset calc(var(--u) * -3) calc(var(--u) * -3) 0 var(--sh);
+  }
+  .bf-note[data-unread] {
+    box-shadow: inset 0 0 0 var(--u) var(--edge), inset calc(var(--u) * 4) 0 0 var(--select), inset calc(var(--u) * 5) 0 0 var(--edge),
+      inset calc(var(--u) * 3) calc(var(--u) * 3) 0 var(--hi), inset calc(var(--u) * -3) calc(var(--u) * -3) 0 var(--sh);
+    padding-inline-start: calc(var(--space-3) + var(--u) * 3);
+  }
+  @media (hover: hover) {
+    .bf-note:hover {
+      background: var(--surface);
+    }
+  }
+  .bf-note__icon {
+    display: grid;
+    place-items: center;
+    inline-size: calc(var(--u) * 24);
+    block-size: calc(var(--u) * 24);
+    background: var(--tip-bg);
+    color: var(--tip-ink);
+    box-shadow: inset 0 0 0 var(--u) var(--tip-edge);
+    --icon-shadow: var(--tip-shadow);
+  }
+  .bf-note__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--u);
+    min-inline-size: 0;
+  }
+  .bf-note__kind {
+    color: var(--accent-ink);
+    font-size: var(--step--1);
+    font-weight: 700;
+  }
+  .bf-note__text {
+    overflow-wrap: anywhere;
+  }
+  .bf-bell {
+    position: relative;
+    display: inline-flex;
+  }
+  .bf-bell__count {
+    position: absolute;
+    inset-block-start: calc(var(--u) * -2);
+    inset-inline-end: calc(var(--u) * -2);
+    pointer-events: none;
+  }
+  .bf-person {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .bf-person__text {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+  .bf-person__bio {
+    overflow: hidden;
+    color: var(--muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ----- servers: one dark row, like the game's server list ------------------------------------------------------- */
+  .bf-server {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: var(--space-4);
+    align-items: start;
+    padding: var(--space-3);
+    background: var(--field);
+    color: var(--field-ink);
+    box-shadow: inset 0 0 0 var(--u) var(--field-edge);
+  }
+  .bf-server__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-inline-size: 0;
+  }
+  .bf-server__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    line-height: var(--leading-heading);
+  }
+  .bf-server__blurb {
+    margin: 0;
+    color: var(--field-hint);
+  }
+  .bf-server .bf-copy {
+    align-self: flex-start;
+    max-inline-size: 100%;
+    padding-inline-start: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .bf-server__main .bf-copy__value,
+  .bf-group .bf-copy__value {
+    flex: 0 1 auto;
+  }
+  /* a large icon sits in a large slot: 24u is the 20u icon at two units per font pixel with a frame */
+  .bf-server > .bf-slot,
+  .bf-group > .bf-slot {
+    --slot-w: calc(var(--u) * 24);
+    --slot-h: calc(var(--u) * 24);
+  }
+  .bf-server__live {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-2);
+    min-inline-size: calc(var(--u) * 52);
+  }
+  .bf-server__live .bf-xp {
+    inline-size: 100%;
+  }
+  .bf-server__live > .bf-tag {
+    align-self: flex-end;
+  }
+  .bf-server__players {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+  @media (max-width: 40rem) {
+    .bf-server {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+    .bf-server__live {
+      grid-column: 1 / -1;
+      align-items: stretch;
+    }
+    .bf-server__live > .bf-tag {
+      align-self: flex-start;
+    }
+  }
+  .bf-filters {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .bf-filters__row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--u) * 70)), 1fr));
+    gap: var(--space-2);
+  }
+  .bf-group {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: var(--space-3);
+    align-items: center;
+  }
+  .bf-group__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-inline-size: 0;
+  }
+  .bf-group__name {
+    margin: 0;
+    font-size: var(--step-2);
+    line-height: var(--leading-heading);
+  }
+  .bf-group__blurb {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  /* ----- weekly challenge ---------------------------------------------------------------------------------------- */
+  .bf-challenge {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .bf-challenge__head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-3) var(--space-5);
+  }
+  .bf-challenge__title {
+    margin: 0 0 var(--space-1);
+    font-size: var(--step-2);
+    line-height: var(--leading-heading);
+  }
+  .bf-challenge__facts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+  .bf-votes {
+    display: inline-flex;
+    gap: var(--u);
+  }
+  .bf-entries {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .bf-entry {
+    display: grid;
+    grid-template-columns: auto calc(var(--u) * 56) minmax(0, 1fr) auto;
+    gap: var(--space-3);
+    align-items: center;
+  }
+  .bf-entry__rank {
+    inline-size: calc(var(--u) * 8);
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-weight: 700;
+    text-align: center;
+  }
+  .bf-entry__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--u);
+    min-inline-size: 0;
+  }
+  .bf-entry__title {
+    overflow-wrap: anywhere;
+  }
+  .bf-entry__vote {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  @media (max-width: 40rem) {
+    .bf-entry {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+    .bf-entry .bf-shot {
+      grid-column: 2;
+    }
+    .bf-entry__main {
+      grid-column: 2;
+    }
+    .bf-entry__vote {
+      grid-column: 2;
+      justify-content: space-between;
+    }
+  }
+
+  /* ----- events calendar ----------------------------------------------------------------------------------------- */
+  .bf-calendar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .bf-calendar__title {
+    margin: 0;
+    font-size: var(--step-1);
+    line-height: var(--leading-heading);
+  }
+  .bf-cal {
+    inline-size: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: var(--u);
+  }
+  .bf-cal th {
+    padding: 0;
+    color: var(--muted);
+    font-size: var(--step--1);
+    font-weight: 700;
+    text-align: center;
+  }
+  .bf-cal td {
+    padding: 0;
+  }
+  .bf-day {
+    --bf-focus-base: inset var(--u) var(--u) 0 var(--slot-dark), inset calc(var(--u) * -1) calc(var(--u) * -1) 0 var(--slot-light);
+    position: relative;
+    display: grid;
+    place-items: center;
+    inline-size: 100%;
+    min-block-size: calc(var(--u) * 16);
+    padding: 0;
+    border: 0;
+    background: var(--sunken);
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+    box-shadow: inset var(--u) var(--u) 0 var(--slot-dark), inset calc(var(--u) * -1) calc(var(--u) * -1) 0 var(--slot-light);
+  }
+  @media (pointer: coarse) {
+    .bf-day {
+      min-block-size: var(--tap-min);
+    }
+  }
+  @media (hover: hover) {
+    .bf-day:hover {
+      background: color-mix(in srgb, var(--sunken), var(--select) 22%);
+    }
+  }
+  .bf-day[data-today] {
+    box-shadow: inset 0 0 0 var(--u) var(--edge), inset 0 0 0 calc(var(--u) * 3) var(--select), inset 0 0 0 calc(var(--u) * 4) var(--edge);
+  }
+  .bf-day[aria-pressed='true'] {
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 700;
+    text-shadow: var(--u) var(--u) 0 var(--accent-shadow);
+  }
+  .bf-day__count {
+    position: absolute;
+    inset-inline-end: calc(var(--u) * 2);
+    inset-block-end: calc(var(--u) * 2);
+    min-inline-size: calc(var(--u) * 7);
+    background: var(--face);
+    color: var(--face-ink);
+    font-size: var(--step--1);
+    font-weight: 700;
+    line-height: 1.1;
+    text-align: center;
+    text-shadow: none;
+  }
+  .bf-events {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .bf-event {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    gap: var(--space-3);
+    align-items: center;
+  }
+  .bf-event__time {
+    font-weight: 700;
+  }
+  .bf-event__main {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+  @media (max-width: 40rem) {
+    .bf-event {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+    .bf-event > :nth-child(n + 3) {
+      grid-column: 2;
+      justify-self: start;
+    }
+  }
+
+  /* ----- search results, moderation ------------------------------------------------------------------------------ */
+  .bf-results {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .bf-results__title {
+    margin: 0;
+    font-size: var(--step-0);
+  }
+  .bf-results__title .bf-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-block-size: var(--target-min);
+  }
+  .bf-results__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .bf-queue {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .bf-queue p {
+    margin: 0;
+  }
+  .bf-quote {
+    margin: 0;
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5);
+    background: var(--field);
+    color: var(--field-ink);
+    box-shadow: inset calc(var(--u) * 2) 0 0 var(--select), inset 0 0 0 var(--u) var(--field-edge);
+    overflow-wrap: anywhere;
+  }
+}

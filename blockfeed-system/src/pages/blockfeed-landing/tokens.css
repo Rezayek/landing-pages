@@ -1,0 +1,72 @@
+/*
+ * Page extensions for blockfeed-landing, scoped to [data-page]. Only what this page's concept uses: the voxel plot's
+ * block faces (top, left, right) and the strata dividers' layer tones. Everything else is the system's tokens.
+ */
+[data-page='blockfeed-landing'] {
+  --bl-grass-1: #7fd13b;
+  --bl-grass-2: #4f8f23;
+  --bl-grass-3: #386a18;
+  --bl-dirt-1: #9a6b43;
+  --bl-dirt-2: #73502f;
+  --bl-dirt-3: #573b22;
+  --bl-stone-1: #b8bcc2;
+  --bl-stone-2: #8b9096;
+  --bl-stone-3: #6a6e74;
+  --bl-plank-1: #d8a35a;
+  --bl-plank-2: #a8793c;
+  --bl-plank-3: #7f5a2b;
+  --bl-glass-1: #bfe8f2;
+  --bl-glass-2: #8ac7d6;
+  --bl-glass-3: #6aa9b8;
+  --bl-lamp-1: #ffe28a;
+  --bl-lamp-2: #f0b84a;
+  --bl-lamp-3: #c98f2c;
+  --bl-roof-1: #c0503a;
+  --bl-roof-2: #93392a;
+  --bl-roof-3: #6e2a1f;
+  --bl-sand-1: #e8d49a;
+  --bl-sand-2: #c9b276;
+  --bl-sand-3: #a8925c;
+  --bl-deep-1: #4b4d55;
+  --bl-deep-2: #33343a;
+  --bl-deep-3: #232428;
+  --bl-bedrock-1: #5a5a5a;
+  --bl-bedrock-2: #2f2f2f;
+  --bl-bedrock-3: #141414;
+  --bl-water-1: #3f76e4;
+  --bl-water-2: #2f5bb8;
+  --bl-water-3: #234690;
+  --bl-leaf-1: #4f9a3a;
+  --bl-leaf-2: #3a7a2a;
+  --bl-leaf-3: #2a5c1e;
+  --bl-log-1: #a07a4a;
+  --bl-log-2: #6e5233;
+  --bl-log-3: #4e3a24;
+  /* the night sky over the world, in three stepped bands, with stars and a square moon */
+  --bl-sky-1: #0b0d1a;
+  --bl-sky-2: #121730;
+  --bl-sky-3: #1b2244;
+  --bl-star: #e8ecff;
+  --bl-moon: #f1f3d8;
+  /* the plot's cube size: half the width of a cube's top face, in CSS px */
+  --bl-cube: 20px;
+  /* the page's two headline steps, in whole font pixels (5u at GUI scale 2): the H1 clearly above the H2s */
+  --bl-size-hero: calc(var(--u) * 40);
+  --bl-size-h2: calc(var(--u) * 25);
+}
+@media (max-width: 48rem) {
+  [data-page='blockfeed-landing'] {
+    --bl-size-hero: calc(var(--u) * 25);
+    --bl-size-h2: calc(var(--u) * 20);
+  }
+}
+@media (max-width: 40rem) {
+  [data-page='blockfeed-landing'] {
+    --bl-cube: 10px;
+  }
+}
+@media (max-width: 24rem) {
+  [data-page='blockfeed-landing'] {
+    --bl-size-hero: calc(var(--u) * 20);
+  }
+}

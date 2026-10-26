@@ -1,0 +1,419 @@
+/*
+ * Echo Atlas: the style's own devices and effects (FOUNDATIONS.md §10, MOTION-SYSTEM.md §Theme expression).
+ * Next to the neutral primitives in ./vfx. Every knob is a token from tokens.css; nothing here holds a raw colour,
+ * duration or curve.
+ *
+ *   .ea-frame          the notched panel: a line layer and a fill layer cut with one 45° notch (top right)
+ *   ea-edge            the lit notch edge: the corner of the line layer turns gold (hover, focus, selected)
+ *   ea-draw            a line drawing from its start (section rule, dialog title rule, delta underline)
+ *   ea-activeline      the fading active line under the current nav item or tab
+ *   ea-ticks           four corner ticks that close in on a selected card
+ *   ea-wave            the waveform loader (verb `tune`), with ea-settle (flattens: done) and ea-detune (fails)
+ *   ea-skel            the draw-on skeleton: the notched outline draws in and settles, the blocks tune in (3 breaths)
+ *   ea-ripple          one ring expanding from a press point or a result (verb `resonate`)
+ *   ea-field           the resonance field: a dot grid masked into a wave; drifts once with [data-field='drift']
+ *   ea-route           the content plane arriving (fade with a short rise; drill-in sweeps from the right)
+ */
+
+@property --ea-lit {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+@layer components {
+  /* --- The notched frame ------------------------------------------------------------------------------------ */
+  .ea-frame {
+    --_n: var(--notch, var(--notch-card));
+    --_fill: var(--frame-fill, var(--surface));
+    --_line: var(--frame-border, transparent);
+    position: relative;
+    isolation: isolate;
+    transition: --ea-lit var(--dur-draw) var(--ease-enter);
+  }
+  .ea-frame::before,
+  .ea-frame::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+  }
+  /* line layer: its top-right corner is the lit edge, drawn by --ea-lit from 0 to 1 */
+  .ea-frame::before {
+    inset: 0;
+    background: linear-gradient(
+      225deg,
+      var(--frame-edge) 0 calc(var(--_n) * 1.6 * var(--ea-lit)),
+      var(--_line) calc(var(--_n) * 1.6 * var(--ea-lit))
+    );
+    clip-path: polygon(0 0, calc(100% - var(--_n)) 0, 100% var(--_n), 100% 100%, 0 100%);
+    padding: 1px;
+    box-sizing: border-box;
+    mask:
+      linear-gradient(
+        225deg,
+        transparent calc(var(--_n) * 0.7071 - 1px),
+        #000 calc(var(--_n) * 0.7071 - 1px) calc(var(--_n) * 0.7071 + 0.5px),
+        transparent calc(var(--_n) * 0.7071 + 0.5px)
+      ),
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: add, exclude;
+  }
+  /* fill layer: 1 px inside, its notch moved in by the same 1 px measured across the diagonal */
+  .ea-frame::after {
+    inset: 1px;
+    background: linear-gradient(var(--_layer, transparent), var(--_layer, transparent)), var(--_fill);
+    clip-path: polygon(
+      0 0,
+      calc(100% - var(--_n) + 0.59px) 0,
+      100% calc(var(--_n) - 0.59px),
+      100% 100%,
+      0 100%
+    );
+  }
+  .ea-frame[data-tone='raised'] {
+    --_fill: var(--raised);
+  }
+  .ea-frame[data-tone='sunken'] {
+    --_fill: var(--sunken);
+  }
+  .ea-frame[data-tone='band'] {
+    --_fill: var(--band-surface);
+    --_line: var(--band-line);
+    color: var(--band-ink);
+  }
+  .ea-frame[data-tone='outline'] {
+    --_line: var(--line);
+  }
+
+  /* --- ea-edge: the notch lights on hover (pointer devices), focus and selection ---------------------------- */
+  @media (hover: hover) and (pointer: fine) {
+    .ea-edge:hover {
+      --ea-lit: 1;
+    }
+  }
+  .ea-edge:focus-visible,
+  .ea-edge:has(:focus-visible),
+  .ea-edge[data-selected='true'],
+  .ea-edge[aria-pressed='true'],
+  .ea-edge[aria-selected='true'],
+  .ea-edge[data-preview='hover'],
+  .ea-edge[data-preview='focus'] {
+    --ea-lit: 1;
+  }
+
+  /* --- ea-draw: a line drawing from its start --------------------------------------------------------------- */
+  .ea-draw {
+    transform-origin: 0 50%;
+    animation: ea-draw var(--dur-draw) var(--ease-enter) both;
+  }
+  @keyframes ea-draw {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  /* --- ea-activeline: the gold line that fades to nothing at both ends -------------------------------------- */
+  .ea-activeline {
+    position: relative;
+  }
+  .ea-activeline::after {
+    content: '';
+    position: absolute;
+    inset-inline: -8px;
+    inset-block-end: 0;
+    block-size: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent) 22%, var(--accent) 78%, transparent);
+    transform: scaleX(0);
+    transition: transform var(--dur-tab) var(--ease-sweep);
+  }
+  .ea-activeline:is([aria-current='page'], [aria-selected='true'], [aria-checked='true'], [aria-pressed='true'])::after {
+    transform: scaleX(1);
+  }
+  .ea-activeline[data-axis='inline']::after {
+    inset: 8px auto 8px 0;
+    inline-size: 1px;
+    block-size: auto;
+    background: linear-gradient(180deg, transparent, var(--accent) 22%, var(--accent) 78%, transparent);
+    transform: scaleY(0);
+  }
+  .ea-activeline[data-axis='inline']:is([aria-current='page'], [aria-selected='true'])::after {
+    transform: scaleY(1);
+  }
+
+  /* --- ea-ticks: the selection marker ----------------------------------------------------------------------- */
+  .ea-ticks {
+    position: relative;
+  }
+  .ea-ticks > .ea-ticks__mark {
+    position: absolute;
+    inset: calc(var(--travel-sm) * -1);
+    pointer-events: none;
+    opacity: 0;
+    --_t: 10px;
+    background:
+      linear-gradient(var(--accent), var(--accent)) top left / var(--_t) 1px,
+      linear-gradient(var(--accent), var(--accent)) top left / 1px var(--_t),
+      linear-gradient(var(--accent), var(--accent)) top right / var(--_t) 1px,
+      linear-gradient(var(--accent), var(--accent)) top right / 1px var(--_t),
+      linear-gradient(var(--accent), var(--accent)) bottom left / var(--_t) 1px,
+      linear-gradient(var(--accent), var(--accent)) bottom left / 1px var(--_t),
+      linear-gradient(var(--accent), var(--accent)) bottom right / var(--_t) 1px,
+      linear-gradient(var(--accent), var(--accent)) bottom right / 1px var(--_t);
+    background-repeat: no-repeat;
+    transition:
+      inset var(--dur-draw) var(--ease-enter),
+      opacity var(--dur-sm) var(--ease-enter);
+  }
+  .ea-ticks:is([data-selected='true'], [aria-pressed='true'], [aria-selected='true']) > .ea-ticks__mark {
+    inset: -3px;
+    opacity: 1;
+  }
+
+  /* --- ea-wave: the waveform loader (tune), settle (done), detune (failed) ---------------------------------- */
+  .ea-wave {
+    --_w: var(--icon-md);
+    display: inline-block;
+    flex: none;
+    inline-size: calc(var(--_w) * 1.2);
+    block-size: calc(var(--_w) * 0.6);
+    overflow: hidden;
+    color: currentColor;
+    vertical-align: middle;
+  }
+  .ea-wave > svg {
+    display: block;
+    inline-size: 200%;
+    block-size: 100%;
+    animation: ea-tune var(--wave-period) linear infinite;
+  }
+  @keyframes ea-tune {
+    from {
+      transform: translateX(0) scaleY(var(--wave-amp));
+    }
+    to {
+      transform: translateX(-50%) scaleY(var(--wave-amp));
+    }
+  }
+  .ea-settle > svg,
+  .ea-wave[data-settle] > svg {
+    animation: ea-settle var(--dur-xl) var(--ease-enter) forwards;
+  }
+  @keyframes ea-settle {
+    to {
+      transform: translateX(0) scaleY(0.06);
+    }
+  }
+  .ea-detune > svg,
+  .ea-wave[data-detune] > svg {
+    color: var(--negative);
+    animation: ea-detune var(--dur-lg) steps(4, end) forwards;
+  }
+  @keyframes ea-detune {
+    25% {
+      transform: translate(-3px, 2px) scaleY(1.2);
+    }
+    50% {
+      transform: translate(2px, -2px) scaleY(0.8);
+    }
+    75% {
+      transform: translate(-1px, 1px) scaleY(1);
+    }
+    to {
+      transform: translate(0, 0) scaleY(0.06);
+    }
+  }
+
+  /* --- ea-skel: the draw-on skeleton. The notched outline draws itself in from the start (verb `draw`) and settles
+     to a quiet line; the blocks inside tune in, three breaths, then still. Built from the loaded component's own
+     markup with transparent text, so it has the loaded size and the swap moves nothing. --------------------------- */
+  .ea-skel {
+    position: relative;
+    display: grid;
+    min-inline-size: 0;
+  }
+  .ea-skel__line {
+    --frame-fill: transparent;
+    --frame-border: var(--accent-edge);
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    animation:
+      ea-skel-draw var(--dur-draw) var(--ease-enter) both,
+      ea-skel-settle var(--dur-lg) var(--ease-standard) var(--dur-draw) both;
+  }
+  .ea-skel--band .ea-skel__line {
+    --notch: var(--notch-sheet);
+    --frame-border: var(--band-accent);
+  }
+  /* the waveform laid flat along the skeleton's foot, tuning while it waits (low amplitude, so it reads as a line) */
+  .ea-skel__wave {
+    position: absolute;
+    inset-inline-start: var(--space-5);
+    inset-block-end: var(--space-5);
+    z-index: 2;
+    inline-size: calc(100% - 2 * var(--space-5));
+    block-size: var(--space-6);
+    overflow: hidden;
+    color: var(--band-accent);
+  }
+  .ea-skel__wave path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    /* one period a loop, in the svg's own units (24 = one period of the 48-wide path) */
+    animation: ea-skel-wave var(--wave-period) linear infinite;
+  }
+  @keyframes ea-skel-wave {
+    to {
+      transform: translateX(-24px);
+    }
+  }
+  /* the waveform is the skeleton's cue; the bars behind it stay faint */
+  .ea-skel--band .ea-bcard {
+    --_bar: color-mix(in srgb, var(--band-ink) 9%, transparent);
+  }
+  @keyframes ea-skel-draw {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes ea-skel-settle {
+    to {
+      opacity: 0.45;
+    }
+  }
+  /* text inside the skeleton keeps its metrics but shows as a bar */
+  .ea-skel__text {
+    color: transparent !important;
+    background: linear-gradient(var(--_bar, var(--skeleton-bg)), var(--_bar, var(--skeleton-bg))) 0 50% / var(--_w, 70%) 0.72em no-repeat;
+    animation: ea-skel-tune var(--dur-tune) var(--ease-standard) calc(var(--_i, 0) * 140ms) 3 both;
+    user-select: none;
+  }
+  .ea-skel--band {
+    --_bar: color-mix(in srgb, var(--band-ink) 16%, transparent);
+  }
+  @keyframes ea-skel-tune {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* --- ea-ripple: one ring from the press point -------------------------------------------------------------- */
+  .ea-ripple {
+    position: absolute;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    margin: -1.25rem 0 0 -1.25rem;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: ea-ripple var(--dur-ripple) var(--ease-enter) forwards;
+  }
+  @keyframes ea-ripple {
+    from {
+      opacity: 0.9;
+      transform: scale(0.4);
+    }
+    to {
+      opacity: 0;
+      transform: scale(3);
+    }
+  }
+
+  /* --- ea-field: the resonance field ------------------------------------------------------------------------ */
+  .ea-field {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, var(--field-dot) 1px, transparent 1.4px);
+    background-size: var(--field-pitch) var(--field-pitch);
+    mask-image: radial-gradient(110% 70% at 72% 115%, #000 28%, transparent 72%);
+  }
+  .ea-field[data-shape='low'] {
+    mask-image: radial-gradient(120% 55% at 30% 120%, #000 30%, transparent 70%);
+  }
+  .ea-field[data-shape='centre'] {
+    mask-image: radial-gradient(60% 60% at 50% 55%, #000 20%, transparent 70%);
+  }
+  .ea-field[data-field='drift'] {
+    animation: ea-field var(--dur-field) linear both;
+  }
+  @keyframes ea-field {
+    to {
+      background-position: calc(var(--field-pitch) * 6) calc(var(--field-pitch) * -2);
+    }
+  }
+
+  /* --- ea-route: the content plane arriving ------------------------------------------------------------------ */
+  .ea-route {
+    animation: ea-route var(--dur-route-in) var(--ease-enter) both;
+  }
+  .ea-route[data-direction='forward'] {
+    --_from: var(--travel-md);
+  }
+  .ea-route[data-direction='back'] {
+    --_from: calc(var(--travel-md) * -1);
+  }
+  @keyframes ea-route {
+    from {
+      opacity: 0;
+      transform: translate(var(--_from, 0), var(--_rise, var(--travel-sm)));
+    }
+  }
+  .ea-route:is([data-direction='forward'], [data-direction='back']) {
+    --_rise: 0px;
+  }
+
+  /* --- Reduced motion: still versions (the travel tokens already go to zero) -------------------------------- */
+  @media (prefers-reduced-motion: reduce) {
+    .ea-ripple,
+    .ea-field[data-field='drift'],
+    .ea-draw,
+    .ea-detune > svg,
+    .ea-wave[data-detune] > svg,
+    .ea-skel__line,
+    .ea-skel__text,
+    .fb.fb-skeleton,
+    .fb-skeleton-text > .fb-skeleton {
+      animation: none;
+    }
+    .ea-skel__line {
+      opacity: 0.45;
+    }
+    .ea-ripple {
+      display: none;
+    }
+  }
+  :root[data-motion='reduced'] :is(.ea-ripple, .ea-field[data-field='drift'], .ea-draw, .ea-detune > svg, .ea-wave[data-detune] > svg, .ea-skel__line, .ea-skel__text, .fb.fb-skeleton, .fb-skeleton-text > .fb-skeleton) {
+    animation: none;
+  }
+  :root[data-motion='reduced'] .ea-skel__line {
+    opacity: 0.45;
+  }
+  :root[data-motion='reduced'] .ea-ripple {
+    display: none;
+  }
+
+  /* --- Forced colours: the frame layers vanish, so draw a real border ---------------------------------------- */
+  @media (forced-colors: active) {
+    .ea-frame {
+      border: 1px solid CanvasText;
+    }
+    .ea-frame::before,
+    .ea-frame::after {
+      display: none;
+    }
+  }
+}

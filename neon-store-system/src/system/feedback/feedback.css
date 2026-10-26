@@ -1,0 +1,968 @@
+/*
+ * Reference styles for the feedback components. Phase 10 of the workflow restyles them with the project's tokens.
+ *
+ * How the colours work: section 1 maps every `--fb-*` knob to a role in the system's tokens.css (`--surface`,
+ * `--ink`, `--accent`, `--positive-ink`, …) with a neutral fallback, so the components look right before the
+ * system has tokens and take the real ones the moment tokens.css defines the roles. The role names are the contract
+ * of tokens.css; when a project renames or adds one, edit the left-hand sides of section 1 and nothing else.
+ * Components never use a colour, size, duration or curve of their own: only `--fb-*`.
+ *
+ * Motion: the loading motion (spin, slide, pulse) is state, so under reduced motion it slows or goes static
+ * instead of vanishing, and every result still appears (section 9). There is no global kill switch. The block runs
+ * for the system setting and for <html data-motion="reduced"> (the in-app switch).
+ *
+ * Everything sits in the `components` layer so Tailwind utilities and page CSS can still override it.
+ */
+
+@layer components {
+  /* 1. Token map ------------------------------------------------------------------------------------------------ */
+  :where(.fb) {
+    /* colour roles */
+    --fb-bg: var(--surface, #ffffff);
+    --fb-raised: var(--raised, var(--fb-bg));
+    --fb-sunken: var(--sunken, #eceef1);
+    --fb-ink: var(--ink, #15181d);
+    --fb-muted: var(--muted, #535b68);
+    --fb-line: var(--line, #dde1e6);
+    --fb-line-strong: var(--line-strong, #7d8591);
+    --fb-accent: var(--accent, #2f66e0);
+    --fb-on-accent: var(--on-accent, #ffffff);
+    --fb-accent-ink: var(--accent-ink, #1d4499);
+    --fb-info: var(--info, #2f66e0);
+    --fb-info-ink: var(--info-ink, #1d4499);
+    --fb-info-bg: var(--info-bg, #eaf1ff);
+    --fb-positive: var(--positive, #23804f);
+    --fb-positive-ink: var(--positive-ink, #1a6b40);
+    --fb-positive-bg: var(--positive-bg, #e8f6ee);
+    --fb-warning: var(--warning, #9a6200);
+    --fb-warning-ink: var(--warning-ink, #7a4a00);
+    --fb-warning-bg: var(--warning-bg, #fdf3e1);
+    --fb-negative: var(--negative, #c8342c);
+    --fb-on-negative: var(--on-negative, #ffffff);
+    --fb-negative-ink: var(--negative-ink, #a12a23);
+    --fb-negative-bg: var(--negative-bg, #fdeceb);
+    --fb-focus: var(--focus, #2453bd);
+    --fb-disabled: var(--disabled-opacity, 0.38);
+    --fb-overlay-border: var(--overlay-border, 1px solid var(--fb-line-strong));
+    --fb-shadow: var(--shadow-overlay, 0 2px 4px rgb(14 16 20 / 0.08), 0 18px 40px -12px rgb(14 16 20 / 0.24));
+    /* a translucent wash that reads on any ground, in either theme */
+    --fb-wash: color-mix(in srgb, var(--fb-ink) 8%, transparent);
+    --fb-skeleton: var(--skeleton-bg, color-mix(in srgb, var(--fb-ink) 9%, transparent));
+
+    /* type, shape, size */
+    --fb-font: var(--font-body, system-ui, sans-serif);
+    --fb-text: var(--step-0, 1rem);
+    --fb-text-sm: var(--step--1, 0.875rem);
+    --fb-text-lg: var(--step-1, 1.25rem);
+    --fb-leading: var(--leading-body, 1.5);
+    --fb-radius: var(--radius-control, 8px);
+    --fb-radius-card: var(--radius-card, 12px);
+    --fb-radius-full: var(--radius-full, 999px);
+    --fb-control-h: var(--control-h, 40px);
+    --fb-tap: var(--tap-min, 44px);
+    --fb-target: var(--target-min, 24px);
+    --fb-icon-sm: var(--icon-sm, 16px);
+    --fb-icon-md: var(--icon-md, 20px);
+    --fb-icon-lg: var(--icon-lg, 24px);
+    --fb-focus-width: var(--focus-width, 2px);
+    --fb-focus-offset: var(--focus-offset, 2px);
+    --fb-toast-gap: var(--toast-gap, 8px);
+    --fb-z-toast: var(--z-toast, 500);
+
+    /* motion: durations by role, curves, the press scale and the travel */
+    --fb-dur-press: var(--dur-press, 100ms);
+    --fb-dur-swap: var(--dur-swap, 200ms);
+    --fb-dur-toast-in: var(--dur-toast-in, 250ms);
+    --fb-dur-toast-out: var(--dur-toast-out, 200ms);
+    --fb-ease-enter: var(--ease-enter, cubic-bezier(0, 0, 0, 1));
+    --fb-ease-move: var(--ease-standard, cubic-bezier(0.2, 0, 0, 1));
+    --fb-ease-exit: var(--ease-exit, cubic-bezier(0.3, 0, 1, 1));
+    --fb-press-scale: var(--press-scale, 0.97);
+    --fb-travel: var(--travel-md, 16px);
+
+    /* loading motion; section 9 slows or stops these under reduced motion */
+    --fb-spin-ms: var(--dur-spin, 800ms);
+    --fb-slide-ms: var(--dur-shimmer, 1400ms);
+    --fb-pulse-ms: var(--dur-shimmer, 1600ms);
+    --fb-skeleton-anim: fb-pulse;
+    --fb-progress-ms: var(--dur-2xl, 300ms);
+    /* opacity of a region that is refreshing (guides/interaction.md: 0.6 to 0.7). Dimmed text is measured at its
+       dimmed contrast, so muted text drops under 4.5:1 at this value: keep anything that must stay readable in ink. */
+    --fb-dim: 0.7;
+  }
+
+  /* Dark fallbacks, written twice with the same values (system setting, and <html data-theme="dark">). They only
+     matter while the system's tokens.css does not define the roles. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) :where(.fb) {
+      --fb-bg: var(--surface, #15181d);
+      --fb-sunken: var(--sunken, #090a0d);
+      --fb-ink: var(--ink, #f6f7f8);
+      --fb-muted: var(--muted, #9aa2ae);
+      --fb-line: var(--line, #262b33);
+      --fb-accent: var(--accent, #6b98f7);
+      --fb-on-accent: var(--on-accent, #0e1014);
+      --fb-accent-ink: var(--accent-ink, #8fb3ff);
+      --fb-info: var(--info, #6b98f7);
+      --fb-info-ink: var(--info-ink, #8fb3ff);
+      --fb-info-bg: var(--info-bg, #14285e);
+      --fb-positive: var(--positive, #7fd6a4);
+      --fb-positive-ink: var(--positive-ink, #7fd6a4);
+      --fb-positive-bg: var(--positive-bg, #123d27);
+      --fb-warning: var(--warning, #ffcf7a);
+      --fb-warning-ink: var(--warning-ink, #ffcf7a);
+      --fb-warning-bg: var(--warning-bg, #4a3000);
+      --fb-negative: var(--negative, #ff9b95);
+      --fb-negative-ink: var(--negative-ink, #ff9b95);
+      --fb-negative-bg: var(--negative-bg, #4a1613);
+      --fb-on-negative: var(--on-negative, #0e1014);
+      --fb-focus: var(--focus, #8fb3ff);
+      --fb-shadow: var(--shadow-overlay, 0 2px 4px rgb(0 0 0 / 0.4), 0 18px 40px -12px rgb(0 0 0 / 0.6));
+    }
+  }
+  :root[data-theme='dark'] :where(.fb) {
+    --fb-bg: var(--surface, #15181d);
+    --fb-sunken: var(--sunken, #090a0d);
+    --fb-ink: var(--ink, #f6f7f8);
+    --fb-muted: var(--muted, #9aa2ae);
+    --fb-line: var(--line, #262b33);
+    --fb-accent: var(--accent, #6b98f7);
+    --fb-on-accent: var(--on-accent, #0e1014);
+    --fb-accent-ink: var(--accent-ink, #8fb3ff);
+    --fb-info: var(--info, #6b98f7);
+    --fb-info-ink: var(--info-ink, #8fb3ff);
+    --fb-info-bg: var(--info-bg, #14285e);
+    --fb-positive: var(--positive, #7fd6a4);
+    --fb-positive-ink: var(--positive-ink, #7fd6a4);
+    --fb-positive-bg: var(--positive-bg, #123d27);
+    --fb-warning: var(--warning, #ffcf7a);
+    --fb-warning-ink: var(--warning-ink, #ffcf7a);
+    --fb-warning-bg: var(--warning-bg, #4a3000);
+    --fb-negative: var(--negative, #ff9b95);
+    --fb-negative-ink: var(--negative-ink, #ff9b95);
+    --fb-negative-bg: var(--negative-bg, #4a1613);
+    --fb-on-negative: var(--on-negative, #0e1014);
+    --fb-focus: var(--focus, #8fb3ff);
+    --fb-shadow: var(--shadow-overlay, 0 2px 4px rgb(0 0 0 / 0.4), 0 18px 40px -12px rgb(0 0 0 / 0.6));
+  }
+
+  /* 2. Shared ---------------------------------------------------------------------------------------------------- */
+  .fb-sr {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .fb-icon {
+    flex: none;
+    font-size: var(--fb-icon-sm);
+  }
+  .fb :focus-visible,
+  .fb:focus-visible {
+    outline: var(--fb-focus-width) solid var(--fb-focus);
+    outline-offset: var(--fb-focus-offset);
+  }
+
+  /* 3. Spinner --------------------------------------------------------------------------------------------------- */
+  .fb-spinner {
+    --_size: var(--fb-icon-md);
+    --_ring: 2px;
+    display: inline-block;
+    flex: none;
+    inline-size: var(--_size);
+    block-size: var(--_size);
+    box-sizing: border-box;
+    border: var(--_ring) solid color-mix(in srgb, currentColor 25%, transparent);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: fb-spin var(--fb-spin-ms) linear infinite;
+  }
+  .fb-spinner[data-size='sm'] {
+    --_size: var(--fb-icon-sm);
+  }
+  .fb-spinner[data-size='lg'] {
+    --_size: 2rem;
+    --_ring: 3px;
+  }
+
+  /* 4. Skeleton -------------------------------------------------------------------------------------------------- */
+  .fb-skeleton {
+    display: block;
+    border-radius: calc(var(--fb-radius) / 2);
+    background: var(--fb-skeleton);
+    animation: var(--fb-skeleton-anim) var(--fb-pulse-ms) var(--ease-symmetric) infinite;
+  }
+  .fb-skeleton[data-variant='circle'] {
+    border-radius: 50%;
+  }
+  /* Each text line takes 1.5em, the height of a line of body text, so a skeleton paragraph equals the real one.
+     A heading bar is thicker and shorter. */
+  .fb-skeleton-text {
+    display: block;
+  }
+  .fb-skeleton-text > .fb-skeleton {
+    block-size: 0.9em;
+    margin-block: 0.3em;
+  }
+  .fb-skeleton-text[data-variant='heading'] > .fb-skeleton {
+    inline-size: 45%;
+    block-size: 1.15em;
+    margin-block: 0.175em;
+  }
+
+  /* 5. Progress -------------------------------------------------------------------------------------------------- */
+  .fb-progress {
+    display: grid;
+    gap: 0.5rem;
+    color: var(--fb-ink);
+    font-family: var(--fb-font);
+  }
+  .fb-progress__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: var(--fb-text-sm);
+  }
+  .fb-progress__detail {
+    color: var(--fb-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .fb-progress__row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .fb-progress__track {
+    position: relative;
+    flex: 1;
+    block-size: 0.5rem;
+    overflow: hidden;
+    border-radius: var(--fb-radius-full);
+    background: var(--fb-sunken);
+    box-shadow: inset 0 0 0 1px var(--fb-line);
+  }
+  .fb-progress__fill {
+    position: absolute;
+    inset: 0;
+    background: var(--fb-accent);
+    transform: scaleX(var(--fb-progress, 0));
+    transform-origin: 0 50%;
+    transition: transform var(--fb-progress-ms) var(--fb-ease-move);
+  }
+  .fb-progress__fill[data-indeterminate] {
+    inset-inline-end: auto;
+    inline-size: 40%;
+    transform: none;
+    transition: none;
+    animation: fb-slide var(--fb-slide-ms) var(--fb-ease-move) infinite;
+  }
+
+  /* 6. Button ---------------------------------------------------------------------------------------------------- */
+  .fb-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-block-size: var(--fb-control-h);
+    min-inline-size: var(--fb-target);
+    padding: 0 1.25rem;
+    border: 1px solid var(--_line, transparent);
+    border-radius: var(--fb-radius);
+    background: var(--_bg, var(--fb-bg));
+    color: var(--_ink, var(--fb-ink));
+    font: inherit;
+    font-family: var(--fb-font);
+    font-size: var(--fb-text);
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      transform var(--fb-dur-press) var(--fb-ease-enter),
+      background-color var(--fb-dur-press) var(--fb-ease-enter),
+      border-color var(--fb-dur-press) var(--fb-ease-enter),
+      color var(--fb-dur-press) var(--fb-ease-enter),
+      box-shadow var(--fb-dur-press) var(--fb-ease-enter);
+  }
+  .fb-btn[data-variant='primary'] {
+    --_bg: var(--fb-accent);
+    --_ink: var(--fb-on-accent);
+    --_line: transparent;
+    min-block-size: max(var(--fb-control-h), var(--fb-tap));
+  }
+  .fb-btn[data-variant='secondary'] {
+    --_bg: var(--fb-bg);
+    --_ink: var(--fb-ink);
+    --_line: var(--fb-line-strong);
+  }
+  .fb-btn[data-variant='ghost'] {
+    --_bg: transparent;
+    --_ink: var(--fb-ink);
+    --_line: transparent;
+  }
+  .fb-btn[data-variant='danger'] {
+    --_bg: var(--fb-negative);
+    --_ink: var(--fb-on-negative);
+    --_line: transparent;
+  }
+  /* Success and error read from text, icon and border as well as colour; they replace the variant's fill. */
+  .fb-btn[data-state='success'] {
+    --_bg: var(--fb-bg);
+    --_ink: var(--fb-positive-ink);
+    --_line: var(--fb-positive-ink);
+  }
+  .fb-btn[data-state='error'] {
+    --_bg: var(--fb-bg);
+    --_ink: var(--fb-negative-ink);
+    --_line: var(--fb-negative-ink);
+  }
+  .fb-btn[data-state='disabled'] {
+    --_bg: color-mix(in srgb, var(--fb-ink) 8%, transparent);
+    --_ink: color-mix(in srgb, var(--fb-ink) calc(var(--fb-disabled) * 100%), transparent);
+    --_line: transparent;
+  }
+  .fb-btn[aria-disabled='true'] {
+    cursor: not-allowed;
+  }
+  .fb-btn[data-state='pending'] {
+    cursor: progress;
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--_ink) 10%, transparent);
+  }
+  /* State layers: hover 8%, pressed 10% plus a small scale. Focus is a ring (section 2), not a layer. */
+  @media (hover: hover) {
+    .fb-btn:hover:not([aria-disabled='true']) {
+      box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--_ink) 8%, transparent);
+    }
+  }
+  .fb-btn[data-preview='hover'] {
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--_ink) 8%, transparent);
+  }
+  .fb-btn:active:not([aria-disabled='true']),
+  .fb-btn[data-preview='pressed'] {
+    transform: scale(var(--fb-press-scale));
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--_ink) 10%, transparent);
+  }
+  .fb-btn[data-preview='focus'] {
+    outline: var(--fb-focus-width) solid var(--fb-focus);
+    outline-offset: var(--fb-focus-offset);
+  }
+  /* Every label sits in one grid cell: the widest sets the width, and the button never jumps. */
+  .fb-btn__labels {
+    display: inline-grid;
+  }
+  .fb-btn__label {
+    display: inline-flex;
+    grid-area: 1 / 1;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+  .fb-btn__label[data-on='false'] {
+    visibility: hidden;
+  }
+
+  /* 7. Toast ----------------------------------------------------------------------------------------------------- */
+  .fb-toasts {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: var(--fb-toast-bottom, max(1rem, env(safe-area-inset-bottom)));
+    z-index: var(--fb-z-toast);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--fb-toast-gap);
+    padding-inline: 1rem;
+    pointer-events: none;
+  }
+  @media (min-width: 40rem) {
+    .fb-toasts {
+      inset-inline: auto 1rem;
+      align-items: flex-end;
+    }
+  }
+  .fb-toast {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 0.75rem;
+    box-sizing: border-box;
+    inline-size: min(26rem, 100%);
+    padding: 0.25rem 0.25rem 0.25rem 1rem;
+    border: var(--fb-overlay-border);
+    border-radius: var(--fb-radius);
+    background: var(--fb-raised);
+    color: var(--fb-ink);
+    box-shadow: var(--fb-shadow);
+    font-family: var(--fb-font);
+    font-size: var(--fb-text-sm);
+    line-height: var(--fb-leading);
+    pointer-events: auto;
+    touch-action: pan-y;
+    transform: translateX(var(--fb-swipe, 0px));
+    animation: fb-toast-in var(--fb-dur-toast-in) var(--fb-ease-enter) both;
+  }
+  .fb-toast[data-state='closing'] {
+    animation: fb-toast-out var(--fb-dur-toast-out) var(--fb-ease-enter) forwards;
+  }
+  .fb-toast[data-swiping] {
+    animation: none;
+    opacity: calc(1 - var(--fb-swipe-fade, 0));
+  }
+  .fb-toast__icon {
+    display: inline-flex;
+    font-size: var(--fb-icon-md);
+  }
+  .fb-toast__icon:empty {
+    display: none;
+  }
+  .fb-toast:not(:has(.fb-toast__icon > *)) {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .fb-toast[data-tone='info'] .fb-toast__icon {
+    color: var(--fb-info-ink);
+  }
+  .fb-toast[data-tone='success'] .fb-toast__icon {
+    color: var(--fb-positive-ink);
+  }
+  .fb-toast[data-tone='warning'] .fb-toast__icon {
+    color: var(--fb-warning-ink);
+  }
+  .fb-toast[data-tone='error'] .fb-toast__icon {
+    color: var(--fb-negative-ink);
+  }
+  .fb-toast__text {
+    margin: 0;
+    padding-block: 0.625rem;
+    text-wrap: pretty;
+  }
+  .fb-toast__buttons {
+    display: inline-flex;
+    align-items: center;
+  }
+  .fb-toast__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--fb-tap);
+    min-inline-size: var(--fb-tap);
+    padding: 0 0.625rem;
+    border: 0;
+    border-radius: calc(var(--fb-radius) - 2px);
+    background: transparent;
+    color: var(--fb-accent-ink);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .fb-toast__close {
+    color: var(--fb-muted);
+    font-size: var(--fb-icon-md);
+  }
+  @media (hover: hover) {
+    .fb-toast__button:hover {
+      background: var(--fb-wash);
+    }
+  }
+
+  /* 8. Messages, states, regions --------------------------------------------------------------------------------- */
+  .fb-msg {
+    --_fill: var(--fb-info);
+    --_tone: var(--fb-info-ink);
+    --_bg: var(--fb-info-bg);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 0.75rem;
+    align-items: start;
+    box-sizing: border-box;
+    padding: 0.75rem 0.5rem 0.75rem 1rem;
+    border: 1px solid var(--_fill);
+    border-radius: var(--fb-radius-card);
+    background: var(--_bg);
+    color: var(--fb-ink);
+    font-family: var(--fb-font);
+    font-size: var(--fb-text-sm);
+    line-height: var(--fb-leading);
+  }
+  .fb-msg[data-tone='success'] {
+    --_fill: var(--fb-positive);
+    --_tone: var(--fb-positive-ink);
+    --_bg: var(--fb-positive-bg);
+  }
+  .fb-msg[data-tone='warning'] {
+    --_fill: var(--fb-warning);
+    --_tone: var(--fb-warning-ink);
+    --_bg: var(--fb-warning-bg);
+  }
+  .fb-msg[data-tone='error'] {
+    --_fill: var(--fb-negative);
+    --_tone: var(--fb-negative-ink);
+    --_bg: var(--fb-negative-bg);
+  }
+  .fb-msg__icon {
+    display: inline-flex;
+    padding-block: 0.125rem;
+    color: var(--_tone);
+    font-size: var(--fb-icon-md);
+  }
+  .fb-msg__title {
+    display: block;
+    color: var(--_tone);
+    font-weight: 600;
+  }
+  .fb-msg__text {
+    text-wrap: pretty;
+  }
+  .fb-msg__action {
+    margin-block-start: 0.5rem;
+  }
+  .fb-msg__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--fb-tap);
+    min-inline-size: var(--fb-tap);
+    margin-block: -0.5rem;
+    border: 0;
+    border-radius: calc(var(--fb-radius) - 2px);
+    background: transparent;
+    color: var(--fb-muted);
+    font-size: var(--fb-icon-md);
+    cursor: pointer;
+  }
+  @media (hover: hover) {
+    .fb-msg__close:hover {
+      background: var(--fb-wash);
+    }
+  }
+
+  .fb-state {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 0.75rem;
+    box-sizing: border-box;
+    min-block-size: var(--fb-region-min, 12rem);
+    padding: 2rem 1.25rem;
+    border: 1px dashed var(--fb-line-strong);
+    border-radius: var(--fb-radius-card);
+    color: var(--fb-ink);
+    font-family: var(--fb-font);
+    text-align: center;
+  }
+  .fb-state[data-kind='error'] {
+    border-style: solid;
+    border-color: var(--fb-negative);
+  }
+  .fb-state__icon {
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border-radius: 50%;
+    background: var(--fb-wash);
+    color: var(--fb-muted);
+    font-size: var(--fb-icon-lg);
+  }
+  .fb-state[data-kind='error'] .fb-state__icon {
+    background: var(--fb-negative-bg);
+    color: var(--fb-negative-ink);
+  }
+  .fb-state[data-kind='cleared'] .fb-state__icon {
+    background: var(--fb-positive-bg);
+    color: var(--fb-positive-ink);
+  }
+  .fb-state__title {
+    margin: 0;
+    font-size: var(--fb-text-lg);
+    font-weight: 600;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+  .fb-state__body {
+    margin: 0;
+    max-inline-size: 38ch;
+    color: var(--fb-muted);
+    font-size: var(--fb-text-sm);
+    line-height: var(--fb-leading);
+    text-wrap: pretty;
+  }
+  .fb-state__filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .fb-chip {
+    padding: 0.25rem 0.625rem;
+    border: 1px solid var(--fb-line-strong);
+    border-radius: var(--fb-radius-full);
+    color: var(--fb-ink);
+    font-size: var(--fb-text-sm);
+  }
+  .fb-state__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .fb-region {
+    position: relative;
+    min-block-size: var(--fb-region-min, 0);
+  }
+  .fb-region__content {
+    transition: opacity var(--fb-dur-swap) var(--fb-ease-enter);
+  }
+  .fb-region[data-stale='true'] > .fb-region__content {
+    opacity: var(--fb-dim);
+  }
+  .fb-region__bar {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 1;
+    block-size: 3px;
+    overflow: hidden;
+    border-radius: var(--fb-radius-full);
+    background: color-mix(in srgb, var(--fb-accent) 20%, transparent);
+  }
+  .fb-region__bar > span {
+    display: block;
+    inline-size: 40%;
+    block-size: 100%;
+    background: var(--fb-accent);
+    animation: fb-slide var(--fb-slide-ms) var(--fb-ease-move) infinite;
+  }
+
+  /* 9. Reduced motion -------------------------------------------------------------------------------------------- */
+  /* Slow what carries state, stop what only decorates, drop the travel and the press scale, keep every result.
+     Written twice with the same values: the system setting, and <html data-motion="reduced">. */
+  @media (prefers-reduced-motion: reduce) {
+    :root :where(.fb) {
+      --fb-spin-ms: var(--dur-spin, 2400ms);
+      --fb-slide-ms: 3200ms;
+      --fb-skeleton-anim: none;
+      --fb-progress-ms: 0ms;
+      --fb-press-scale: 1;
+      --fb-travel: 0px;
+    }
+  }
+  :root[data-motion='reduced'] :where(.fb) {
+    --fb-spin-ms: var(--dur-spin, 2400ms);
+    --fb-slide-ms: 3200ms;
+    --fb-skeleton-anim: none;
+    --fb-progress-ms: 0ms;
+    --fb-press-scale: 1;
+    --fb-travel: 0px;
+  }
+}
+
+@keyframes fb-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+@keyframes fb-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+@keyframes fb-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+@keyframes fb-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--fb-travel));
+  }
+}
+@keyframes fb-toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(calc(var(--fb-travel) / 2));
+  }
+}
+
+/* 10. VOLTCART restyle (phase 10) ------------------------------------------------------------------------------------
+   The behaviour above is the starter's; this block changes the look to FOUNDATIONS.md: square corners with a 45° cut
+   on the top-right and bottom-left, drawn by two clipped layers so the element itself is never clipped and the focus
+   outline stays whole (COMPONENTS.md, Shared rules). `--_edge` is the 1 px edge, `--_fill` the face, `--_layer` the
+   hover or pressed wash over it. Under forced colours the layers hide and a real border shows. */
+@layer components {
+  :where(.fb) {
+    --fb-radius: var(--radius-control, 0);
+    --fb-radius-card: var(--radius-card, 0);
+  }
+  .fb-btn,
+  .fb-msg,
+  .fb-toast,
+  .fb-state {
+    --_cut: var(--cut-control, 8px);
+    --_layer: transparent;
+    isolation: isolate;
+  }
+  .fb-btn::before,
+  .fb-msg::before,
+  .fb-toast::before,
+  .fb-btn::after,
+  .fb-msg::after,
+  .fb-toast::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .fb-btn::before,
+  .fb-msg::before,
+  .fb-toast::before {
+    inset: 0;
+    background: var(--_edge, transparent);
+    /* a ring: the outer cut path, then the inner one in reverse, so the face shows through */
+    clip-path: polygon(
+      0 0, calc(100% - var(--_cut)) 0, 100% var(--_cut), 100% 100%, var(--_cut) 100%, 0 calc(100% - var(--_cut)), 0 0,
+      var(--border, 1px) var(--border, 1px),
+      var(--border, 1px) calc(100% - var(--_cut) + 0.41px),
+      calc(var(--_cut) - 0.41px) calc(100% - var(--border, 1px)),
+      calc(100% - var(--border, 1px)) calc(100% - var(--border, 1px)),
+      calc(100% - var(--border, 1px)) calc(var(--_cut) - 0.41px),
+      calc(100% - var(--_cut) + 0.41px) var(--border, 1px),
+      var(--border, 1px) var(--border, 1px)
+    );
+  }
+  .fb-btn::after,
+  .fb-msg::after,
+  .fb-toast::after {
+    inset: 1px;
+    background: linear-gradient(var(--_layer), var(--_layer)), var(--_face, transparent);
+    clip-path: polygon(0 0, calc(100% - var(--_cut) + 0.41px) 0, 100% calc(var(--_cut) - 0.41px), 100% 100%, calc(var(--_cut) - 0.41px) 100%, 0 calc(100% - var(--_cut) + 0.41px));
+  }
+
+  /* Button: the face and edge come from the variant; the starter's border, background and inset-shadow layers go. */
+  .fb-btn {
+    --_edge: var(--_line);
+    --_face: var(--_bg);
+    border-color: transparent;
+    background: none;
+    font-weight: var(--weight-label, 500);
+    box-shadow: none;
+  }
+  .fb-btn[data-variant='primary'] {
+    --_edge: var(--button-primary-edge, transparent);
+    --_face: var(--_bg);
+  }
+  .fb-btn[data-variant='secondary'] {
+    --_bg: transparent;
+  }
+  /* Danger is outlined (COMPONENTS.md, Button); a confirm dialog fills it with .vc-danger-fill. */
+  .fb-btn[data-variant='danger'] {
+    --_bg: transparent;
+    --_ink: var(--fb-negative-ink);
+    --_line: var(--fb-negative);
+  }
+  .fb-btn[data-variant='danger'].vc-danger-fill {
+    --_bg: var(--fb-negative);
+    --_ink: var(--fb-on-negative);
+    --_line: var(--fb-negative);
+  }
+  .fb-btn[data-state='success'],
+  .fb-btn[data-state='error'] {
+    --_bg: transparent;
+  }
+  .fb-btn[data-state='disabled'] {
+    --_line: var(--fb-line);
+  }
+  .fb-btn[data-state='pending'] {
+    box-shadow: none;
+    --_layer: color-mix(in srgb, var(--_ink) 10%, transparent);
+  }
+  @media (hover: hover) {
+    .fb-btn:hover:not([aria-disabled='true']) {
+      box-shadow: none;
+      --_layer: var(--hover-bg, color-mix(in srgb, var(--_ink) 8%, transparent));
+    }
+  }
+  .fb-btn[data-preview='hover'] {
+    box-shadow: none;
+    --_layer: var(--hover-bg, color-mix(in srgb, var(--_ink) 8%, transparent));
+  }
+  .fb-btn:active:not([aria-disabled='true']),
+  .fb-btn[data-preview='pressed'] {
+    box-shadow: none;
+    --_layer: var(--pressed-bg, color-mix(in srgb, var(--_ink) 10%, transparent));
+  }
+  /* On the volt night button, the wash is drawn in the label colour so hover darkens instead of greying. */
+  .fb-btn[data-variant='primary']:is(:hover, [data-preview='hover'], [data-preview='pressed'], :active) {
+    --_layer: color-mix(in srgb, var(--_ink) 10%, transparent);
+  }
+
+  /* Messages: tinted face, 1 px status edge, the card cut. */
+  .fb-msg {
+    --_cut: var(--cut-control, 8px);
+    --_edge: var(--_fill);
+    --_face: var(--_bg);
+    position: relative;
+    border-color: transparent;
+    background: none;
+  }
+
+  /* Toasts: the raised face with the line edge and the overlay shadow on the box (soft, so the cut barely shows). */
+  .fb-toast {
+    --_edge: var(--line, var(--fb-line));
+    --_face: var(--fb-raised);
+    position: relative;
+    border-color: transparent;
+    background: none;
+  }
+
+  /* Skeleton: square, and the pulse stops after three sweeps (about 4 s), then stays static. */
+  .fb-skeleton {
+    border-radius: 0;
+    animation-iteration-count: 3;
+  }
+
+  @media (forced-colors: active) {
+    .fb-btn::before,
+    .fb-btn::after,
+    .fb-msg::before,
+    .fb-msg::after,
+    .fb-toast::before,
+    .fb-toast::after {
+      display: none;
+    }
+    .fb-btn,
+    .fb-msg,
+    .fb-toast {
+      border: 1px solid ButtonText;
+    }
+  }
+}
+
+/* 11. VOLTCART round 3: success and error keep the variant's chrome (only the icon and label change), and the
+   error text and a disabled reason sit visibly beside the button. */
+@layer components {
+  .fb-btn[data-variant='primary']:is([data-state='success'], [data-state='error']) {
+    --_bg: var(--fb-accent);
+    --_ink: var(--fb-on-accent);
+    --_line: transparent;
+  }
+  .fb-btn[data-variant='secondary']:is([data-state='success'], [data-state='error']) {
+    --_bg: transparent;
+    --_ink: var(--fb-ink);
+    --_line: var(--fb-line-strong);
+    --_edge: var(--fb-line-strong);
+  }
+  .fb-btn[data-variant='ghost']:is([data-state='success'], [data-state='error']) {
+    --_bg: transparent;
+    --_ink: var(--fb-ink);
+    --_line: transparent;
+    --_edge: transparent;
+  }
+  .fb-btn[data-variant='danger']:is([data-state='success'], [data-state='error']) {
+    --_ink: var(--fb-negative-ink);
+    --_line: var(--fb-negative);
+    --_edge: var(--fb-negative);
+  }
+  .fb-btn-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--fb-muted);
+    font-family: var(--fb-font);
+    font-size: var(--fb-text-sm);
+    line-height: var(--fb-leading);
+  }
+  .fb-btn-note[data-tone='error'] {
+    color: var(--fb-negative-ink);
+  }
+  .fb-btn-note .fb-icon {
+    flex: none;
+    inline-size: var(--fb-icon-sm);
+    block-size: var(--fb-icon-sm);
+  }
+}
+
+/* 12. VOLTCART round 4. The button's error note takes its own line at the end of a flex row, so a neighbour never
+   moves sideways when a result arrives; the indeterminate fills slide inside their track (no hidden overflow). */
+@layer components {
+  .fb-btn-note {
+    order: 99;
+    flex-basis: 100%;
+  }
+}
+@keyframes fb-slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(150%);
+  }
+}
+
+/* 13. Round 7: secondary hover inks its edge; a pinned pressed demo keeps its full size. */
+@layer components {
+  @media (hover: hover) {
+    .fb-btn[data-variant='secondary']:hover:not([aria-disabled='true']) {
+      --_edge: var(--fb-ink);
+    }
+  }
+  .fb-btn[data-variant='secondary'][data-preview='hover'] {
+    --_edge: var(--fb-ink);
+  }
+  .fb-btn[data-preview='pressed'] {
+    transform: none;
+  }
+}
+
+/* 14. Round 8: the primary action's hover is a full face step you can see (light: a lighter block; dark: pale volt). */
+@layer components {
+  @media (hover: hover) {
+    .fb-btn[data-variant='primary']:hover:not([aria-disabled='true']) {
+      --_bg: var(--accent-hover);
+      --_layer: transparent;
+    }
+  }
+  .fb-btn[data-variant='primary'][data-preview='hover'] {
+    --_bg: var(--accent-hover);
+    --_layer: transparent;
+  }
+}
+
+/* 15. Filter chips in "no results" (0.6.0, voltcart-landing round 2): square like every tag; the system has no full
+   rounds. */
+@layer components {
+  .fb-chip {
+    border-radius: var(--radius-tag);
+    font-family: var(--font-mono);
+    letter-spacing: var(--tracking-tag);
+    text-transform: uppercase;
+    font-size: var(--step--2);
+  }
+}
+
+/* Every button is a full touch target on a coarse pointer, whatever its variant (quiet text buttons included). */
+@layer components {
+  @media (pointer: coarse) {
+    .fb-btn {
+      min-block-size: var(--tap-min);
+    }
+  }
+}

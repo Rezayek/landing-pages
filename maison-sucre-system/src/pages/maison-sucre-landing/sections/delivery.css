@@ -1,0 +1,119 @@
+/*
+ * S7 Delivery: the ganache band (the --band-* roles, the same in both themes) with a light card standing on it.
+ * Tokens only. Mobile first from 320 px: one column (heading, still, check); from 60rem the still takes the right
+ * column over both rows.
+ */
+.dl {
+  --bead: var(--band-line); /* the shell piping under the heading is drawn in the band's own line colour */
+  padding: var(--gap-section) var(--gutter);
+  background: var(--band-bg);
+  color: var(--band-ink);
+}
+.dl__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'head' 'fig' 'card';
+  gap: var(--space-6);
+  max-inline-size: var(--container);
+  margin-inline: auto;
+}
+.dl__head {
+  grid-area: head;
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+.dl__head h2 {
+  margin: 0;
+  font-size: var(--step-3);
+  color: var(--band-ink);
+}
+.dl__head .ms-beads {
+  inline-size: min(100%, 15rem);
+}
+.dl__head :focus-visible {
+  outline-color: var(--band-accent);
+}
+.dl__sub {
+  margin: 0;
+  max-inline-size: var(--measure);
+  font-size: var(--step-1);
+  color: var(--band-muted);
+}
+
+/* the rendered still: card radius, no frame; the cake sits right of centre, so the crop follows it */
+.dl__fig {
+  grid-area: fig;
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  align-content: start;
+}
+.dl__fig img {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: 50% 58%; /* phones: the band with the cake on its table */
+  border-radius: var(--radius-card);
+  background: var(--band-line);
+}
+.dl__fig figcaption {
+  font-size: var(--step--1);
+  color: var(--band-muted);
+}
+
+/* the check: the system's surface tone on the band, closed at the top by the lace scallop in its own colour */
+.dl__card {
+  --_scallop: var(--surface);
+  grid-area: card;
+  display: grid;
+  gap: var(--space-4);
+  align-self: start;
+  margin-block-start: var(--space-2); /* room for the scallop that sits above the edge */
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--ink);
+}
+.dl__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+.dl__act {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+.dl__answer {
+  min-block-size: 8rem; /* a title and two lines at 320 px: the answer arrives into space that is already there */
+}
+
+@media (min-width: 30rem) {
+  .dl__card {
+    padding: var(--inset-card);
+  }
+  .dl__answer {
+    min-block-size: 6.5rem;
+  }
+}
+
+@media (min-width: 60rem) {
+  .dl__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'head fig'
+      'card fig';
+    column-gap: var(--space-8);
+    align-items: start;
+  }
+  .dl__fig img {
+    aspect-ratio: 4 / 5;
+    max-block-size: 44rem;
+  }
+}

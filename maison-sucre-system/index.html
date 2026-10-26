@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#FAF6EF" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1A1412" media="(prefers-color-scheme: dark)" />
+    <title>Maison Sucre · system playground</title>
+    <script>
+      // A stored theme choice applies before first paint, so the page never flashes the other theme.
+      try {
+        const t = localStorage.getItem('ms-theme')
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

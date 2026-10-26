@@ -1,0 +1,87 @@
+/* S6 Flavours. System tokens only. Mobile first (320 px): the tasting box, then the cards, one column; the box pins beside the cards from 64rem. */
+.flv {
+  padding-block: var(--gap-section);
+  scroll-margin-block-start: var(--sticky-top);
+}
+.flv__inner {
+  max-inline-size: calc(var(--container) + 2 * var(--gutter)); /* content 76rem, the footer's edge */
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.flv__head {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+  margin-block-end: var(--gap-group);
+}
+.flv__title {
+  margin: 0;
+  font-size: var(--step-3);
+  overflow-wrap: anywhere;
+}
+.flv__rule {
+  display: block;
+  inline-size: min(100%, 14rem);
+}
+.flv__sub {
+  margin: 0;
+  max-inline-size: var(--measure);
+  font-size: var(--step-1);
+  color: var(--muted);
+}
+
+.flv__layout {
+  display: grid;
+  gap: var(--gap-group);
+  min-inline-size: 0;
+}
+.flv__box,
+.flv__main {
+  min-inline-size: 0;
+}
+.flv__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.flv__item {
+  display: grid; /* the card fills its cell, so a row of cards has one height */
+  min-inline-size: 0;
+}
+.flv__item > * {
+  min-inline-size: 0;
+}
+.flv__note {
+  margin: var(--gap-group) 0 0;
+  max-inline-size: var(--measure);
+  color: var(--muted);
+}
+.flv__action {
+  margin: var(--space-3) 0 0;
+}
+
+@media (min-width: 40rem) {
+  .flv__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 64rem) {
+  .flv__layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+    align-items: start;
+    column-gap: var(--gap-group);
+  }
+  .flv__main {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .flv__box {
+    grid-column: 2;
+    grid-row: 1;
+    position: sticky;
+    inset-block-start: calc(var(--sticky-top) + var(--space-5));
+  }
+}

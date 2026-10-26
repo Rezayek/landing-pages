@@ -1,0 +1,170 @@
+/*
+ * S4 Design yours. Layout only: every value is a role from the system's tokens. The stand, price card, servings
+ * guide, controls and messages bring their own styles (src/system/cake, ui and feedback).
+ */
+.design {
+  background: var(--sunken); /* the next tone step after the gallery's sugar */
+  padding-block: var(--gap-section);
+  min-inline-size: 0;
+}
+.design__inner {
+  display: grid;
+  gap: var(--gap-group);
+  min-inline-size: 0;
+  max-inline-size: calc(var(--container) + 2 * var(--gutter)); /* content 76rem, the footer's edge */
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.design__head {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+  margin-block-end: var(--space-4);
+}
+.design__head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-variation-settings: var(--font-display-settings);
+  font-weight: var(--weight-heading);
+  line-height: var(--leading-heading);
+}
+.design__sub {
+  margin: 0;
+  max-inline-size: var(--measure);
+  color: var(--muted);
+}
+.design__head .ms-beads {
+  inline-size: min(100%, 15rem);
+  margin-block-start: var(--space-2);
+}
+
+/* the stand and the price first on a phone, the controls beside them from 861 px (the stand is sticky there) */
+.design__builder {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gap-group);
+  align-items: start;
+  min-inline-size: 0;
+}
+.design__stand {
+  order: -1;
+  min-inline-size: 0;
+}
+.design__controls {
+  display: grid;
+  gap: var(--gap-group);
+  min-inline-size: 0;
+}
+@media (min-width: 861px) {
+  .design__builder {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--space-7);
+  }
+  .design__stand {
+    order: 0;
+  }
+}
+
+.design__fields {
+  display: grid;
+  gap: var(--gap-group);
+  min-inline-size: 0;
+}
+.design__flavours {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.design__flavour {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  min-inline-size: 0;
+}
+.design__flavour label {
+  min-inline-size: 6ch;
+}
+.design__flavour select {
+  flex: 1 1 12rem;
+  inline-size: auto;
+  min-inline-size: 0;
+}
+.design__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+}
+
+/* the two quiet routes out of the price card */
+.design__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+}
+
+/* the keepsake card a saved design returns: the drawn cake on its stand beside its facts and price, under the lace
+   scallop (FOUNDATIONS §10); the one place on the page made to be kept or sent */
+.design__keep {
+  display: grid;
+  grid-template-columns: minmax(6rem, 9rem) minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: center;
+  margin: var(--space-2) 0 0;
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--raised);
+  animation: ms-stack-in var(--dur-stack) var(--ease-enter) both;
+}
+.design__keep-cake {
+  /* the drawing sets its own height (its tiers are drawn to scale), so the box never clips or overlaps it */
+  display: grid;
+}
+.design__keep-text {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+}
+.design__keep-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-variation-settings: var(--font-display-settings);
+  font-weight: var(--weight-heading);
+  font-size: var(--step-2);
+}
+.design__keep-facts,
+.design__keep-link {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+.design__keep-price {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--step-1);
+  font-variant-numeric: tabular-nums;
+}
+.design__keep-note {
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+.design__keep-fleck {
+  inline-size: 14px;
+  block-size: 12px;
+  background: var(--gold);
+  clip-path: polygon(10% 20%, 60% 0, 100% 35%, 80% 90%, 30% 100%, 0 60%);
+}
+/* phones: the drawn cake above the facts, and the price, its note and the link wrap inside the card */
+.design__keep-price { flex-wrap: wrap; row-gap: var(--space-1); }
+.design__keep-link { overflow-wrap: anywhere; }
+@media (max-width: 30rem) {
+  .design__keep { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+  .design__keep-cake { inline-size: 7rem; }
+}

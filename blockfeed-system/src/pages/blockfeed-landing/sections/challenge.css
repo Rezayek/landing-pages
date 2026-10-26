@@ -1,0 +1,186 @@
+/*
+ * S3 Challenge: the clock, the votes bar and the entries standing on plinths (steal #6: a block that marks the place
+ * you step into). The plinth is stone in both themes, so its text is a fixed dark; it lights lime when you vote.
+ * Every length is in pixel units.
+ */
+@layer components {
+  /* the board: the clock and the votes bar side by side from tablet up, stacked on a phone */
+  .bl-board {
+    display: grid;
+    gap: var(--space-3) var(--space-6);
+    align-items: center;
+  }
+  @media (min-width: 40rem) {
+    .bl-board {
+      grid-template-columns: minmax(0, 1fr) minmax(0, calc(var(--u) * 140));
+    }
+  }
+
+  /* stepped numerals: each unit sits in a slot well, in the display face on the two-unit grid */
+  .bl-clock {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    margin: 0;
+  }
+  .bl-clock__label {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .bl-clock__segs {
+    display: flex;
+    gap: var(--space-2);
+  }
+  .bl-seg {
+    display: inline-block;
+    min-inline-size: calc(var(--u) * 24);
+    padding: var(--u) var(--space-2);
+    /* lamp light, not experience-lime: green stays for the primary action and earned votes (critique round 4, V4) */
+    background: var(--bl-sky-1);
+    color: var(--bl-lamp-1);
+    font-family: var(--font-display);
+    font-size: var(--step-3);
+    line-height: 1;
+    text-align: center;
+    box-shadow: inset 0 0 0 var(--u) var(--edge), inset 0 calc(var(--u) * -1) 0 0 var(--bl-lamp-3);
+  }
+  .bl-clock__closed {
+    margin: 0;
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .bl-votebar {
+    min-inline-size: 0;
+  }
+
+  /* the entries: a row of three; on a phone a sideways strip that shows the edge of the next one */
+  .bl-entries {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-5);
+    align-items: stretch;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (max-width: 47.99rem) {
+    .bl-entries {
+      display: flex;
+      gap: var(--space-4);
+      padding: 0 calc(var(--u) * 3) var(--space-2);
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x proximity;
+    }
+    .bl-entry {
+      flex: 0 0 calc(var(--u) * 120);
+      scroll-snap-align: start;
+    }
+  }
+  .bl-entry {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+  .bl-entry__card {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    gap: var(--space-2);
+    padding-block-end: calc(var(--u) * 5);
+  }
+  /* the words on the picture's inset, like the feed cards */
+  .bl-entry__card > :not(.bf-shot) {
+    padding-inline: calc(var(--u) * 2);
+  }
+  .bl-entry__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+    /* two lines reserved, so a long title never pushes its card out of line */
+    min-block-size: 2.2em;
+  }
+  .bl-entry__by {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .bl-entry__facts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+  }
+
+  /* the plinth: a stone top face you stand on and a wider base under it */
+  .bl-plinth {
+    --_ink: var(--bl-deep-3);
+    margin-block-start: var(--space-2);
+  }
+  .bl-plinth__pad {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background: var(--bl-stone-1);
+    color: var(--_ink);
+    box-shadow: inset 0 0 0 var(--u) var(--edge), inset calc(var(--u) * 2) calc(var(--u) * 2) 0 0 var(--select),
+      inset calc(var(--u) * -2) calc(var(--u) * -2) 0 0 var(--bl-stone-2);
+  }
+  /* voted: the pad lights experience-lime, a frame and a word say it too */
+  .bl-plinth__pad[data-lit] {
+    background: color-mix(in srgb, var(--bl-stone-1) 35%, var(--xp));
+    box-shadow: inset 0 0 0 var(--u) var(--edge), inset calc(var(--u) * 2) calc(var(--u) * 2) 0 0 var(--select),
+      inset calc(var(--u) * -2) calc(var(--u) * -2) 0 0 var(--xp-dark), 0 0 0 var(--u) var(--xp);
+  }
+  .bl-plinth__base {
+    block-size: calc(var(--u) * 6);
+    /* one unit wider than the pad on each side: a base, not an overhang (critique round 5, V9) */
+    margin-inline: calc(var(--u) * -1);
+    background: var(--bl-stone-3);
+    box-shadow: inset 0 0 0 var(--u) var(--edge), inset 0 calc(var(--u) * 2) 0 0 var(--bl-stone-2),
+      inset 0 calc(var(--u) * -2) 0 0 var(--bl-deep-1);
+  }
+  .bl-plinth__go {
+    --b-ink: var(--_ink);
+    --b-hover: color-mix(in srgb, var(--_ink) 14%, transparent);
+    justify-content: flex-start;
+    padding-inline: 0;
+    min-block-size: var(--tap-min);
+  }
+  @media (pointer: fine) {
+    .bl-plinth__go {
+      min-block-size: calc(var(--u) * 14);
+    }
+  }
+  .bl-plinth__vote {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    min-block-size: var(--tap-min);
+  }
+  .bl-plinth__why {
+    color: var(--_ink);
+    font-size: var(--step--1);
+  }
+
+  /* the link after a vote: long words wrap */
+  .bl-join {
+    padding-block: var(--space-2);
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+/* the coordinate command on the stone pad: the pad's own dark ink (a ghost button's light ink would vanish on stone) */
+@layer components {
+  .bl-plinth .bl-plinth__go.bf-btn {
+    --b-ink: var(--_ink);
+    color: var(--_ink);
+    text-shadow: none;
+  }
+}

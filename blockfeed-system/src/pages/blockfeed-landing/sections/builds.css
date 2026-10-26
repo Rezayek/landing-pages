@@ -1,0 +1,80 @@
+/*
+ * S2 Builds: the feed's frame. The cards are the system's BuildCard; this file adds the signal row above the list, the
+ * coordinate bar under each card and the rise of the two new builds. Every length is in pixel units.
+ */
+@layer components {
+  /* the signal slot: it holds its height whether or not the "new builds" button is there, so the list never moves */
+  .bl-feedbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+    min-block-size: var(--tap-min);
+  }
+  /* a count in a slot well: text on the well is --ink only */
+  .bl-count {
+    padding: var(--space-1) var(--space-3);
+    background: var(--sunken);
+    color: var(--ink);
+    box-shadow: inset var(--u) var(--u) 0 var(--slot-dark), inset calc(var(--u) * -1) calc(var(--u) * -1) 0 var(--slot-light);
+  }
+
+  /* one build: the card, its address bar and any message about it */
+  /* equal rows: the card stretches, the address bar sits at the bottom of every cell */
+  .bl-build {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: var(--space-2);
+    min-inline-size: 0;
+  }
+  #builds .bf-feed {
+    align-items: stretch;
+  }
+  .bl-build > :first-child {
+    display: grid;
+    block-size: 100%;
+  }
+  /* the card fills its cell and keeps its action row on the bottom edge, so every /tp bar in a row lines up */
+  .bl-build__host > .bf-card {
+    block-size: 100%;
+  }
+  /* the seed and coordinate bars and the action row sit on the bottom edge, so they line up across a row whatever the
+     title and tags take (critique round 5, V9) */
+  .bl-build__host > .bf-card > .bf-facts {
+    margin-block-start: auto;
+  }
+  .bl-build[data-new] {
+    animation: bl-rise var(--dur-list-in) var(--ease-enter) both;
+  }
+  @keyframes bl-rise {
+    from {
+      translate: 0 var(--travel-sm);
+    }
+    to {
+      translate: 0 0;
+    }
+  }
+
+  .bl-build > .bf-tipwrap {
+    display: flex;
+  }
+  .bl-build > .bf-tipwrap > .bf-btn {
+    flex: 1 1 auto;
+  }
+
+  /* the address bar: the coordinates are a command, in the number font */
+  .bl-tp {
+    justify-content: flex-start;
+    min-block-size: var(--tap-min);
+  }
+  @media (pointer: fine) {
+    .bl-tp {
+      min-block-size: calc(var(--u) * 14);
+    }
+  }
+  .bl-tp .bf-num {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

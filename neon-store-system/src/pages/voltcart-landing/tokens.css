@@ -1,0 +1,20 @@
+/* voltcart-landing: page extensions to the system's tokens (DESIGN.md §System). Nothing here overrides a system token.
+   The street is at night: the page root carries data-theme="dark" (Decisions log), so one set of values serves. */
+[data-page='voltcart-landing'] {
+  /* The night street: the 3D scene and the poster grade read these (scene/palette.ts mirrors them for WebGL). */
+  --street-fog: #07080d;
+  --street-cyan: var(--cyan-400);
+  --street-magenta: var(--magenta-400);
+  --street-amber: var(--orange-400);
+  --street-volt: var(--volt-400);
+  /* Scrim behind text that sits over the street: opaque enough for 4.5:1 at the brightest sign (measured in phase 10). */
+  --street-scrim: rgb(8 9 12 / 0.82);
+  --street-scrim-soft: rgb(8 9 12 / 0.55);
+  /* The hero headline: one step above the system's display size on wide screens. */
+  --hero-size: clamp(2.25rem, 1.1rem + 3.9vw, 4.75rem);
+  /* Camera damping (MOTION.md token extensions): mirrored as constants in the scene. */
+  --walk-damping: 3;
+  --lean-max: 3deg;
+  /* Section rhythm on the street. */
+  --chapter-gap: clamp(var(--space-8), 12vh, var(--space-10));
+}

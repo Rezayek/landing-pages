@@ -1,0 +1,654 @@
+/*
+ * System tokens for Kitty, direction "Kitchen ledger" (FOUNDATIONS.md; format and rules in guides/design-system.md §2).
+ * Three tiers:
+ *   1. primitives: raw values; components never read them;
+ *   2. roles: what components read (colour, type, space, shape, elevation, density, motion);
+ *   3. component tokens: only for a part a theme must change that no role covers (COMPONENTS.md names each one).
+ * Dark re-points roles and leaves primitives alone. It is written twice with identical values: under the
+ * prefers-color-scheme media query (what the audit emulates), skipped when <html data-theme="light">, and under
+ * <html data-theme="dark"> for a toggle. Edit both blocks together. The more-contrast context follows the same pattern
+ * (prefers-contrast: more, or <html data-contrast="more">), for light and for dark.
+ * Names are the contract: the feedback components, the /system page and every page template read these roles. Add a
+ * role, never rename one, and add a line to the SYSTEM.md changelog.
+ * Import this file once, after Tailwind (`@import 'tailwindcss'` first), so the base rules at the end sit in the
+ * right layer.
+ */
+:root {
+  /* 1. Primitives ------------------------------------------------------------------------------------------- */
+  /* paper: the warm neutral of the household book. Light grounds at the top, dark grounds at the bottom. */
+  --paper-0: #fffdf9;
+  --paper-50: #f5f2ec;
+  --paper-100: #ede9e1;
+  --paper-150: #e3ddd3;
+  --paper-300: #bdb5a9;
+  --paper-400: #a39b90;
+  --paper-425: #b3aba0;
+  --paper-450: #857d73;
+  --paper-500: #6e675f;
+  --paper-600: #5e5851;
+  --paper-650: #46413c;
+  --paper-700: #3f3a35;
+  --paper-750: #3a3732;
+  --paper-800: #2c2a26;
+  --paper-900: #23211e;
+  --paper-950: #1a1917;
+  --paper-975: #141311;
+  --paper-dark-200: #d6cfc4;
+  --paper-dark-250: #ccc4b8;
+
+  /* bottle green: the one action colour. 600 fills on light grounds, 400 on dark; 700 hovers, 300 the dark text step */
+  --green-50: #e7f1ec;
+  --green-100: #cfe3d9;
+  --green-150: #b5dcc8;
+  --green-300: #8fcbae;
+  --green-400: #6fbf9b;
+  --green-450: #4f9a79;
+  --green-500: #2e7a5c;
+  --green-550: #5e9c80;
+  --green-600: #1f5c46;
+  --green-700: #174a38;
+  --green-800: #123a2c;
+  --green-850: #163328;
+  --green-900: #10241b;
+
+  /* status hues: leaf (positive), brick (negative), amber (warning), ink blue (info) */
+  --leaf-50: #e8f3e6;
+  --leaf-300: #7ccb86;
+  --leaf-200: #8ed497;
+  --leaf-100: #b4e4ba;
+  --leaf-600: #2f7d3a;
+  --leaf-700: #256630;
+  --leaf-800: #1b4d24;
+  --leaf-900: #183320;
+  --leaf-950: #0f2412;
+  --brick-50: #fbeae7;
+  --brick-300: #ff9489;
+  --brick-200: #ffa399;
+  --brick-100: #ffc2ba;
+  --brick-600: #b83a2e;
+  --brick-700: #9a2f25;
+  --brick-800: #7a241c;
+  --brick-900: #3a1a16;
+  --brick-950: #2a0e0b;
+  --amber-50: #fbf0da;
+  --amber-300: #f2be5c;
+  --amber-200: #f5c76e;
+  --amber-100: #f9dc9e;
+  --amber-600: #9a6200;
+  --amber-700: #7a4d00;
+  --amber-800: #5c3a00;
+  --amber-900: #3a2a0c;
+  --amber-950: #2a1c00;
+  --blue-50: #e7eef8;
+  --blue-300: #8cb4ee;
+  --blue-200: #9dbff1;
+  --blue-100: #c3d8f6;
+  --blue-600: #2f62a8;
+  --blue-700: #284f87;
+  --blue-800: #1d3d6a;
+  --blue-900: #18263b;
+  --blue-950: #0d1c33;
+
+  /* person colours (the graft from "Fridge door"): one per family member, meaning "who" and nothing else */
+  --tomato-500: #c8553d;
+  --tomato-300: #f08a72;
+  --sky-500: #2f72c4;
+  --sky-300: #7daef0;
+  --plum-500: #8250b8;
+  --plum-300: #b994e8;
+  --teal-500: #1b8a83;
+  --teal-300: #5ccbc2;
+  --honey-500: #b5763a;
+  --honey-300: #e3a76a;
+
+  --shadow-rgb: 35 33 30;
+
+  /* families and a scale (ratio about 1.2, base 16 px); nothing below 12 px (0.75rem) */
+  --family-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
+  --family-body: 'Inter Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --size--2: 0.75rem;
+  --size--1: 0.875rem;
+  --size-0: 1rem;
+  --size-1: 1.25rem;
+  --size-2: 1.5rem;
+  --size-3: 2rem;
+  --size-display: clamp(2.25rem, 1.7rem + 2.2vw, 3.5rem);
+
+  /* spacing on a 4 px base */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  --radius-0: 0;
+  --radius-1: 4px;
+  --radius-2: 8px;
+  --radius-3: 12px;
+  --radius-4: 20px;
+  --radius-full: 999px;
+
+  /* 2. Roles: light ------------------------------------------------------------------------------------------ */
+  /* surfaces: tone steps first (guides/craft.md Depth); --overlay is the scrim behind a modal, menus and dialogs sit on --raised */
+  --bg: var(--paper-50);
+  --surface: var(--paper-0);
+  --raised: var(--paper-0);
+  --sunken: var(--paper-100);
+  --overlay: rgb(var(--shadow-rgb) / 0.45);
+
+  /* text and lines: --line divides, --line-strong draws a control (3:1 on every surface) */
+  --ink: var(--paper-900);
+  --muted: var(--paper-600);
+  --subtle: var(--paper-500);
+  --line: var(--paper-150);
+  --line-strong: var(--paper-450);
+
+  /* accent: the primary action, bottle green. --accent-ink is the text-safe version, --accent-bg a quiet container */
+  --accent: var(--green-600);
+  --accent-hover: var(--green-700);
+  --on-accent: var(--paper-0);
+  --accent-ink: var(--green-600);
+  --accent-bg: var(--green-50);
+
+  /* status: info, positive, warning, negative. Each role is a set:
+       --x        fill, icon and border (3:1 on every surface), with --on-x as the text on it (4.5:1)
+       --x-ink    text on the surfaces and on --x-bg (4.5:1)
+       --x-bg     the quiet container
+     A status always shows an icon and a word as well as the colour (guides/craft.md Colour). */
+  --positive: var(--leaf-600);
+  --on-positive: var(--paper-0);
+  --positive-ink: var(--leaf-700);
+  --positive-bg: var(--leaf-50);
+  --negative: var(--brick-600);
+  --on-negative: var(--paper-0);
+  --negative-ink: var(--brick-700);
+  --negative-bg: var(--brick-50);
+  --warning: var(--amber-600);
+  --on-warning: var(--paper-0);
+  --warning-ink: var(--amber-700);
+  --warning-bg: var(--amber-50);
+  --info: var(--blue-600);
+  --on-info: var(--paper-0);
+  --info-ink: var(--blue-700);
+  --info-bg: var(--blue-50);
+
+  /* people: one colour per family member (avatar ring, split chip, chart series), always beside the name or initials.
+     Graphic marks only (3:1 on every surface); never text, never status. */
+  --person-1: var(--tomato-500);
+  --person-2: var(--sky-500);
+  --person-3: var(--plum-500);
+  --person-4: var(--teal-500);
+  --person-5: var(--honey-500);
+
+  /* data: a sequential bottle-green ramp for amounts by category (bars sorted, direct labels); people use --person-* */
+  --data-1: var(--green-550);
+  --data-2: var(--green-500);
+  --data-3: var(--green-600);
+  --data-track: var(--paper-100);
+
+  /* focus, selection and state layers (hover 8 %, pressed 10 %: Material 3; a disabled control keeps 38 %).
+     --focus is 3:1 on every surface in every theme; the offset keeps the ring off the control. */
+  --focus: var(--green-600);
+  --focus-width: 2px;
+  --focus-offset: 2px;
+  --selection-bg: var(--green-100);
+  --selection-ink: var(--paper-900);
+  --hover-bg: color-mix(in srgb, var(--ink) 6%, transparent);
+  --pressed-bg: color-mix(in srgb, var(--ink) 10%, transparent);
+  --disabled-opacity: 0.38;
+
+  /* depth: tone steps carry it, shadows come second, from one light above; overlays keep a border for forced colours */
+  --shadow-raised: 0 1px 2px rgb(var(--shadow-rgb) / 0.06), 0 4px 12px -4px rgb(var(--shadow-rgb) / 0.1);
+  --shadow-overlay: 0 2px 4px rgb(var(--shadow-rgb) / 0.08), 0 16px 36px -12px rgb(var(--shadow-rgb) / 0.22);
+  --overlay-border: 1px solid var(--line);
+  --z-base: 0;
+  --z-sticky: 100;
+  --z-dropdown: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* type: named steps (guides/craft.md Type). Product screens use fixed steps; only display is fluid. */
+  --font-display: var(--family-display);
+  --font-body: var(--family-body);
+  --step--2: var(--size--2);
+  --step--1: var(--size--1);
+  --step-0: var(--size-0);
+  --step-1: var(--size-1);
+  --step-2: var(--size-2);
+  --step-3: var(--size-3);
+  --step-display: var(--size-display);
+  --leading-body: 1.5;
+  --leading-compact: 1.43;
+  --leading-heading: 1.15;
+  --leading-display: 1.05;
+  --tracking-display: -0.02em;
+  --tracking-heading: -0.01em;
+  --tracking-body: -0.006em;
+  --weight-display: 500;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-strong: 600;
+  --measure: 66ch;
+
+  /* space: --gutter is 16 px on a phone */
+  --gap-tight: var(--space-2);
+  --gap-group: var(--space-5);
+  --gap-section: clamp(var(--space-7), 6vw, var(--space-8));
+  --inset-control: var(--space-3);
+  --inset-card: var(--space-5);
+  --gutter: clamp(16px, 3vw, 32px);
+  --container: 75rem;
+  --sidebar-w: 248px;
+  --rail-w: 72px;
+  --sticky-top: 0px; /* height of a sticky header: scroll-padding keeps a focused control from sitting under it */
+  --sticky-bottom: 0px;
+
+  /* shape: radius by role; a full pill only for avatars and the person tag (FOUNDATIONS.md Shapes). A nested
+     corner is the outer radius minus the padding between them. */
+  --radius-control: var(--radius-2);
+  --radius-card: var(--radius-3);
+  --radius-sheet: var(--radius-4);
+  --radius-tag: var(--radius-1);
+  --radius-avatar: var(--radius-full);
+  --border: 1px;
+
+  /* icons: one set (Lucide), one stroke width; an icon takes its colour from the text beside it */
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-stroke: 1.75;
+
+  /* targets and density: heights are roles, so a compact region changes them. Nothing goes under --target-min;
+     primary actions and every control on a coarse pointer are --tap-min or more. */
+  --target-min: 24px;
+  --tap-min: 44px;
+  --control-h: 40px;
+  --row-h: 48px;
+
+  /* Motion (MOTION-SYSTEM.md; the same values as motion.ts). Components read the roles, never the raw steps. ----- */
+  --dur-instant: 0ms;
+  --dur-xs: 50ms;
+  --dur-sm: 100ms;
+  --dur-md: 150ms;
+  --dur-lg: 200ms;
+  --dur-xl: 250ms;
+  --dur-2xl: 300ms;
+  --dur-3xl: 400ms;
+  --dur-4xl: 600ms;
+  --dur-hero: 800ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-enter: cubic-bezier(0, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+  --ease-enter-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-exit-emphasized: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-symmetric: cubic-bezier(0.42, 0, 0.58, 1);
+  /* by role: components read these, not the scale */
+  --dur-press: var(--dur-sm);
+  --dur-hover: var(--dur-sm);
+  --dur-tooltip-in: var(--dur-md);
+  --dur-tooltip-out: var(--dur-sm);
+  --dur-popover-in: var(--dur-md);
+  --dur-popover-out: var(--dur-sm);
+  --dur-modal-in: var(--dur-xl);
+  --dur-modal-out: var(--dur-lg);
+  --dur-sheet-in: var(--dur-3xl);
+  --dur-sheet-out: var(--dur-2xl);
+  --dur-toast-in: var(--dur-xl);
+  --dur-toast-out: var(--dur-lg);
+  --dur-disclosure: var(--dur-lg);
+  --dur-list-in: var(--dur-lg);
+  --dur-list-out: var(--dur-md);
+  --dur-tab: var(--dur-lg);
+  --dur-route-in: var(--dur-xl);
+  --dur-route-out: var(--dur-lg);
+  --dur-swap: var(--dur-lg);
+  --dur-success-swap: var(--dur-md);
+  --dur-scene: var(--dur-4xl);
+  --dur-reduced: var(--dur-sm);
+  --hold-success: 1500ms;
+  --stagger-ui: 30ms;
+  --stagger-scene: 60ms;
+  --travel-sm: 8px; /* how far things move; 0 under reduced motion */
+  --travel-md: 16px;
+  --travel-lg: 24px;
+  --scale-from: 0.95; /* what an overlay grows from; never 0 */
+  --press-scale: 0.97;
+  /* Kitty's own timings (motion.ts timingMs) */
+  --delay-tooltip: 600ms; /* the first tooltip waits; neighbours open at once */
+  --spin-period: 800ms; /* one spinner turn */
+  --shimmer-period: 1600ms; /* one skeleton pulse; it stops after 5 s */
+  --dur-highlight-fade: var(--dur-3xl); /* a live new row's highlight fades after --hold-success */
+
+  /* 3. Component tokens ---------------------------------------------------------------------------------------
+     Add one only for a part a theme must change that no role covers. A component token that aliases a density role
+     (--control-h, --row-h) would not follow a compact region, so components read those roles directly. */
+  --toast-gap: var(--space-2);
+  --skeleton-bg: var(--sunken);
+  --avatar-tint: 16%; /* how much of the person colour fills an avatar disc behind ink initials */
+
+  /* A section that keeps its look in both themes: the bottle-green band (the month closed, the kid's allowance
+     header). No theme block re-points these. */
+  --band-bg: var(--green-600);
+  --band-ink: var(--paper-0);
+  --band-muted: var(--green-100);
+  --band-line: var(--green-500);
+
+  /* The document, from the roles (browser surfaces: guides/craft.md Browser surfaces) */
+  color-scheme: light;
+  caret-color: var(--accent);
+  accent-color: var(--accent);
+  scrollbar-color: var(--line-strong) transparent;
+  scroll-padding-top: var(--sticky-top);
+  scroll-padding-bottom: var(--sticky-bottom);
+}
+
+/* More contrast, light: text pairs to 7:1 (WCAG 1.4.6). Before the dark blocks, so dark wins where both match. */
+@media (prefers-contrast: more) {
+  :root {
+    --ink: var(--paper-975);
+    --muted: var(--paper-700);
+    --subtle: var(--paper-650);
+    --line: var(--paper-300);
+    --line-strong: var(--paper-600);
+    --accent-ink: var(--green-800);
+    --positive-ink: var(--leaf-800);
+    --negative-ink: var(--brick-800);
+    --warning-ink: var(--amber-800);
+    --info-ink: var(--blue-800);
+  }
+}
+:root[data-contrast='more'] {
+  --ink: var(--paper-975);
+  --muted: var(--paper-700);
+  --subtle: var(--paper-650);
+  --line: var(--paper-300);
+  --line-strong: var(--paper-600);
+  --accent-ink: var(--green-800);
+  --positive-ink: var(--leaf-800);
+  --negative-ink: var(--brick-800);
+  --warning-ink: var(--amber-800);
+  --info-ink: var(--blue-800);
+}
+
+/* 2. Roles: dark, following the system setting unless <html data-theme="light"> */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: var(--paper-950);
+    --surface: var(--paper-900);
+    --raised: var(--paper-800);
+    --sunken: var(--paper-975);
+    --overlay: rgb(0 0 0 / 0.6);
+    --ink: var(--paper-50);
+    --muted: var(--paper-425);
+    --subtle: var(--paper-400);
+    --line: var(--paper-750);
+    --line-strong: var(--paper-450);
+    --accent: var(--green-400);
+    --accent-hover: var(--green-300);
+    --on-accent: var(--green-900);
+    --accent-ink: var(--green-300);
+    --accent-bg: var(--green-850);
+    --positive: var(--leaf-300);
+    --on-positive: var(--leaf-950);
+    --positive-ink: var(--leaf-200);
+    --positive-bg: var(--leaf-900);
+    --negative: var(--brick-300);
+    --on-negative: var(--brick-950);
+    --negative-ink: var(--brick-200);
+    --negative-bg: var(--brick-900);
+    --warning: var(--amber-300);
+    --on-warning: var(--amber-950);
+    --warning-ink: var(--amber-200);
+    --warning-bg: var(--amber-900);
+    --info: var(--blue-300);
+    --on-info: var(--blue-950);
+    --info-ink: var(--blue-200);
+    --info-bg: var(--blue-900);
+    --person-1: var(--tomato-300);
+    --person-2: var(--sky-300);
+    --person-3: var(--plum-300);
+    --person-4: var(--teal-300);
+    --person-5: var(--honey-300);
+    --data-1: var(--green-450);
+    --data-2: var(--green-400);
+    --data-3: var(--green-150);
+    --data-track: var(--paper-800);
+    --focus: var(--green-300);
+    --selection-bg: var(--green-700);
+    --selection-ink: var(--paper-50);
+    --shadow-raised: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 12px -4px rgb(0 0 0 / 0.5);
+    --shadow-overlay: 0 2px 4px rgb(0 0 0 / 0.4), 0 16px 36px -12px rgb(0 0 0 / 0.6);
+    --avatar-tint: 24%;
+    color-scheme: dark;
+  }
+}
+
+/* 2. Roles: dark, when a toggle sets <html data-theme="dark">. Identical to the block above. */
+:root[data-theme='dark'] {
+  --bg: var(--paper-950);
+  --surface: var(--paper-900);
+  --raised: var(--paper-800);
+  --sunken: var(--paper-975);
+  --overlay: rgb(0 0 0 / 0.6);
+  --ink: var(--paper-50);
+  --muted: var(--paper-425);
+  --subtle: var(--paper-400);
+  --line: var(--paper-750);
+  --line-strong: var(--paper-450);
+  --accent: var(--green-400);
+  --accent-hover: var(--green-300);
+  --on-accent: var(--green-900);
+  --accent-ink: var(--green-300);
+  --accent-bg: var(--green-850);
+  --positive: var(--leaf-300);
+  --on-positive: var(--leaf-950);
+  --positive-ink: var(--leaf-200);
+  --positive-bg: var(--leaf-900);
+  --negative: var(--brick-300);
+  --on-negative: var(--brick-950);
+  --negative-ink: var(--brick-200);
+  --negative-bg: var(--brick-900);
+  --warning: var(--amber-300);
+  --on-warning: var(--amber-950);
+  --warning-ink: var(--amber-200);
+  --warning-bg: var(--amber-900);
+  --info: var(--blue-300);
+  --on-info: var(--blue-950);
+  --info-ink: var(--blue-200);
+  --info-bg: var(--blue-900);
+  --person-1: var(--tomato-300);
+  --person-2: var(--sky-300);
+  --person-3: var(--plum-300);
+  --person-4: var(--teal-300);
+  --person-5: var(--honey-300);
+  --data-1: var(--green-450);
+  --data-2: var(--green-400);
+  --data-3: var(--green-150);
+  --data-track: var(--paper-800);
+  --focus: var(--green-300);
+  --selection-bg: var(--green-700);
+  --selection-ink: var(--paper-50);
+  --shadow-raised: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 12px -4px rgb(0 0 0 / 0.5);
+  --shadow-overlay: 0 2px 4px rgb(0 0 0 / 0.4), 0 16px 36px -12px rgb(0 0 0 / 0.6);
+  --avatar-tint: 24%;
+  color-scheme: dark;
+}
+
+/* More contrast, dark: four selectors for the four ways dark and more contrast can combine. Identical values. */
+@media (prefers-color-scheme: dark) and (prefers-contrast: more) {
+  :root:not([data-theme='light']) {
+    --ink: var(--paper-0);
+    --muted: var(--paper-dark-200);
+    --subtle: var(--paper-dark-250);
+    --line: var(--paper-600);
+    --line-strong: var(--paper-400);
+    --accent-ink: var(--green-150);
+    --positive-ink: var(--leaf-100);
+    --negative-ink: var(--brick-100);
+    --warning-ink: var(--amber-100);
+    --info-ink: var(--blue-100);
+  }
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-contrast='more']:not([data-theme='light']) {
+    --ink: var(--paper-0);
+    --muted: var(--paper-dark-200);
+    --subtle: var(--paper-dark-250);
+    --line: var(--paper-600);
+    --line-strong: var(--paper-400);
+    --accent-ink: var(--green-150);
+    --positive-ink: var(--leaf-100);
+    --negative-ink: var(--brick-100);
+    --warning-ink: var(--amber-100);
+    --info-ink: var(--blue-100);
+  }
+}
+@media (prefers-contrast: more) {
+  :root[data-theme='dark'] {
+    --ink: var(--paper-0);
+    --muted: var(--paper-dark-200);
+    --subtle: var(--paper-dark-250);
+    --line: var(--paper-600);
+    --line-strong: var(--paper-400);
+    --accent-ink: var(--green-150);
+    --positive-ink: var(--leaf-100);
+    --negative-ink: var(--brick-100);
+    --warning-ink: var(--amber-100);
+    --info-ink: var(--blue-100);
+  }
+}
+:root[data-theme='dark'][data-contrast='more'] {
+  --ink: var(--paper-0);
+  --muted: var(--paper-dark-200);
+  --subtle: var(--paper-dark-250);
+  --line: var(--paper-600);
+  --line-strong: var(--paper-400);
+  --accent-ink: var(--green-150);
+  --positive-ink: var(--leaf-100);
+  --negative-ink: var(--brick-100);
+  --warning-ink: var(--amber-100);
+  --info-ink: var(--blue-100);
+}
+
+/* Density: one step is 4 px (Material). A region or the whole document sets data-density="compact" (the
+   transactions table, budget editing). Controls are --tap-min or more on a coarse pointer, whatever the density. */
+[data-density='compact'] {
+  --control-h: 36px;
+  --row-h: 40px;
+}
+@media (pointer: coarse) {
+  :root,
+  [data-density] {
+    --control-h: var(--tap-min);
+    --row-h: max(var(--tap-min), 48px);
+  }
+}
+
+/* Reduced motion keeps the state change and drops the travel (guides/motion.md Reduced motion; MOTION-SYSTEM.md).
+   Written twice, like dark: the system setting, and the in-app switch <html data-motion="reduced"> motion.ts reads.
+   Every role that travels, scales or slides falls back to a short fade (--dur-reduced); the spinner slows but turns. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --travel-sm: 0px;
+    --travel-md: 0px;
+    --travel-lg: 0px;
+    --scale-from: 1;
+    --press-scale: 1;
+    --stagger-ui: 0ms;
+    --stagger-scene: 0ms;
+    --dur-modal-in: var(--dur-reduced);
+    --dur-modal-out: var(--dur-reduced);
+    --dur-sheet-in: var(--dur-reduced);
+    --dur-sheet-out: var(--dur-reduced);
+    --dur-toast-in: var(--dur-reduced);
+    --dur-toast-out: var(--dur-reduced);
+    --dur-list-in: var(--dur-reduced);
+    --dur-list-out: var(--dur-reduced);
+    --dur-route-in: var(--dur-reduced);
+    --dur-route-out: var(--dur-reduced);
+    --dur-disclosure: var(--dur-instant);
+    --dur-tab: var(--dur-instant);
+    --dur-scene: var(--dur-reduced);
+    --spin-period: 1600ms;
+    --shimmer-period: 0ms;
+  }
+}
+:root[data-motion='reduced'] {
+  --travel-sm: 0px;
+  --travel-md: 0px;
+  --travel-lg: 0px;
+  --scale-from: 1;
+  --press-scale: 1;
+  --stagger-ui: 0ms;
+  --stagger-scene: 0ms;
+  --dur-modal-in: var(--dur-reduced);
+  --dur-modal-out: var(--dur-reduced);
+  --dur-sheet-in: var(--dur-reduced);
+  --dur-sheet-out: var(--dur-reduced);
+  --dur-toast-in: var(--dur-reduced);
+  --dur-toast-out: var(--dur-reduced);
+  --dur-list-in: var(--dur-reduced);
+  --dur-list-out: var(--dur-reduced);
+  --dur-route-in: var(--dur-reduced);
+  --dur-route-out: var(--dur-reduced);
+  --dur-disclosure: var(--dur-instant);
+  --dur-tab: var(--dur-instant);
+  --dur-scene: var(--dur-reduced);
+  --spin-period: 1600ms;
+  --shimmer-period: 0ms;
+}
+
+/* Forced colours: fix only what turns illegible (guides/craft.md Browser surfaces). */
+@media (forced-colors: active) {
+  :root {
+    --overlay-border: 1px solid CanvasText;
+  }
+}
+
+/* Document base, from the roles. It sits in the base layer so Tailwind utilities and component styles win. */
+@layer base {
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    line-height: var(--leading-body);
+    letter-spacing: var(--tracking-body);
+    font-optical-sizing: auto;
+  }
+  ::selection {
+    background: var(--selection-bg);
+    color: var(--selection-ink);
+  }
+  :focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+  a {
+    color: var(--accent-ink);
+    text-underline-offset: 0.2em;
+  }
+  :is(h1, h2, h3) {
+    font-family: var(--font-display);
+    font-weight: var(--weight-display);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-heading);
+    text-wrap: balance;
+  }
+  h1 {
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :is(td, th, output, data, .num) {
+    font-variant-numeric: tabular-nums;
+  }
+}

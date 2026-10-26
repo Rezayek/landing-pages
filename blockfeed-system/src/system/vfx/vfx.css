@@ -1,0 +1,249 @@
+/*
+ * Blockfeed's effects: the layers of the motion language (MOTION-SYSTEM.md §Theme expression, guides/expression.md).
+ * Every effect is drawn the way the rest of the system is: hard edges, whole pixel units, stepped frames, no blur,
+ * no glow, no scale. The script half (pickup, xp, burst, decode) is vfx.ts.
+ *
+ * How they attach
+ *   data-vfx="<words>"        a host and its standing effects: `ignite` (the select frame: a one-unit white frame on
+ *                             hover, focus and [data-vfx-on]), `scanlines` or `dither` (a still texture layer)
+ *   data-vfx-play="<name>"    a one-shot, set by play() in vfx.ts: glint, scan, pop, shake, pulse, wipe, flicker
+ * One texture (::before) and one pass (::after) per host. A host keeps its own `position` when it sets one; the
+ * default here is `relative` at zero specificity so the pseudo layers have a box.
+ *
+ * Knobs (tokens.css sets them on :root; a host may override)
+ *   --vfx-color, --vfx-color-2   the effect's light (experience lime) and its second channel (rare-tier aqua)
+ *   --vfx-dur                    one-shot length (defaults to the effect's role token)
+ *   --vfx-strength               0-1, how much of a texture shows
+ *
+ * Safety (guides/motion.md): no one-shot repeats by itself; flicker dips twice in 600 ms on small elements only;
+ * under reduced motion every one-shot is skipped by play() or becomes a still here, textures stay still, and the
+ * state the effect decorates always shows without it.
+ */
+
+@layer components {
+  :where([data-vfx], [data-vfx-play]) {
+    position: relative;
+    isolation: isolate;
+  }
+
+  /* Standing: ignite, the select frame. Instant, like a game cursor over a slot; fine for frequent interactions. */
+  :where([data-vfx~='ignite']):is(:focus-visible, [data-vfx-on]),
+  :where([data-vfx~='ignite']):hover:not(:disabled) {
+    box-shadow: inset 0 0 0 var(--u) var(--select), 0 0 0 var(--u) var(--edge);
+  }
+  @media not ((hover: hover) and (pointer: fine)) {
+    :where([data-vfx~='ignite']):hover:not(:focus-visible, [data-vfx-on]) {
+      box-shadow: none;
+    }
+  }
+
+  /* Standing textures (::before, still). */
+  :where([data-vfx~='scanlines'], [data-vfx~='dither'])::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: calc(var(--vfx-strength) * 0.3);
+  }
+  :where([data-vfx~='scanlines'])::before {
+    background: repeating-linear-gradient(to bottom, var(--vfx-color) 0 var(--u), transparent var(--u) calc(var(--u) * 3));
+  }
+  /* a two-unit checker, the way old games shaded a surface without a gradient */
+  :where([data-vfx~='dither'])::before {
+    background: conic-gradient(var(--vfx-color) 25%, transparent 0 50%, var(--vfx-color) 0 75%, transparent 0) 0 0 /
+      calc(var(--u) * 2) calc(var(--u) * 2);
+  }
+
+  /* One-shot passes (::after). */
+  :where([data-vfx-play='glint'], [data-vfx-play='scan'])::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-repeat: no-repeat;
+  }
+  /* glint: the enchanted shine, a hard diagonal band (a wide faint one and a narrow bright one) stepping across once */
+  :where([data-vfx-play='glint'])::after {
+    --vfx-dur: var(--dur-glint);
+    background-image: linear-gradient(
+      115deg,
+      transparent 0 36%,
+      color-mix(in srgb, var(--vfx-color-2) 35%, transparent) 36% 44%,
+      color-mix(in srgb, var(--select) 70%, transparent) 44% 48%,
+      color-mix(in srgb, var(--vfx-color-2) 35%, transparent) 48% 52%,
+      transparent 52% 100%
+    );
+    background-size: 260% 100%;
+    animation: vfx-glint var(--dur-glint) steps(8, end) both;
+  }
+  /* scan: a two-unit line steps down the host, then is gone: "working on this" */
+  :where([data-vfx-play='scan'])::after {
+    background-image: linear-gradient(var(--vfx-color), var(--vfx-color));
+    background-size: 100% calc(var(--u) * 2);
+    animation: vfx-scan var(--vfx-dur, var(--dur-3xl)) steps(10, end) both;
+  }
+
+  /* One-shots on the host itself. */
+  /* pop: a two-frame hop of two units, the item-in-hotbar bump */
+  :where([data-vfx-play='pop']) {
+    animation: vfx-pop var(--dur-pop) steps(1, end) both;
+  }
+  /* shake: two-unit swings, three of them, no tween: a refusal */
+  :where([data-vfx-play='shake']) {
+    animation: vfx-shake var(--dur-shake) steps(1, end) both;
+  }
+  /* pulse: hard one-unit rings step outward three times: "something changed here" */
+  :where([data-vfx-play='pulse']) {
+    animation: vfx-pulse var(--vfx-dur, var(--dur-2xl)) steps(1, end) both;
+  }
+  /* wipe: a reveal in six column steps, left to right */
+  :where([data-vfx-play='wipe']) {
+    animation: vfx-wipe var(--vfx-dur, var(--dur-2xl)) steps(6, end) both;
+  }
+  /* flicker: a torch dip, twice in 600 ms */
+  :where([data-vfx-play='flicker']) {
+    animation: vfx-flicker var(--dur-4xl) steps(1, end) both;
+  }
+
+  @keyframes vfx-glint {
+    from {
+      background-position: 130% 0;
+    }
+    to {
+      background-position: -30% 0;
+    }
+  }
+  @keyframes vfx-scan {
+    from {
+      background-position: 0 0;
+    }
+    to {
+      background-position: 0 100%;
+    }
+  }
+  @keyframes vfx-pop {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    34% {
+      translate: 0 calc(var(--u) * -2);
+    }
+    67% {
+      translate: 0 calc(var(--u) * -1);
+    }
+  }
+  @keyframes vfx-shake {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    17% {
+      translate: calc(var(--u) * -2) 0;
+    }
+    34% {
+      translate: calc(var(--u) * 2) 0;
+    }
+    50% {
+      translate: calc(var(--u) * -2) 0;
+    }
+    67% {
+      translate: calc(var(--u) * 1) 0;
+    }
+    84% {
+      translate: 0 0;
+    }
+  }
+  @keyframes vfx-pulse {
+    0% {
+      box-shadow: 0 0 0 var(--u) var(--vfx-color);
+    }
+    34% {
+      box-shadow: 0 0 0 calc(var(--u) * 2) var(--vfx-color);
+    }
+    67% {
+      box-shadow: 0 0 0 calc(var(--u) * 3) color-mix(in srgb, var(--vfx-color) 50%, transparent);
+    }
+    100% {
+      box-shadow: 0 0 0 0 transparent;
+    }
+  }
+  @keyframes vfx-wipe {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  /* Two dips in 600 ms: under three flashes a second. Small elements only (a status word, an icon). */
+  @keyframes vfx-flicker {
+    0% {
+      opacity: 0.25;
+    }
+    18% {
+      opacity: 1;
+    }
+    30% {
+      opacity: 0.5;
+    }
+    42%,
+    100% {
+      opacity: 1;
+    }
+  }
+
+  /* pickup and xp (vfx.ts): the sprites that fly. Fixed, pointer-transparent, removed when they land. */
+  .vfx-fly {
+    position: fixed;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    z-index: var(--z-toast, 500);
+    pointer-events: none;
+    image-rendering: pixelated;
+  }
+  .vfx-orb {
+    inline-size: calc(var(--u) * 4);
+    block-size: calc(var(--u) * 4);
+    background: var(--xp);
+    box-shadow: inset calc(var(--u) * -1) calc(var(--u) * -1) 0 var(--xp-dark), 0 0 0 var(--u) var(--edge);
+  }
+
+  /* Decode (vfx.ts): the real text for assistive tech while the glyphs run. */
+  .vfx-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Reduced motion: written twice, the system setting and the in-app switch. Wipe becomes a fade; the rest are
+     skipped by play() and would be still here anyway. */
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-vfx-play]),
+    :where([data-vfx-play])::after {
+      animation: none;
+    }
+    :where([data-vfx-play='wipe']) {
+      animation: vfx-fade var(--dur-sm) linear both;
+    }
+  }
+  :root[data-motion='reduced'] :where([data-vfx-play]),
+  :root[data-motion='reduced'] :where([data-vfx-play])::after {
+    animation: none;
+  }
+  :root[data-motion='reduced'] :where([data-vfx-play='wipe']) {
+    animation: vfx-fade var(--dur-sm) linear both;
+  }
+  @keyframes vfx-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

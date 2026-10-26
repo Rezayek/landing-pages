@@ -1,0 +1,112 @@
+/*
+ * S3 Cakes. Layout only: every value is a role from the system's tokens. The cards, chips, dialog and states
+ * bring their own styles (src/system/ui, cake and feedback).
+ */
+.cakes {
+  background: var(--bg);
+  padding-block: var(--gap-section);
+  min-inline-size: 0;
+}
+.cakes__inner {
+  display: grid;
+  gap: var(--gap-group);
+  min-inline-size: 0;
+  max-inline-size: calc(var(--container) + 2 * var(--gutter)); /* content 76rem, the footer's edge */
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.cakes__head {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+  margin-block-end: var(--space-4);
+}
+.cakes__head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-variation-settings: var(--font-display-settings);
+  font-weight: var(--weight-heading);
+  line-height: var(--leading-heading);
+}
+.cakes__sub {
+  margin: 0;
+  max-inline-size: var(--measure);
+  color: var(--muted);
+}
+.cakes__head .ms-beads {
+  inline-size: min(100%, 15rem);
+  margin-block-start: var(--space-2);
+}
+
+/* the style chips and the tier select share a row; they wrap on a phone */
+.cakes__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--space-4) var(--space-5);
+  min-inline-size: 0;
+}
+.cakes__tiers {
+  inline-size: auto;
+  min-inline-size: min(10rem, 100%);
+}
+.cakes__tiers select {
+  inline-size: 100%;
+}
+
+/* the details: the rendered study beside the facts, stacked on a phone */
+.cakes-detail {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+  gap: var(--gap-group);
+  align-items: start;
+  min-inline-size: 0;
+}
+.cakes-detail__pic {
+  position: relative;
+  display: grid;
+  margin: 0;
+  inline-size: 100%; /* fills its half of the dialog: no void beside a small picture */
+  aspect-ratio: 4 / 5;
+  max-block-size: 52svh;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--_petal, var(--sunken));
+  color: var(--_petal-ink, var(--ink));
+}
+.cakes-detail__pic img {
+  grid-area: 1 / 1;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--dur-swap) var(--ease-enter);
+}
+.cakes-detail__pic[data-state='loaded'] img {
+  opacity: 1;
+}
+.cakes-detail__failed {
+  grid-area: 1 / 1;
+  place-self: center;
+  padding: var(--space-3);
+  text-align: center;
+  font-size: var(--step--1);
+}
+.cakes-detail__credit {
+  position: absolute;
+  inset-block-end: var(--space-3);
+  inset-inline-start: var(--space-3);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-tag);
+  background: color-mix(in srgb, var(--raised) 88%, transparent);
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+.cakes-detail__text {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+.cakes-detail__text p {
+  margin: 0;
+}

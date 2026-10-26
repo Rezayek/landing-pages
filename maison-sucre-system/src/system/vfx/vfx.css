@@ -1,0 +1,169 @@
+/*
+ * The effects of the "Piped" motion language (MOTION-SYSTEM.md §Theme expression, FOUNDATIONS.md §10). Each one
+ * comes from the craft: a line piped from a no. 1 nozzle, a row of beads, gold leaf pressed on with a dry brush, the
+ * chalky settle of petal dust.
+ *
+ * How they attach
+ *   data-vfx-play="<name>"   a one-shot, set by play() in vfx.ts:
+ *     pipe    every <path>/<circle> with pathLength="1" inside the host draws on along its line; a [data-bead]
+ *             end dot appears when the line arrives                       (a mark is made: tick, error ring)
+ *     bead    the host is revealed left to right, like beads piped along a tier's base (a group is complete)
+ *     gild    the host (a gold fleck) is pressed on: scale from 0.9 and a fade, once     (something is finished)
+ *     glint   one soft band of gold light crosses the host, once                (a booking or price is confirmed)
+ *     dust    a petal-dust fill settles into the host (opacity of its ::before)            (a choice settled)
+ * Knobs (tokens.css, component tier): --vfx-color (gold leaf), --vfx-color-2 (the dust), --vfx-dur, --vfx-strength.
+ *
+ * Safety (guides/motion.md Reduced motion): no one-shot repeats by itself; nothing flashes; under reduced motion
+ * every one-shot ends at its final frame at once (pipe and bead show the finished mark, gild and dust a short fade)
+ * and the state the effect decorates always shows without it.
+ */
+
+@layer components {
+  :where([data-vfx-play]) {
+    --vfx-color: var(--gold);
+    --vfx-color-2: var(--petal-floral);
+    --vfx-dur: var(--dur-2xl);
+    --vfx-strength: 0.55;
+  }
+
+  /* pipe: lines draw on along their own path. Hosts mark the drawable parts with pathLength="1". */
+  :where([data-vfx-play='pipe']) :is(path, circle, line, polyline)[pathLength] {
+    stroke-dasharray: 1;
+    animation: vfx-pipe var(--vfx-dur) var(--ease-enter) both;
+  }
+  :where([data-vfx-play='pipe']) [data-bead] {
+    animation: vfx-fade var(--dur-xs) linear calc(var(--vfx-dur) - var(--dur-xs)) both;
+  }
+
+  /* bead: a reveal from the left, the way a row of beads is piped along a tier. */
+  :where([data-vfx-play='bead']) {
+    animation: vfx-bead var(--vfx-dur) var(--ease-standard) both;
+  }
+
+  /* gild: gold leaf pressed on. */
+  :where([data-vfx-play='gild']) {
+    animation: vfx-gild var(--dur-lg) var(--ease-enter) both;
+  }
+
+  /* glint: one band of warm light across a confirmed thing. */
+  :where([data-vfx-play='glint']) {
+    position: relative;
+    isolation: isolate;
+  }
+  :where([data-vfx-play='glint'])::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient( /* taste-skill-ignore: the glint effect, once (MOTION-SYSTEM.md) */
+        100deg,
+        transparent 35%,
+        color-mix(in srgb, var(--vfx-color) calc(var(--vfx-strength) * 100%), transparent) 50%,
+        transparent 65%
+      )
+      120% 0 / 260% 100% no-repeat;
+    mix-blend-mode: soft-light;
+    animation: vfx-glint var(--dur-4xl) var(--ease-standard) both;
+  }
+
+  /* dust: a chalky fill settles under the content. */
+  :where([data-vfx-play='dust']) {
+    position: relative;
+    isolation: isolate;
+  }
+  :where([data-vfx-play='dust'])::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--vfx-color-2);
+    animation: vfx-dust var(--dur-xl) var(--ease-enter) both;
+  }
+  /* the settled dust marks a choice: once the host is no longer chosen (a time reloaded, a flavour released), it goes */
+  :where([data-vfx-play='dust']:is([aria-checked='false'], [aria-pressed='false'], [aria-selected='false']))::before {
+    display: none;
+  }
+
+  @keyframes vfx-pipe {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes vfx-bead {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes vfx-gild {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes vfx-glint {
+    to {
+      background-position: -20% 0;
+    }
+  }
+  @keyframes vfx-dust {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes vfx-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Reduced motion: written twice, the system setting and the in-app switch. Lines and rows are simply there; gild
+     and dust keep a short fade (opacity only); glint is skipped. */
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-vfx-play='pipe']) :is(path, circle, line, polyline)[pathLength],
+    :where([data-vfx-play='pipe']) [data-bead],
+    :where([data-vfx-play='bead']),
+    :where([data-vfx-play='glint'])::after {
+      animation: none;
+    }
+    :where([data-vfx-play='gild']) {
+      animation: vfx-fade var(--dur-reduced) linear both;
+    }
+  }
+  :root[data-motion='reduced'] :where([data-vfx-play='pipe']) :is(path, circle, line, polyline)[pathLength],
+  :root[data-motion='reduced'] :where([data-vfx-play='pipe']) [data-bead],
+  :root[data-motion='reduced'] :where([data-vfx-play='bead']),
+  :root[data-motion='reduced'] :where([data-vfx-play='glint'])::after {
+    animation: none;
+  }
+  :root[data-motion='reduced'] :where([data-vfx-play='gild']) {
+    animation: vfx-fade var(--dur-reduced) linear both;
+  }
+
+  /* Text for assistive technology while a figure counts. */
+  .vfx-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px; /* taste-skill-ignore: visually hidden text, not a rule */
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

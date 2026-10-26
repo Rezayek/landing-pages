@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f2f3ee" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d0e13" media="(prefers-color-scheme: dark)" />
+    <title>VOLTCART</title>
+    <script>
+      // Apply the stored theme and contrast before first paint, so the page never flashes the wrong one.
+      try {
+        var t = localStorage.getItem('voltcart-theme')
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t
+        var c = localStorage.getItem('voltcart-contrast')
+        if (c === 'more' || c === 'normal') document.documentElement.dataset.contrast = c
+        if (localStorage.getItem('voltcart-motion') === 'reduced') document.documentElement.dataset.motion = 'reduced'
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript><p style="padding: 24px; font: 16px/1.5 system-ui, sans-serif">VOLTCART needs JavaScript for this design study.</p></noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

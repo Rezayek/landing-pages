@@ -1,0 +1,37 @@
+/*
+ * Page-level extensions for `tidelog-landing`. The SYSTEM owns the tokens (src/system/tokens.css); this file only adds
+ * the few values the Echo orbit hero needs, built from system tokens. The hero and the header sit on the system's
+ * night band (--band-*), which keeps its look in both themes, so nothing here differs in dark.
+ */
+[data-page='tidelog-landing'] {
+  /* one pair of page margins for the header, hero, sections and footer: the gutter, or the space beside the 76rem
+     content column when the window is wider (a percentage of the element's own width, so no scrollbar drift) */
+  --page-inline: max(var(--gutter), calc((100% - 76rem) / 2));
+  /* hero: the copy column and the H1 size that keep the H1 to two lines beside the figure on desktop */
+  --hero-copy-w: 34rem;
+  --hero-title-size: min(var(--step-display), 9.5vw);
+  /* hero: how the key art is anchored across the stage, so she stays right of the copy as the window narrows (the
+     plates' arc and their traces are in Hero.tsx, ORBIT) */
+  --hero-art-x: 63%;
+  /* hero: the stage height, reserved before the art loads */
+  --hero-min: max(40rem, 100svh);
+  /* phone: the key art's box above the copy, cropped onto her */
+  --hero-figure-phone: clamp(11rem, min(62vw, 28svh), 20rem);
+  --hero-art-x-phone: 64%;
+  /* S2: the ghost figure behind the build panel */
+  --build-ghost-w: min(44vw, 40rem);
+}
+@media (min-width: 64rem) {
+  [data-page='tidelog-landing'] {
+    --hero-copy-w: 40rem;
+    --hero-title-size: calc(var(--step-display) * 0.74);
+    --hero-art-inset: 10%;
+  }
+}
+/* wide screens: the H1's display jump (round 2), still two lines beside her */
+@media (min-width: 88rem) {
+  [data-page='tidelog-landing'] {
+    --hero-copy-w: 48rem;
+    --hero-title-size: calc(var(--step-display) * 0.86);
+  }
+}
