@@ -1,0 +1,483 @@
+/* S1 Play: the hero (ported from the locked comp 1d, proof/comps-*.css). Scoped to the page; system tokens only. */
+[data-page='pulse-landing'] {
+  .pl-hero h1 {
+    margin: 0; font-family: var(--font-display); font-stretch: var(--stretch-display); font-weight: var(--weight-display);
+    line-height: 0.98; letter-spacing: -0.01em;
+  }
+  .pl-hero__copy { position: absolute; z-index: 4; inset: auto auto 2.5rem var(--space-5); inline-size: min(40rem, 52%); display: grid; gap: var(--space-3); }
+  .pl-hero__copy h1.d-title { position: static; inset: auto; max-inline-size: 13ch; }
+  .pl-hero__sub { margin: 0; max-inline-size: 36ch; color: var(--graphite-100); font-size: var(--step-0); text-shadow: 0 1px 12px var(--scope-bg); } /* taste-skill-ignore: FOUNDATIONS.md §10, neutral scrim behind text over the live scope (the scrim exception) */
+  .pl-hero__note { margin: 0; color: var(--muted); font-size: var(--step--1); }
+  .pl-hero__terms { margin: 0; color: var(--ink); font-size: var(--step-0); }
+  .pl-hero__secondary { justify-self: start; display: inline-flex; align-items: center; min-block-size: var(--tap-min); color: var(--ink); text-decoration-color: var(--accent-ink); }
+  .c-knobs { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-5); }
+
+/* from proof/comps-detail.css */
+/* 1b: the detailed signal path (hero sprint, phase 3). System tokens only. */
+.d { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0; }
+.d-rail {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-6);
+  padding: var(--space-3) var(--space-5); border-block-end: 1px solid var(--line);
+}
+.d-nav { display: flex; gap: var(--space-5); font-size: var(--step--1); }
+.d-nav a { color: var(--muted); text-decoration: none; }
+.d-study { margin-inline-start: auto; color: var(--subtle); }
+
+/* the scene: a phosphor CRT, edge to edge */
+.d-scene { position: relative; background: var(--scope-bg); }
+.d-crt { position: relative; overflow: hidden; }
+.d-crt .pi-scope__glass { aspect-ratio: auto; block-size: clamp(16rem, 40svh, 26rem); border-radius: 0; }
+.d-crt .pi-scope__plate, .d-crt .pi-scope__bar { display: none; }
+.d-crt .pi-scope__canvas {
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--trace-1) 60%, transparent)); /* taste-skill-ignore: FOUNDATIONS.md §10, phosphor afterglow (Scope screen) */
+}
+.d-crt::before {
+  content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent 0 2px, rgb(0 0 0 / 0.22) 2px 3px); /* taste-skill-ignore: FOUNDATIONS.md §10, CRT scanlines (Scope screen) */
+}
+.d-crt::after {
+  content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 50% 45%, transparent 55%, rgb(0 0 0 / 0.7) 100%), /* taste-skill-ignore: FOUNDATIONS.md §10, tube vignette (Scope screen) */
+    linear-gradient(90deg, color-mix(in srgb, var(--scope-bg) 88%, transparent) 0 28%, transparent 52%); /* taste-skill-ignore: FOUNDATIONS.md §10, neutral scrim behind the copy (the scrim exception) */
+}
+.d-hud { position: absolute; z-index: 3; color: var(--oled-muted); }
+.d-hud--tl { inset: var(--space-4) auto auto var(--space-5); }
+.d-hud--tr { inset: var(--space-4) var(--space-5) auto auto; }
+.d-hud--bl { inset: auto auto var(--space-4) var(--space-5); }
+.d-hud--br { inset: auto var(--space-5) var(--space-4) auto; color: var(--trace-1); }
+.d-ticks {
+  position: absolute; z-index: 3; margin: 0; padding: 0; list-style: none;
+  font-family: var(--font-readout); font-size: 0.6875rem; color: var(--oled-muted); opacity: 0.8;
+}
+.d-ticks--x { inset: auto 0 2.25rem 0; display: flex; justify-content: space-between; padding-inline: 9.5% 0; }
+.d-ticks--x li { inline-size: 10%; }
+.d-ticks--y { inset: 0 var(--space-5) 0 auto; display: grid; align-content: space-around; text-align: end; }
+.pl-hero h1.d-title {
+  position: absolute; z-index: 4; inset: auto auto 3.25rem var(--space-5); max-inline-size: 13ch;
+  font-size: clamp(2.25rem, 1rem + 3.6vw, 4.5rem); color: var(--ink);
+}
+.d-title span:nth-child(2) { color: var(--trace-1); }
+
+.d-path {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none;
+  border-block: 1px solid var(--oled-line);
+}
+@media (max-width: 50rem) { .d-path { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.d-stage {
+  position: relative; display: grid; grid-template-columns: auto 1fr; grid-template-areas: 'head head' 'glyph value';
+  align-items: center; gap: var(--space-2) var(--space-3); padding: var(--space-3) var(--space-5);
+  color: var(--oled-muted);
+}
+.d-stage + .d-stage { border-inline-start: 1px solid var(--oled-line); }
+.d-stage + .d-stage::before {
+  content: '→'; position: absolute; inset: 50% auto auto -0.6em; translate: 0 -50%;
+  color: var(--oled-muted); background: var(--scope-bg); font-size: 0.875rem;
+}
+.d-stage[data-lit] { color: var(--trace-1); }
+.d-stage__head { grid-area: head; display: inline-flex; align-items: center; gap: var(--space-2); }
+.d-stage .d-glyph { grid-area: glyph; inline-size: 3.375rem; block-size: 1.5rem; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.d-stage .d-glyph rect { fill: color-mix(in srgb, currentColor 25%, transparent); stroke: none; }
+.d-stage .d-glyph rect[data-on] { fill: currentColor; }
+.d-stage__value {
+  grid-area: value; font-family: var(--font-readout); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.04em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.d-stage__short { display: none; }
+
+/* the device: a machined slab */
+.d-device { display: grid; gap: var(--space-5); align-items: start; padding: 0 var(--space-5) var(--space-6); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 72rem) { .d-device { grid-template-columns: minmax(0, 1fr) 19rem; } }
+.d-edge {
+  position: absolute; inset: 0.85rem 2.5rem auto auto; z-index: 1;
+  display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); justify-content: flex-end;
+}
+.d-device { position: relative; padding-block-start: var(--space-4); }
+.d-jack { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--subtle); }
+.d-jack i {
+  inline-size: 0.875rem; block-size: 0.875rem; border-radius: 50%;
+  background: radial-gradient(circle, var(--graphite-975) 0 40%, var(--graphite-500) 42% 60%, var(--graphite-800) 62%); /* taste-skill-ignore: FOUNDATIONS.md §10, 3.5 mm jack well (Jack and cable) */
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.5); /* taste-skill-ignore: FOUNDATIONS.md §10, 3.5 mm jack well (Jack and cable) */
+}
+.d-face {
+  position: relative; display: grid; gap: var(--space-5) var(--space-6);
+  grid-template-columns: minmax(13rem, 15rem) auto minmax(0, 1fr); grid-template-areas: 'left knobs keys';
+  align-items: end; padding: 2.75rem var(--space-6) var(--space-5);
+  border-radius: calc(var(--radius-card) * 1.5);
+  background: radial-gradient(140% 120% at 30% 0%, color-mix(in srgb, var(--panel-hi) 55%, transparent), transparent 60%), var(--panel-face); /* taste-skill-ignore: FOUNDATIONS.md §10, panel face falloff (Matte panel) */
+  box-shadow: /* taste-skill-ignore: FOUNDATIONS.md §10, panel lip (Machined edge) */
+    inset 0 1px 0 var(--panel-rim), inset 0 -2px 0 rgb(0 0 0 / 0.45),
+    0 1px 0 var(--panel-line), 0 28px 60px -18px rgb(0 0 0 / 0.8), 0 8px 18px -8px rgb(0 0 0 / 0.6);
+}
+@media (max-width: 80rem) { .d-face { grid-template-columns: minmax(13rem, 15rem) minmax(0, 1fr); grid-template-areas: 'left knobs' 'keys keys'; } }
+@media (max-width: 50rem) { .d-face { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'left' 'knobs' 'keys'; padding: 3.5rem var(--space-4) var(--space-5); } .d-edge { inset: 0.85rem 1rem auto 1rem; justify-content: flex-start; } }
+.d-face__left { grid-area: left; display: grid; gap: var(--space-4); align-content: start; }
+.d-face__knobs { grid-area: knobs; display: grid; gap: var(--space-4); }
+.d-face__pair { display: flex; gap: var(--space-5); justify-content: center; }
+.d-face__keys { grid-area: keys; display: grid; gap: var(--space-3); }
+.d-engrave { color: var(--subtle); text-shadow: var(--panel-engrave); } /* taste-skill-ignore: FOUNDATIONS.md §10, silkscreen engraving (Silkscreen legends) */
+.d-vents { display: block; block-size: 0.75rem; background: repeating-linear-gradient(90deg, var(--panel-vent) 0 3px, transparent 3px 9px); border-radius: 2px; } /* taste-skill-ignore: FOUNDATIONS.md §10, vent slots (Vent slots) */
+.d-screw {
+  position: absolute; inline-size: 0.75rem; block-size: 0.75rem; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--panel-screw-hi), var(--panel-screw) 70%); box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.4); /* taste-skill-ignore: FOUNDATIONS.md §10, panel screw (Matte panel) */
+}
+.d-screw::after { content: ''; position: absolute; inset: 45% 15%; background: rgb(0 0 0 / 0.55); rotate: 35deg; }
+.d-screw--tl { inset: 0.75rem auto auto 0.75rem; }
+.d-screw--tr { inset: 0.75rem 0.75rem auto auto; }
+.d-screw--bl { inset: auto auto 0.75rem 0.75rem; }
+.d-screw--br { inset: auto 0.75rem 0.75rem auto; }
+.d-plate { position: absolute; inset: auto 2.25rem 0.55rem auto; color: var(--subtle); font-size: var(--step-legend); }
+
+/* the patch tag and the pre-order */
+.d-order { display: grid; gap: var(--space-3); align-content: start; padding-block-start: var(--space-4); }
+.d-tag {
+  position: relative; display: grid; gap: var(--space-2); padding: var(--space-6) var(--space-4) var(--space-4);
+  background: var(--bone-100); color: var(--bone-900);
+  clip-path: polygon(14% 0, 86% 0, 100% 10%, 100% 100%, 0 100%, 0 10%);
+  rotate: -2deg; filter: drop-shadow(0 14px 18px rgb(0 0 0 / 0.6)); /* taste-skill-ignore: FOUNDATIONS.md §10, the hanging tag casts a shadow (a physical tag) */
+}
+.d-tag .pi-legend { color: var(--bone-700); }
+.d-tag__hole {
+  position: absolute; inset: 0.6rem auto auto 50%; translate: -50% 0; inline-size: 0.75rem; block-size: 0.75rem;
+  border-radius: 50%; background: var(--bg); box-shadow: inset 0 0 0 2px var(--bone-400); /* taste-skill-ignore: FOUNDATIONS.md §10, tag eyelet (a physical tag) */
+}
+.d-tag strong { font-family: var(--font-readout); font-size: var(--step-2); letter-spacing: 0.04em; color: var(--amber-800); }
+.d-tag dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); margin: 0; }
+.d-tag dd { margin: 0; font-family: var(--font-readout); font-weight: 700; font-size: 0.875rem; }
+
+/* from proof/comps-live.css */
+/* 1c: the signal path, live (hero sprint, phase 3). Extends comps-detail.css. System tokens only. */
+.e { position: relative; }
+.e-crt { block-size: clamp(16rem, 40svh, 26rem); background: var(--scope-bg); }
+.e-crt::before, .e-crt::after { content: none; }
+.ph { position: absolute; inset: 0; }
+.ph__canvas, .ph__poster { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
+.ph__poster { fill: none; stroke: var(--trace-1); stroke-width: 1.5; opacity: 0.8; }
+.ph__poster[data-hidden] { display: none; }
+.e-crt::after {
+  content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--scope-bg) 94%, transparent) 0 36%, transparent 54%); /* taste-skill-ignore: FOUNDATIONS.md §10, neutral scrim behind the copy (the scrim exception) */
+}
+
+/* the envelope glyph's live segment and dot, the VU */
+.d-glyph__hot { stroke: var(--trace-2); stroke-width: 2.4; }
+.d-glyph__dot { fill: var(--trace-2); stroke: none; }
+.d-stage .d-glyph rect[data-hot][data-on] { fill: var(--negative); }
+
+/* the scope's input socket, where the cable lands */
+.e-socket { position: absolute; inset: 50% var(--space-4) auto auto; translate: 0 -50%; display: grid; justify-items: center; gap: 2px; }
+.e-socket i {
+  inline-size: 1.125rem; block-size: 1.125rem; border-radius: 50%;
+  background: radial-gradient(circle, var(--graphite-975) 0 32%, var(--graphite-400) 35% 55%, var(--graphite-800) 58%); /* taste-skill-ignore: FOUNDATIONS.md §10, CH1 socket well (Jack and cable) */
+  box-shadow: 0 0 0 2px var(--graphite-750); /* taste-skill-ignore: FOUNDATIONS.md §10, CH1 socket ring (Jack and cable) */
+}
+/* the label sits above its socket, where the plug never covers it */
+.e-socket .pi-legend { order: -1; font-size: var(--step-legend); color: var(--oled-muted); white-space: nowrap; }
+
+
+/* the device sitting on a desk: depth from its lip and shadow, never a 3D tilt, so every control is hit where it is seen */
+.e-desk { position: relative; padding-block-start: var(--space-5); }
+.e-desk::after { /* contact shadow on the desk */ /* taste-skill-ignore: FOUNDATIONS.md §10, the device rests on a desk: its contact shadow */
+  content: ''; position: absolute; inset: auto 4% -1.25rem 4%; block-size: 2.5rem; z-index: -1;
+  background: radial-gradient(50% 50% at 50% 50%, rgb(0 0 0 / 0.75), transparent 70%); filter: blur(6px); /* taste-skill-ignore: FOUNDATIONS.md §10, the device rests on a desk: its contact shadow */
+}
+.e-face {
+  padding-block-start: 3.25rem;
+  box-shadow: /* taste-skill-ignore: FOUNDATIONS.md §10, panel lip (Machined edge) */
+    inset 0 1px 0 var(--panel-rim), inset 0 -2px 0 rgb(0 0 0 / 0.45),
+    0 2px 0 var(--panel-line), 0 16px 0 -2px var(--panel-deep), 0 17px 0 -2px var(--panel-line),
+    0 46px 60px -24px rgb(0 0 0 / 0.85);
+}
+.e-edge {
+  position: absolute; inset: 0 0 auto 0; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-2) var(--space-5);
+  padding: 0.85rem 2.5rem; border-block-end: 1px solid var(--panel-seam);
+  background: linear-gradient(var(--panel-band-a), var(--panel-band-b)); /* taste-skill-ignore: FOUNDATIONS.md §10, machined edge band (Machined edge) */
+  border-radius: calc(var(--radius-card) * 1.5) calc(var(--radius-card) * 1.5) 0 0;
+}
+@media (max-width: 50rem) { .e-edge { justify-content: flex-start; padding-inline: 1rem; } .e-face { transform: none; padding-block-start: 5rem; } }
+
+/* the patch cable */
+.d-cable { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; z-index: 5; pointer-events: none; overflow: visible; }
+.d-cable path { fill: none; stroke-linecap: round; }
+.d-cable__shadow { stroke: rgb(0 0 0 / 0.6); stroke-width: 12; translate: 0 8px; filter: blur(4px); }
+.d-cable__body { stroke: var(--graphite-750); stroke-width: 9; }
+.d-cable__sheen { stroke: var(--graphite-400); stroke-width: 2; translate: -1px -2px; opacity: 0.55; }
+.d-cable__pulse {
+  stroke: var(--trace-1); stroke-width: 3.5; stroke-dasharray: 10 90; stroke-dashoffset: 100;
+  filter: drop-shadow(0 0 6px var(--trace-1)); /* taste-skill-ignore: FOUNDATIONS.md §10, phosphor pulse along the cable (Jack and cable) */
+  animation: e-pulse var(--dur-3xl, 600ms) linear forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .d-cable__pulse { stroke-dasharray: none; animation: e-flash var(--dur-led, 120ms) steps(1) forwards; }
+}
+
+
+/* from proof/comps-more.css */
+/* 1d: patchable cable, annotations, light and material, the loop (hero sprint, phase 3). System tokens only. */
+
+/* the plug: a jack plug you can drag */
+.e-plug {
+  position: absolute; z-index: 6; translate: -50% -50%;
+  inline-size: 2.75rem; block-size: 2.75rem; padding: 0; border: 0; border-radius: 50%;
+  background: transparent; cursor: grab; touch-action: none;
+}
+.e-plug span {
+  position: absolute; inset: 0.55rem; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--graphite-300), var(--graphite-750) 62%, var(--graphite-950)); /* taste-skill-ignore: FOUNDATIONS.md §10, cable plug (Jack and cable) */
+  box-shadow: 0 0 0 2px var(--graphite-975), 0 6px 10px rgb(0 0 0 / 0.6); /* taste-skill-ignore: FOUNDATIONS.md §10, cable plug (Jack and cable) */
+}
+.e-plug[data-state='drag'] { cursor: grabbing; }
+.e-plug[data-state='drag'] span { box-shadow: 0 0 0 2px var(--accent), 0 14px 18px rgb(0 0 0 / 0.6); } /* taste-skill-ignore: FOUNDATIONS.md §10, cable plug, held (Jack and cable) */
+.e-plug[data-state='none'] span { box-shadow: 0 0 0 2px var(--negative), 0 6px 10px rgb(0 0 0 / 0.6); } /* taste-skill-ignore: FOUNDATIONS.md §10, cable plug, unplugged fault (Jack and cable) */
+.e-plug:focus-visible { outline: var(--focus-width) solid var(--focus); outline-offset: 2px; }
+.d-jack[data-plugged] .pi-legend { color: var(--trace-1); }
+.d-jack[data-plugged] i { box-shadow: 0 0 0 2px var(--accent), 0 0 10px var(--accent); } /* taste-skill-ignore: FOUNDATIONS.md §10, lit jack ring (Amber LED) */
+
+/* no signal */
+/* with the cable out, the status place shows the fault instead of the note */
+.e-crt:has(.e-nosignal) .d-hud--br { display: none; }
+.e-nosignal {
+  /* the tube's status place, bottom right (where "No note held" sits), never over the headline */
+  position: absolute; z-index: 3; inset: auto var(--space-5) var(--space-4) auto; margin: 0;
+  padding: var(--space-2) var(--space-3); border: 1px solid var(--negative); color: var(--negative); background: var(--scope-bg);
+}
+
+/* annotations on the spectrum */
+.e-annot { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.e-annot__fc {
+  position: absolute; inset: 14% auto 0 var(--fc); border-inline-start: 1px dashed color-mix(in srgb, var(--trace-2) 70%, transparent);
+}
+.e-annot__fc .pi-legend {
+  position: absolute; inset: -1.4rem auto auto 0.35rem; white-space: nowrap; color: var(--trace-2);
+  padding: 1px 4px; background: color-mix(in srgb, var(--scope-bg) 80%, transparent);
+}
+.e-annot__q {
+  position: absolute; inset: auto auto 0 var(--fc); block-size: var(--flag);
+  border-inline-start: 2px solid var(--trace-1);
+}
+.e-annot__q .pi-legend {
+  position: absolute; inset: 0 auto auto 0; padding: 1px 5px; color: var(--scope-bg); background: var(--trace-1);
+  clip-path: polygon(0 0, 100% 0, 88% 50%, 100% 100%, 0 100%);
+  padding-inline-end: 12px;
+}
+.e-annot__band {
+  position: absolute; inset: 14% auto 0 var(--fc); inline-size: var(--lfo-w); translate: -50% 0;
+  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--trace-3) 22%, transparent) 0 2px, transparent 2px 7px); /* taste-skill-ignore: FOUNDATIONS.md §10, LFO band on the graticule (Scope screen) */
+  animation: e-breathe var(--lfo-s) ease-in-out infinite alternate;
+}
+.e-annot__lfo { position: absolute; inset: auto auto 0.5rem var(--fc); translate: calc(-100% - 0.5rem) 0; color: var(--trace-3); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) { .e-annot__band { animation: none; } }
+
+/* hovering a stage: its control on the device lights, and a leader line joins them */
+.d-stage { cursor: default; outline-offset: -3px; }
+.d-stage[data-hot] { background: color-mix(in srgb, var(--trace-1) 7%, transparent); }
+.e-target { border-radius: var(--radius-1); transition: box-shadow var(--dur-sm) var(--ease-step); }
+.e-target[data-hot], .d-jack[data-hot] { outline: 1px solid var(--trace-1); outline-offset: 2px; }
+.e-leader { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; z-index: 4; pointer-events: none; overflow: visible; }
+.e-leader path { fill: none; stroke: var(--trace-1); stroke-width: 1; stroke-dasharray: 3 3; }
+.e-leader circle { fill: var(--trace-1); }
+
+/* light and material: the scope's glow spills onto the panel, the panel has grain, knobs have printed scales */
+.e-face {
+  background:
+    radial-gradient(120% 70% at 50% -10%, color-mix(in srgb, var(--trace-1) calc(var(--spill, 0) * 22%), transparent), transparent 70%), /* taste-skill-ignore: FOUNDATIONS.md §10, tube light spilling on the panel (Matte panel) */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(140% 120% at 30% 0%, color-mix(in srgb, var(--panel-hi) 55%, transparent), transparent 60%), /* taste-skill-ignore: FOUNDATIONS.md §10, panel face falloff (Matte panel) */
+    var(--panel-face);
+}
+.e-face::after { /* worn, brighter machined rim on the top edge */
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 1px var(--panel-rim), inset 0 2px 0 -1px var(--panel-rim); /* taste-skill-ignore: FOUNDATIONS.md §10, worn machined rim (Machined edge) */
+}
+.e-face .pi-led[data-state='on'] .pi-led__dot, .e-face .pi-led[data-state='blink'] .pi-led__dot {
+  box-shadow: 0 0 6px 1px var(--led-on), 0 0 22px 4px color-mix(in srgb, var(--led-on) 35%, transparent); /* taste-skill-ignore: FOUNDATIONS.md §10, amber LED (Amber LED) */
+}
+.e-scaled .pi-knob__dial::before {
+  content: ''; position: absolute; inset: -1.15rem; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-60 -60 120 120'%3E%3Cg stroke='%23827c6f' stroke-width='1.2'%3E%3Cline x1='0' y1='-54' x2='0' y2='-49' transform='rotate(-150)'/%3E%3Cline x1='0' y1='-54' x2='0' y2='-50' transform='rotate(-120)'/%3E%3Cline x1='0' y1='-54' x2='0' y2='-50' transform='rotate(-90)'/%3E%3Cline x1='0' y1='-54' x2='0' y2='-50' transform='rotate(-60)'/%3E%3Cline x1='0' y1='-54' x2='0' y2='-50' transform='rotate(-30)'/%3E%3Cline x1='0' y1='-54' x2='0' y2='-49' transform='rotate(0)'/%3E%3Cline x1='0' y1='-54' x2='0' y2='-50' transform='rotate(30)'/%3E%3Cline x1='0' y1='-54' x2='0' y2='-50' transform='rotate(60)'/%3E%3Cline x1='0' y1='-54' x2='0' y2='-50' transform='rotate(90)'/%3E%3Cline x1='0' y1='-54' x2='0' y2='-50' transform='rotate(120)'/%3E%3Cline x1='0' y1='-54' x2='0' y2='-49' transform='rotate(150)'/%3E%3C/g%3E%3Cg fill='%23827c6f' font-family='Arial' font-size='8' text-anchor='middle'%3E%3Ctext x='-50' y='33'%3E0%3C/text%3E%3Ctext x='0' y='-41'%3E5%3C/text%3E%3Ctext x='50' y='33'%3E10%3C/text%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* the 8-step loop */
+.e-loop { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.e-loop__key[aria-pressed='true'] { color: var(--accent-ink); }
+.e-loop__pads { display: grid; grid-template-columns: repeat(8, 1.5rem); gap: 0.375rem; margin: 0; padding: 0; list-style: none; }
+.e-loop__pads li {
+  block-size: 1.5rem; border-radius: 3px; background: var(--panel-pad);
+  box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.45), inset 0 1px 0 var(--panel-rim); /* taste-skill-ignore: FOUNDATIONS.md §10, pad key edge (Machined edge) */
+}
+.e-loop__pads li[data-accent] { background: color-mix(in srgb, var(--accent) 18%, var(--panel-pad)); }
+.e-loop__pads li[data-on] { background: var(--accent); box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 70%, transparent), inset 0 1px 0 rgb(255 255 255 / 0.35); } /* taste-skill-ignore: FOUNDATIONS.md §10, the active pad emits light (Amber LED: the active key) */
+.e-loop__bpm { color: var(--subtle); }
+
+/* the richer face: big knobs and the envelope on top, the voice and effects strip, the loop, the full keybed */
+.e-face {
+  grid-template-columns: minmax(13rem, 15rem) minmax(0, 1fr) auto;
+  grid-template-areas: 'left knobs env' 'mod mod mod' 'keys keys keys';
+}
+.e-env { grid-area: env; display: flex; gap: var(--space-3); align-self: end; padding-inline-start: var(--space-4); border-inline-start: 1px solid var(--panel-line); }
+.e-mod {
+  grid-area: mod; display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-3) var(--space-4);
+  padding-block: var(--space-4); border-block: 1px solid var(--panel-line);
+}
+.e-mod .pi-waves { margin-inline-end: var(--space-3); }
+.e-face .d-face__keys { grid-area: keys; }
+@media (max-width: 80rem) {
+  .e-face { grid-template-columns: minmax(13rem, 15rem) minmax(0, 1fr); grid-template-areas: 'left knobs' 'env env' 'mod mod' 'keys keys'; }
+  .e-env { border-inline-start: 0; padding-inline-start: 0; }
+}
+@media (max-width: 50rem) {
+  .e-face { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'left' 'knobs' 'env' 'mod' 'keys'; }
+}
+
+
+  /* the hero's own overrides of the ported comp rules: a taller CRT that holds the copy; the phone composition */
+  .e-crt { block-size: clamp(19rem, 40svh, 26rem); }
+  .pl-hero .pl-hero__copy h1.d-title { position: static; inset: auto; font-size: clamp(2.25rem, 1rem + 2.6vw, 3.6rem); max-inline-size: 24ch; }
+  .pl-hero__copy { inset-block-end: var(--space-5); inline-size: min(46rem, 58%); }
+  .pl-hero__sub { max-inline-size: 52ch; }
+  /* the spectrum marks read across the open tube, right of the copy, so the cutoff never lands on the headline */
+  .e-annot { inset-inline-start: calc(min(46rem, 58%) + var(--space-6)); }
+  /* the cable's lane: a strip of panel under the path, so the cable sags through it and never across a readout */
+  @media (min-width: 50rem) { .d-path { margin-block-end: var(--space-7); } }
+  .e-device { padding-block-start: 0; }
+  .e-desk { padding-block-start: var(--space-3); }
+  @media (max-width: 50rem) {
+    .e-crt { block-size: auto; display: flex; flex-direction: column; }
+    .e-crt .ph { position: relative; inset: auto; aspect-ratio: 16 / 10; order: 2; }
+    /* on a phone the tube keeps only its status ("No note held"): the scope settings would sit above the headline as a
+       kicker, or crowd the status under the tube; the socket's label gives way to the path's own "Output" */
+    .e-crt .d-hud--tl, .e-crt .d-hud--tr, .e-socket .pi-legend { display: none; }
+    .d-stage__full { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .d-stage__short { display: inline; }
+    /* two cells a row: the arrow into the second row's first cell would clip at the screen's edge */
+    .d-stage:nth-child(3)::before { display: none; }
+    /* the cable plugs in above the Output readout, so it drops down the cell's edge, never across the readout */
+    .e-socket { inset: var(--space-2) var(--space-3) auto auto; translate: none; }
+    /* the Output cell drops its meter on phones: the readout starts at the cell's left edge, clear of the cable */
+    .d-stage:has(.e-socket) .d-glyph { display: none; }
+    .d-stage:has(.e-socket) .d-stage__value { grid-column: 1 / -1; }
+    .e-crt .d-hud--br { inset: auto var(--space-4) var(--space-3) auto; }
+    .e-crt::after { content: none; }
+    .pl-hero__copy { position: relative; inset: auto; inline-size: auto; order: 1; padding: var(--space-3) var(--space-4); }
+    .pl-hero .pl-hero__copy h1.d-title { font-size: clamp(2rem, 1.2rem + 4vw, 2.75rem); }
+    .e-annot { display: none; }
+  }
+}
+[data-page='pulse-landing'] {
+  /* the hero sequence: LEDs light in path order, knobs sweep to their values in detents, the patch tag swings in */
+  .pl-hero[data-booting] .d-stage .pi-led { animation: pl-led-in var(--dur-led) steps(1) both; animation-delay: calc(var(--boot-led-at) + var(--i, 0) * var(--boot-led-step)); }
+  .pl-hero[data-booting] .pi-knob__cap { animation: pl-knob-sweep var(--dur-hero) var(--ease-step-fine) var(--boot-knob-at) both; }
+  .pl-hero[data-booting] .pi-knob__value { animation: pl-arc-sweep var(--dur-hero) var(--ease-step-fine) var(--boot-knob-at) both; }
+  .pl-hero[data-booting] .pi-fader__cap { animation: pl-fader-rise var(--dur-hero) var(--ease-step-fine) var(--boot-fader-at) both; }
+  .pl-hero[data-booting] .pl-tag { animation: pl-tag-swing var(--dur-hero) var(--ease-standard) var(--boot-tag-at) both; }
+  /* the amber lights breathe with the LFO once the sound is on (--lfo from the hero's frame loop) */
+  .pl-hero .pi-led[data-state='on'] .pi-led__dot { box-shadow: 0 0 calc(4px + var(--lfo, 0) * 12px) calc(var(--lfo, 0) * 3px) var(--led-on); } /* taste-skill-ignore: FOUNDATIONS.md §10, the LED breathes at the LFO rate (Amber LED) */
+}
+
+/* ---------------------------------------------------------------------------------------------------------------------
+   The hero in one card (the person: "make the hero in one card, it's bad for the user to scroll back and forth").
+   The copy and the order tag sit beside the instrument; the scope is the instrument's own screen; the controls are in
+   banks behind the page keys, the sound key and the OLED stay out, the keyboard runs along the bottom. On a desktop the
+   whole card fits one screen; on a phone the screen and the keys come first, so playing and watching stay together. */
+[data-page='pulse-landing'] {
+  .pl-hero {
+    display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: 'copy' 'device' 'order';
+    gap: var(--space-5); padding: var(--space-4) var(--gutter) var(--space-6);
+  }
+  .pl-hero .pl-hero__copy { grid-area: copy; position: static; inset: auto; inline-size: auto; padding: 0; display: grid; gap: var(--space-3); }
+  .pl-hero .pl-hero__copy h1.d-title { font-size: clamp(2rem, 1.2rem + 2vw, 3.2rem); max-inline-size: 14ch; color: var(--ink); }
+  .pl-hero .d-title span:nth-child(2) { color: var(--accent-ink); }
+  .pl-hero .pl-hero__sub { max-inline-size: 34ch; color: var(--muted); text-shadow: none; } /* taste-skill-ignore: this removes the old scrim shadow (the copy is off the tube now) */
+  .pl-hero .d-device { grid-area: device; grid-template-columns: minmax(0, 1fr); padding: 0; }
+  .pl-hero .e-desk { padding: 0; }
+  .pl-hero .d-order { grid-area: order; padding: 0; }
+
+  /* the card: the screen on top, the sound key and the banks, the keys */
+  .pl-hero .e-face {
+    grid-template-columns: minmax(12rem, 14rem) minmax(0, 1fr); grid-template-areas: 'scene scene' 'left banks' 'keys keys';
+    gap: var(--space-4) var(--space-5); padding: 3rem var(--space-5) var(--space-4); align-items: start;
+  }
+  .pl-hero .d-scene { grid-area: scene; border-radius: var(--radius-card); overflow: hidden; box-shadow: inset 0 0 0 1px var(--panel-seam); } /* taste-skill-ignore: FOUNDATIONS.md §10, the screen's bezel seam (Machined edge) */
+  .pl-hero .e-crt { block-size: clamp(8rem, 18svh, 11rem); }
+  .pl-hero .e-crt::after { content: none; }
+  .pl-hero .d-crt .pi-scope__glass { block-size: 100%; }
+  .pl-hero .e-annot { inset-inline-start: 0; }
+  .pl-hero .d-path { margin-block-end: 0; }
+  .pl-hero .d-hud--tr { inset-inline-end: 5.5rem; }
+  .pl-hero .e-socket { inset: var(--space-3) var(--space-4) auto auto; translate: none; z-index: 5; }
+  .pl-hero .d-face__left { grid-area: left; }
+  .pl-hero .pl-banks { grid-area: banks; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-3); align-content: start; }
+  /* every bank holds the main bank's height, so switching banks never moves the keyboard */
+  .pl-hero .pl-bank { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-3) var(--space-5); min-block-size: 10.5rem; }
+  .pl-hero .pl-bank[hidden] { display: none; }
+  .pl-hero .pl-bank .d-face__knobs { display: flex; align-items: flex-end; gap: var(--space-5); }
+  .pl-hero .pl-bank .e-env { align-self: flex-end; }
+  .pl-hero .d-face__keys { grid-area: keys; }
+  .pl-hero .pi-keys { --key-h: 6rem; }
+  /* the jack legends sit left of their holes, so the plug never covers a name; the Q flag keeps its value on one line;
+     the CH1 legend sits left of its socket, clear of the cable's loop */
+  .pl-hero .d-jack { flex-direction: row-reverse; }
+  /* the line input at the band's left: a quiet key with its LED and the track's credit; the jacks keep the right */
+  .pl-hero .e-line { display: inline-flex; align-items: center; gap: var(--space-3); margin-inline-end: auto; }
+  .pl-hero .e-line__key { min-block-size: 1.75rem; padding-inline: var(--space-3); }
+  @media (pointer: coarse) { .pl-hero .e-line__key { min-block-size: var(--tap-min); } }
+  .pl-hero .e-line__credit { color: var(--subtle); white-space: nowrap; }
+  /* narrower cards keep the two jacks you can plug into, beside the screen's CH1 input; the line in stays at the left */
+  @media (max-width: 80rem) { .pl-hero .d-jack:not([data-plug]) { display: none; } }
+  @media (max-width: 60rem) { .pl-hero .e-line__credit { display: none; } }
+  .pl-hero .e-annot__q { min-block-size: 1.75rem; }
+  .pl-hero .e-annot__q .pi-legend { white-space: nowrap; }
+  .pl-hero .e-socket { grid-auto-flow: column; align-items: center; gap: var(--space-2); }
+  .pl-hero .d-hud--tr { inset-inline-end: 7.5rem; }
+
+  /* wide screens: the copy and the order tag in a column beside the card */
+  @media (min-width: 72rem) {
+    .pl-hero {
+      grid-template-columns: minmax(17rem, 21rem) minmax(0, 1fr); grid-template-areas: 'copy device' 'order device';
+      grid-template-rows: auto 1fr; column-gap: var(--space-6); align-items: start;
+    }
+    .pl-hero .pl-hero__copy { padding-block-start: var(--space-4); }
+  }
+
+  /* phones: the screen and the keys first, then the sound key and the banks */
+  @media (max-width: 50rem) {
+    .pl-hero { padding-inline: var(--space-3); }
+    .pl-hero .e-face { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'scene' 'left' 'keys' 'banks'; padding: 3.25rem var(--space-3) var(--space-4); }
+    /* the sound key sits between the screen and the keys; the tube's status already shows the note, so the OLED and
+       the engraved title step aside on a phone */
+    .pl-hero .d-face__left > .d-engrave, .pl-hero .d-face__left > .pi-oled { display: none; }
+    .pl-hero .e-crt { block-size: auto; }
+    .pl-hero .e-crt .ph { aspect-ratio: auto; block-size: clamp(10rem, 26svh, 14rem); }
+    /* the path in one row of four: the stage number and its one stat (the name stays for screen readers) */
+    .pl-hero .d-path { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .pl-hero .d-path .d-glyph { display: none; }
+    .pl-hero .d-stage { grid-template-areas: 'head' 'value'; grid-template-columns: minmax(0, 1fr); gap: var(--space-1); padding: var(--space-2); }
+    .pl-hero .d-stage:nth-child(3)::before { display: revert; }
+    .pl-hero .d-stage__name { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    /* the band keeps the two jacks you can plug into, next to the screen's CH1 input */
+    /* one row on a phone: the line in at the left, PHONES and OUT at the right (a wrapped OUT hid under the screen) */
+    .pl-hero .e-edge { justify-content: flex-end; flex-wrap: nowrap; gap: var(--space-2); padding-inline: 1.75rem; }
+    /* the plug is wider than its hole: OUT's legend stands further off, so the plug never covers it */
+    .pl-hero .d-jack[data-target='out'] { gap: var(--space-4); }
+    /* a bank's controls wrap inside the card instead of widening it */
+    .pl-hero .pl-bank .d-face__knobs { flex-wrap: wrap; }
+    .pl-hero .pl-bank { min-block-size: 0; }
+    .pl-hero .pi-keys { --key-h: 7rem; }
+  }
+}
+
+/* the narrowest phones: the jack band's gaps tighten so the line in, PHONES and OUT keep one row */
+[data-page='pulse-landing'] {
+  @media (max-width: 22rem) { .pl-hero .e-edge { gap: var(--space-2); padding-inline: 1rem; } .pl-hero .d-jack:not([data-target='out']) { gap: var(--space-1); } .pl-hero .e-line__key { padding-inline: var(--space-2); } .pl-hero .d-screw--tl, .pl-hero .d-screw--tr { display: none; } }
+}
+
+@keyframes e-pulse { to { stroke-dashoffset: 0; } }
+@keyframes e-flash { to { opacity: 0; } }
+@keyframes e-breathe { from { scale: 0.55 1; } to { scale: 1 1; } }
+@keyframes pl-led-in { from { opacity: 0.2; } to { opacity: 1; } }
+@keyframes pl-knob-sweep { from { transform: rotate(-150deg); } }
+@keyframes pl-arc-sweep { from { stroke-dasharray: 0 360; } }
+@keyframes pl-fader-rise { from { translate: 0 calc(var(--fader-t) * (var(--fader-h) - 14px)); } }
+@keyframes pl-tag-swing { from { rotate: -9deg; } 60% { rotate: 1deg; } to { rotate: -2deg; } }

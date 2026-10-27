@@ -1,0 +1,91 @@
+/* S4 Specs: numerals as the visual, then a dense centred wall of small specs. */
+[data-page='pulse-landing'] .specs {
+  padding-block: var(--gap-section);
+  padding-inline: var(--gutter);
+}
+[data-page='pulse-landing'] .specs__inner {
+  display: grid;
+  gap: var(--gap-group);
+  justify-items: center;
+  max-inline-size: var(--container);
+  margin-inline: auto;
+  min-inline-size: 0;
+  text-align: center;
+}
+[data-page='pulse-landing'] .specs__title {
+  margin: 0;
+  font-size: var(--step-3);
+  max-inline-size: var(--measure);
+}
+[data-page='pulse-landing'] .specs__lead {
+  margin: 0;
+  max-inline-size: var(--measure);
+  color: var(--ink);
+  font-size: var(--step-1);
+}
+
+/* Numerals: one column on a phone, two from 48rem. The size follows the box so "40 Hz–12 kHz" always fits. */
+[data-page='pulse-landing'] .specs__numerals {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5) var(--space-6);
+  inline-size: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  container-type: inline-size;
+}
+[data-page='pulse-landing'] .specs__cell {
+  min-inline-size: 0;
+  padding-block-start: var(--space-4);
+  border-block-start: var(--border) solid var(--line-strong);
+}
+[data-page='pulse-landing'] .specs__numeral {
+  display: inline-block;
+  max-inline-size: 100%;
+  font-family: var(--font-readout);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-size: min(var(--step-display), 11cqi);
+  line-height: 1.1;
+  color: var(--accent-ink);
+  white-space: nowrap;
+}
+[data-page='pulse-landing'] .specs__numeral[data-armed]:not([data-vfx-play]) {
+  visibility: hidden;
+}
+@media (min-width: 48rem) {
+  [data-page='pulse-landing'] .specs__numerals {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  [data-page='pulse-landing'] .specs__numeral {
+    font-size: min(var(--step-display), 5.5cqi);
+  }
+}
+
+/* The wall: term over value, centred, hairlines between cells */
+[data-page='pulse-landing'] .specs__wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 0 var(--space-5);
+  inline-size: 100%;
+  margin: 0;
+}
+[data-page='pulse-landing'] .specs__row {
+  display: grid;
+  gap: var(--space-1);
+  align-content: start;
+  padding-block: var(--space-3);
+  border-block-end: var(--border) solid var(--line);
+}
+[data-page='pulse-landing'] .specs__row dd {
+  margin: 0;
+  font-size: var(--step-0);
+  color: var(--ink);
+  text-wrap: balance;
+}
+[data-page='pulse-landing'] .specs__note {
+  margin: 0;
+  font-size: var(--step--1);
+  color: var(--muted);
+}

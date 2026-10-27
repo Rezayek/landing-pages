@@ -54,12 +54,16 @@ design-src/
 /*/src/pages/*/proof/
 /*/src/system/*.md
 /*/public/_proof/
+/*/src/system/scratch/
 
 # 3D source scenes, scripts and downloads (only rendered output in public/ ships)
 blender/
 
 # Demo recording scratch
 demos/_raw/
+
+# Licensed audio kept on this machine only (pulse-landing plays it when the file is present)
+/pulse-system/public/pulse-landing/audio/
 
 # Assets no page loads
 /neon-store-system/public/voltcart-landing/tex/

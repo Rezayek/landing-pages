@@ -7,6 +7,16 @@ Made with a tool I'm building. More on that soon.
 
 ---
 
+## PULSE-1 — a desktop synth you can play on the page
+
+![PULSE-1 demo](demos/pulse.gif)
+
+A pre-order page for an eight-voice desktop synth. The hero is the instrument: play it with your computer keys or the
+on-screen keyboard, switch waves and turn knobs, and the oscilloscope draws the sound live. Then a full-screen
+rendered film assembles the synth part by part, six patches to try, specs and a pre-order form.
+
+`pulse-system/`
+
 ## VOLTCART — game-key deals in a neon city
 
 ![VOLTCART demo](demos/voltcart.gif)
@@ -65,7 +75,7 @@ npm install
 npm run dev
 ```
 
-The page opens at `http://localhost:5190/p/<slug>`: `voltcart-landing`, `maison-sucre-landing`, `fintech-landing`,
+The page opens at `http://localhost:5190/p/<slug>`: `pulse-landing`, `voltcart-landing`, `maison-sucre-landing`, `fintech-landing`,
 `blockfeed-landing` or `tidelog-landing`. For the production build, run `npm run build && npm run preview`
 (port 5191).
 
@@ -77,4 +87,6 @@ The page opens at `http://localhost:5190/p/<slug>`: `voltcart-landing`, `maison-
   art and in-game icons belong to Kuro Games; see
   [`wuwa-hub-system/public/resonators/full/CREDITS.md`](wuwa-hub-system/public/resonators/full/CREDITS.md).
 - The VOLTCART and Maison Sucre films were rendered in Blender with CC0 assets from [Poly Haven](https://polyhaven.com)
-  and free models from [BlenderKit](https://www.blenderkit.com). Only the rendered frames ship here.
+  and free models from [BlenderKit](https://www.blenderkit.com). The PULSE-1 film was modelled and rendered in
+  Blender from scratch. Only the rendered frames ship here.
+- PULSE-1 is a fictional product. Its line-in track is not included; the page works without it.

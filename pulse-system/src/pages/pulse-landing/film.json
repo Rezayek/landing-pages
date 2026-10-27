@@ -1,0 +1,17 @@
+{
+  "about": "The PULSE-1 assembly film (MOTION.md, S2). One frame map read by blender/pulse_film.py and the page's frame loader. Frames are 0-based. It opens on every part scattered in a cloud; each group then assembles into its own layer in signal-path order (panel, board, keys, case: each key frame is where that layer has landed and its fact shows); the four layers then close into the finished instrument.",
+  "frames": 145,
+  "fps": 24,
+  "keys": {
+    "scattered": 0,
+    "panel": 30,
+    "board": 60,
+    "keys": 90,
+    "case": 120,
+    "assembled": 144
+  },
+  "sets": {
+    "desktop": { "size": [1600, 900], "dir": "explode/desktop" },
+    "phone": { "size": [900, 1600], "dir": "explode/phone" }
+  }
+}

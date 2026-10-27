@@ -1,0 +1,71 @@
+/* S5 Pre-order. Mobile first (320 px): tag above the form; two columns (tag | form) from 60rem. Tokens only. */
+[data-page='pulse-landing'] {
+  .pl-order { padding-block: var(--gap-section); padding-inline: var(--space-4); }
+  .pl-order__wrap {
+    display: grid; gap: var(--gap-group); max-inline-size: 72rem; margin-inline: auto; min-inline-size: 0;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pl-order__head { display: grid; gap: var(--space-3); }
+  .pl-order__head h2 { margin: 0; font-size: var(--step-3); max-inline-size: 24ch; text-wrap: balance; }
+  .pl-nowrap { white-space: nowrap; }
+  .pl-order__head p { margin: 0; color: var(--muted); font-size: var(--step-1); max-inline-size: var(--measure); }
+
+  /* the box holds the form, then the result, at the same size */
+  .pl-order__box {
+    box-sizing: border-box; min-inline-size: 0; padding: var(--space-5);
+    background: var(--raised); border: 1px solid var(--line); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-raised); /* taste-skill-ignore: FOUNDATIONS.md §10, raised module (Machined edge, --shadow-raised) */
+  }
+  .pl-order__form { display: grid; gap: var(--gap-group); }
+  .pl-order__field { max-inline-size: 28rem; }
+  /* name and email are ordinary text, not the patch-name readout: body face, natural case, full width */
+  .pl-order__input {
+    max-inline-size: none; font-family: var(--font-body); font-weight: var(--weight-body);
+    letter-spacing: normal; text-transform: none; font-size: var(--step-0);
+  }
+  /* slot 1 keeps the readout look of PatchNameField */
+  .pl-order__field:has([name='patch']) .pl-order__input {
+    font-family: var(--font-readout); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+    font-size: var(--step-1); max-inline-size: calc(16ch + 2 * var(--space-3) + 1ch);
+  }
+  .pl-order__act { display: grid; gap: var(--space-3); justify-items: start; }
+  .pl-order__act .fb-msg { justify-self: stretch; max-inline-size: 28rem; }
+  .pl-order__note { max-inline-size: 40ch; }
+
+  .pl-order__result {
+    display: grid; gap: var(--space-4); justify-items: start;
+    animation: pl-order-in var(--dur-swap) var(--ease-step) both;
+  }
+  .pl-order__result h3 { display: flex; align-items: center; gap: var(--space-3); margin: 0; font-size: var(--step-2); }
+  .pl-order__result p { margin: 0; max-inline-size: var(--measure); font-size: var(--step-1); }
+  .pl-order__result strong { font-weight: var(--weight-strong); overflow-wrap: anywhere; }
+  /* the box is a grid so the result can fill the height the form held */
+  .pl-order__box { display: grid; }
+  .pl-order__result { align-content: space-between; }
+  .pl-slip { display: grid; grid-template-columns: max-content minmax(0, 1fr); inline-size: 100%; margin: 0; border-block-start: 1px solid var(--line); }
+  .pl-slip dt, .pl-slip dd { margin: 0; padding-block: var(--space-3); border-block-end: 1px dashed var(--line); }
+  .pl-slip dt { padding-inline-end: var(--space-5); color: var(--subtle); }
+  .pl-slip dd { color: var(--ink); font-size: var(--step-0); overflow-wrap: anywhere; }
+  .pl-slip__patch { font-family: var(--font-readout); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .pl-order__answers { display: grid; gap: var(--space-1); margin: 0; padding: 0; list-style: none; color: var(--ink); font-size: var(--step-0); }
+  .pl-order__answers li { padding-inline-start: var(--space-4); position: relative; }
+  .pl-order__answers li::before { content: ''; position: absolute; inset: 0.7em auto auto 0; inline-size: 8px; block-size: 2px; background: var(--subtle); }
+  
+
+  @media (min-width: 40rem) {
+    .pl-order { padding-inline: var(--space-5); }
+    .pl-order__box { padding: var(--space-6); }
+  }
+  /* the patch tag hangs from the form's top edge, riveted to the panel: one module, no column of its own to fall empty */
+  /* one column on the page's axis: the heading, the hung tag and the fields share one left edge, no void beside the card */
+  .pl-order__wrap { max-inline-size: 38rem; }
+  .pl-order__tag {
+    position: relative; z-index: 1; justify-self: start; inline-size: min(100% - 2 * var(--space-4), 17rem);
+    margin: 0 0 calc(-1 * var(--space-7)) var(--space-4); padding: 0;
+  }
+  .pl-order__box { padding-block-start: calc(var(--space-7) + var(--space-5)); }
+  @media (min-width: 40rem) {
+    .pl-order__tag { margin-inline-start: var(--space-6); }
+  }
+}
+@keyframes pl-order-in { from { opacity: 0; } to { opacity: 1; } }

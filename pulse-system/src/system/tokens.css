@@ -1,0 +1,552 @@
+/*
+ * System tokens for PULSE-1, direction "Graphite and Amber" (FOUNDATIONS.md; format and rules in
+ * guides/design-system.md §2). Three tiers:
+ *   1. primitives: raw values; components never read them;
+ *   2. roles: what components read (colour, type, space, shape, elevation, density, motion);
+ *   3. component tokens: only for a part a theme must change that no role covers (COMPONENTS.md names each one).
+ * Two hardware finishes are the two themes: Graphite (dark, the default use scene) and Bone (light). Dark re-points
+ * roles and leaves primitives alone. It is written twice with identical values: under the prefers-color-scheme media
+ * query (what the audit emulates), skipped when <html data-theme="light">, and under <html data-theme="dark"> for the
+ * finish switch. Edit both blocks together.
+ * Names are the contract: the feedback components, the /system page and every page template read these roles. Add a
+ * role, never rename one, and add a line to the SYSTEM.md changelog.
+ * Import this file once, after Tailwind (`@import 'tailwindcss'` first), so the base rules at the end sit in the
+ * right layer.
+ */
+/* metric-matched fallbacks for text at normal width: while the web fonts load, it sets in a local face sized to the
+   same advance widths and line box (measured on a pangram and the hero copy). Text at another width axis (the
+   display at 82 %, the legends at 125 %) cannot be matched; a page holds its first render for its fonts instead */
+@font-face {
+  font-family: 'Archivo Fallback';
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans');
+  size-adjust: 101.5%;
+  ascent-override: 86.5%;
+  descent-override: 20.7%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Doto Fallback';
+  src: local('Courier New'), local('CourierNewPSMT'), local('Liberation Mono');
+  size-adjust: 100%;
+  ascent-override: 95%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+}
+
+:root {
+  /* 1. Primitives ------------------------------------------------------------------------------------------- */
+  /* graphite: the powder-coated panel, from the OLED black up to the silkscreen ink */
+  --graphite-975: #0b0a09;
+  --graphite-950: #121110;
+  --graphite-900: #1a1916;
+  --graphite-850: #22201c;
+  --graphite-800: #2b2924;
+  --graphite-750: #36332d;
+  --graphite-500: #827c6f;
+  --graphite-400: #a29b8c;
+  --graphite-300: #b8b0a1;
+  --graphite-100: #ede7da;
+
+  /* bone: the light finish; its text steps are warm near-blacks */
+  --bone-50: #f2efe8;
+  --bone-100: #e8e4db;
+  --bone-200: #dedacf;
+  --bone-300: #d2cdc1;
+  --bone-400: #c4beb1;
+  --bone-600: #736d61;
+  --bone-700: #5a554c;
+  --bone-800: #47433c;
+  --bone-900: #1c1b19;
+
+  /* amber: the indicator LED. 400 is the light itself (fills and arcs on graphite), 700 and 800 the text-safe steps
+     on bone, 50 and 900 the quiet containers */
+  --amber-50: #f3e2c4;
+  --amber-300: #ffc266;
+  --amber-350: #ffc66e;
+  --amber-400: #ffb547;
+  --amber-700: #a35400;
+  --amber-800: #8a4500;
+  --amber-900: #3a2a12;
+
+  /* status hues: dark fills on bone (white text), light fills on graphite (dark text) */
+  --green-100: #d7ebdd;
+  --green-300: #7fd19b;
+  --green-250: #8fdba8;
+  --green-600: #22764a;
+  --green-700: #1c6640;
+  --green-900: #173323;
+  --red-100: #f5dad6;
+  --red-300: #ff8a7a;
+  --red-250: #ff9c8e;
+  --red-600: #b3261e;
+  --red-700: #9c2019;
+  --red-900: #401914;
+  --yellow-100: #efe6b8;
+  --yellow-300: #e6d15a;
+  --yellow-250: #ebd86e;
+  --yellow-600: #7d6a00;
+  --yellow-700: #6b5a00;
+  --yellow-900: #36310f;
+  --steel-100: #d6e3ef;
+  --steel-300: #8db4d9;
+  --steel-250: #9dc0e0;
+  --steel-600: #2d5d88;
+  --steel-700: #284f75;
+  --steel-900: #172839;
+  --white: #ffffff;
+  --shadow-rgb: 11 10 9;
+
+  /* families and a modular scale (ratio 1.25, base 16 px); nothing below 13 px */
+  --family-archivo: 'Archivo Variable', 'Archivo', 'Archivo Fallback', ui-sans-serif, 'Segoe UI', system-ui, sans-serif;
+  --family-doto: 'Doto Variable', 'Doto', 'Doto Fallback', ui-monospace, 'Cascadia Mono', monospace;
+  --size--1: 0.875rem;
+  --size-0: 1rem;
+  --size-1: 1.25rem;
+  --size-2: 1.5625rem;
+  --size-3: 1.953rem;
+  --size-display: clamp(2.75rem, 1.4rem + 5.6vw, 6rem);
+  --size-legend: 0.8125rem;
+
+  /* spacing on a 4 px base */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  /* bent sheet metal: small radii; round only where the part is round (knobs, jacks, LEDs) */
+  --radius-0: 0;
+  --radius-1: 2px;
+  --radius-2: 3px;
+  --radius-3: 4px;
+  --radius-4: 6px;
+  --radius-full: 999px;
+
+  /* 2. Roles: light (the Bone finish) ------------------------------------------------------------------------ */
+  /* surfaces: panel ground, module surface, raised key caps and menus, sunken wells */
+  --bg: var(--bone-200);
+  --surface: var(--bone-100);
+  --raised: var(--bone-50);
+  --sunken: var(--bone-300);
+  --overlay: rgb(var(--shadow-rgb) / 0.5);
+
+  /* text and lines: --line is a panel seam, --line-strong draws a control (3:1 on every surface) */
+  --ink: var(--bone-900);
+  --muted: var(--bone-800);
+  --subtle: var(--bone-700);
+  --line: var(--bone-400);
+  --line-strong: var(--bone-600);
+
+  /* accent: the amber LED. On a control it means "on, live, selected"; the one primary action is a backlit key */
+  --accent: var(--amber-700);
+  --accent-hover: var(--amber-800);
+  --on-accent: var(--white);
+  --accent-ink: var(--amber-800);
+  --accent-bg: var(--amber-50);
+
+  /* status: each role is a set (fill, on-fill, ink, quiet container); always an icon and a word as well */
+  --positive: var(--green-600);
+  --on-positive: var(--white);
+  --positive-ink: var(--green-700);
+  --positive-bg: var(--green-100);
+  --negative: var(--red-600);
+  --on-negative: var(--white);
+  --negative-ink: var(--red-700);
+  --negative-bg: var(--red-100);
+  --warning: var(--yellow-600);
+  --on-warning: var(--white);
+  --warning-ink: var(--yellow-700);
+  --warning-bg: var(--yellow-100);
+  --info: var(--steel-600);
+  --on-info: var(--white);
+  --info-ink: var(--steel-700);
+  --info-bg: var(--steel-100);
+
+  /* focus, selection and state layers (hover 8 %, pressed 10 %; a disabled control keeps 38 %) */
+  --focus: var(--amber-700);
+  --focus-width: 2px;
+  --focus-offset: 2px;
+  --selection-bg: var(--amber-700);
+  --selection-ink: var(--white);
+  --hover-bg: color-mix(in srgb, var(--ink) 8%, transparent);
+  --pressed-bg: color-mix(in srgb, var(--ink) 10%, transparent);
+  --disabled-opacity: 0.38;
+
+  /* depth: tone steps carry it. A machined edge (1 px light top, 1 px dark bottom) on raised parts; one soft shadow
+     for things that float (menus, toasts, dialogs). Light comes from above. */
+  --edge-light: rgb(255 255 255 / 0.55);
+  --edge-dark: rgb(var(--shadow-rgb) / 0.18);
+  --shadow-raised: inset 0 1px 0 var(--edge-light), inset 0 -1px 0 var(--edge-dark);
+  --shadow-overlay: 0 2px 4px rgb(var(--shadow-rgb) / 0.1), 0 18px 40px -12px rgb(var(--shadow-rgb) / 0.3);
+  --overlay-border: 1px solid var(--line);
+  --z-base: 0;
+  --z-sticky: 100;
+  --z-dropdown: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* type: Archivo carries display, body and the engraved legends through its width axis; Doto only on readouts */
+  --font-display: var(--family-archivo);
+  --font-body: var(--family-archivo);
+  --font-readout: var(--family-doto);
+  --step--1: var(--size--1);
+  --step-0: var(--size-0);
+  --step-1: var(--size-1);
+  --step-2: var(--size-2);
+  --step-3: var(--size-3);
+  --step-display: var(--size-display);
+  --step-legend: var(--size-legend);
+  --leading-body: 1.55;
+  --leading-heading: 1.08;
+  --leading-display: 0.96;
+  --tracking-display: -0.015em;
+  --tracking-legend: 0.12em;
+  --stretch-display: 82%;
+  --stretch-body: 100%;
+  --stretch-legend: 125%;
+  --weight-body: 420;
+  --weight-strong: 620;
+  --weight-display: 720;
+  --weight-legend: 640;
+  --measure: 64ch;
+
+  /* space: --gutter is 16 px on a phone */
+  --gap-tight: var(--space-2);
+  --gap-group: var(--space-5);
+  --gap-section: clamp(var(--space-8), 8vw, var(--space-10));
+  --inset-control: var(--space-3);
+  --inset-card: var(--space-5);
+  --gutter: clamp(16px, 4vw, 48px);
+  --container: 76rem;
+  --sticky-top: 0px;
+  --sticky-bottom: 0px;
+
+  /* shape: radius by role */
+  --radius-control: var(--radius-2);
+  --radius-card: var(--radius-3);
+  --radius-sheet: var(--radius-4);
+  --radius-tag: var(--radius-1);
+  --radius-knob: var(--radius-full);
+  --border: 1px;
+
+  /* icons: one set (hand-drawn in feedback/icons.tsx), one 1.75 px stroke; colour from the text beside it */
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-stroke: 1.75;
+
+  /* targets and density */
+  --target-min: 24px;
+  --tap-min: 44px;
+  --control-h: 44px;
+  --row-h: 44px;
+  --knob-size: 64px;
+  --knob-size-lg: 96px;
+  --knob-size-sm: 44px;
+  --fader-h: 120px;
+  --key-w: 44px;
+  --key-w-fine: 30px;
+  --key-h: 132px;
+
+  /* Motion tokens: the same values as motion.ts and MOTION-SYSTEM.md. The language is "dot-matrix power-on":
+     stepped and mechanical, like a small OLED and a panel of LEDs. Steps instead of curves where a display would
+     step; plain decelerate curves for the few things that physically travel (a key, a toast). */
+  --dur-instant: 0ms;
+  --dur-xs: 50ms;
+  --dur-sm: 90ms;
+  --dur-md: 140ms;
+  --dur-lg: 200ms;
+  --dur-xl: 240ms;
+  --dur-2xl: 300ms;
+  --dur-3xl: 400ms;
+  --dur-4xl: 640ms;
+  --dur-hero: 900ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-enter: cubic-bezier(0, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+  --ease-enter-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-exit-emphasized: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-symmetric: cubic-bezier(0.42, 0, 0.58, 1);
+  --ease-step: steps(4, jump-end);
+  --ease-step-fine: steps(8, jump-end);
+  --ease-type: steps(16, jump-end);
+  /* by role: components read these, not the scale */
+  --dur-press: var(--dur-sm);
+  --dur-hover: var(--dur-sm);
+  --dur-tooltip-in: var(--dur-md);
+  --dur-tooltip-out: var(--dur-sm);
+  --dur-popover-in: var(--dur-md);
+  --dur-popover-out: var(--dur-sm);
+  --dur-modal-in: var(--dur-xl);
+  --dur-modal-out: var(--dur-lg);
+  --dur-sheet-in: var(--dur-3xl);
+  --dur-sheet-out: var(--dur-2xl);
+  --dur-toast-in: var(--dur-xl);
+  --dur-toast-out: var(--dur-lg);
+  --dur-disclosure: var(--dur-lg);
+  --dur-list-in: var(--dur-lg);
+  --dur-list-out: var(--dur-md);
+  --dur-tab: var(--dur-lg);
+  --dur-route-in: var(--dur-xl);
+  --dur-route-out: var(--dur-lg);
+  --dur-swap: var(--dur-lg);
+  --dur-success-swap: var(--dur-md);
+  --dur-scene: var(--dur-4xl);
+  --dur-reduced: var(--dur-sm);
+  --dur-led: var(--dur-xs);
+  --dur-power-on: var(--dur-4xl);
+  --dur-knob: var(--dur-lg);
+  --dur-type: var(--dur-3xl);
+  --dur-invert: var(--dur-sm);
+  --dur-blink: 500ms;
+  --dur-spin: 1280ms;
+  --hold-success: 1500ms;
+  --stagger-ui: 30ms;
+  --stagger-scene: 60ms;
+  --travel-sm: 6px;
+  --travel-md: 12px;
+  --travel-lg: 24px;
+  --scale-from: 0.96;
+  --press-scale: 0.97;
+  --key-travel: 3px;
+
+  /* 3. Component tokens ---------------------------------------------------------------------------------------- */
+  --toast-gap: var(--space-2);
+  --skeleton-bg: var(--sunken);
+  --skeleton-slot: color-mix(in srgb, var(--ink) 30%, var(--sunken));
+  --knob-cap: var(--raised);
+  --knob-knurl-a: var(--bone-300);
+  --knob-knurl-b: var(--bone-400);
+  --key-white: var(--bone-50);
+  --key-black: var(--bone-900);
+  --key-white-ink: var(--bone-700);
+  --key-black-ink: var(--graphite-300);
+  --finish-graphite: var(--graphite-900);
+  --finish-bone: var(--bone-200);
+  --grain-opacity: 0.035;
+
+  /* Fixed-look parts: the OLED and the scope screen are the same black glass in both finishes. No theme block
+     re-points these. */
+  --oled-bg: var(--graphite-975);
+  --oled-ink: var(--amber-400);
+  --oled-muted: #c29550;
+  --oled-line: #2e2a23;
+  --scope-bg: var(--graphite-975);
+  --scope-grid: #2e2a23;
+  --trace-1: var(--amber-300);
+  --trace-2: var(--graphite-100);
+  --trace-3: var(--steel-300);
+  --led-on: var(--amber-400);
+  --led-off: #4a3a22;
+  --led-fault: var(--red-600);
+
+  /* The document, from the roles */
+  color-scheme: light;
+  caret-color: var(--accent);
+  accent-color: var(--accent);
+  scrollbar-color: var(--line-strong) transparent;
+  scroll-padding-top: var(--sticky-top);
+  scroll-padding-bottom: var(--sticky-bottom);
+}
+
+/* 2. Roles: dark (the Graphite finish), following the system setting unless <html data-theme="light"> */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --led-fault: var(--red-250);
+    --bg: var(--graphite-900);
+    --surface: var(--graphite-850);
+    --raised: var(--graphite-800);
+    --sunken: var(--graphite-950);
+    --overlay: rgb(var(--shadow-rgb) / 0.72);
+    --ink: var(--graphite-100);
+    --muted: var(--graphite-300);
+    --subtle: var(--graphite-400);
+    --line: var(--graphite-750);
+    --line-strong: var(--graphite-500);
+    --accent: var(--amber-400);
+    --accent-hover: var(--amber-350);
+    --on-accent: var(--graphite-900);
+    --accent-ink: var(--amber-300);
+    --accent-bg: var(--amber-900);
+    --positive: var(--green-300);
+    --on-positive: var(--graphite-950);
+    --positive-ink: var(--green-250);
+    --positive-bg: var(--green-900);
+    --negative: var(--red-300);
+    --on-negative: var(--graphite-950);
+    --negative-ink: var(--red-250);
+    --negative-bg: var(--red-900);
+    --warning: var(--yellow-300);
+    --on-warning: var(--graphite-950);
+    --warning-ink: var(--yellow-250);
+    --warning-bg: var(--yellow-900);
+    --info: var(--steel-300);
+    --on-info: var(--graphite-950);
+    --info-ink: var(--steel-250);
+    --info-bg: var(--steel-900);
+    --focus: var(--amber-400);
+    --selection-bg: var(--amber-400);
+    --selection-ink: var(--graphite-900);
+    --edge-light: rgb(255 255 255 / 0.07);
+    --edge-dark: rgb(0 0 0 / 0.45);
+    --shadow-overlay: 0 2px 4px rgb(0 0 0 / 0.4), 0 18px 40px -12px rgb(0 0 0 / 0.65);
+    --knob-knurl-a: var(--graphite-750);
+    --knob-knurl-b: var(--graphite-850);
+    --key-white: var(--graphite-100);
+    --key-black: var(--graphite-950);
+    --grain-opacity: 0.05;
+    color-scheme: dark;
+  }
+}
+
+/* 2. Roles: dark, when the finish switch sets <html data-theme="dark">. Identical to the block above. */
+:root[data-theme='dark'] {
+  --led-fault: var(--red-250);
+  --bg: var(--graphite-900);
+  --surface: var(--graphite-850);
+  --raised: var(--graphite-800);
+  --sunken: var(--graphite-950);
+  --overlay: rgb(var(--shadow-rgb) / 0.72);
+  --ink: var(--graphite-100);
+  --muted: var(--graphite-300);
+  --subtle: var(--graphite-400);
+  --line: var(--graphite-750);
+  --line-strong: var(--graphite-500);
+  --accent: var(--amber-400);
+  --accent-hover: var(--amber-350);
+  --on-accent: var(--graphite-900);
+  --accent-ink: var(--amber-300);
+  --accent-bg: var(--amber-900);
+  --positive: var(--green-300);
+  --on-positive: var(--graphite-950);
+  --positive-ink: var(--green-250);
+  --positive-bg: var(--green-900);
+  --negative: var(--red-300);
+  --on-negative: var(--graphite-950);
+  --negative-ink: var(--red-250);
+  --negative-bg: var(--red-900);
+  --warning: var(--yellow-300);
+  --on-warning: var(--graphite-950);
+  --warning-ink: var(--yellow-250);
+  --warning-bg: var(--yellow-900);
+  --info: var(--steel-300);
+  --on-info: var(--graphite-950);
+  --info-ink: var(--steel-250);
+  --info-bg: var(--steel-900);
+  --focus: var(--amber-400);
+  --selection-bg: var(--amber-400);
+  --selection-ink: var(--graphite-900);
+  --edge-light: rgb(255 255 255 / 0.07);
+  --edge-dark: rgb(0 0 0 / 0.45);
+  --shadow-overlay: 0 2px 4px rgb(0 0 0 / 0.4), 0 18px 40px -12px rgb(0 0 0 / 0.65);
+  --knob-knurl-a: var(--graphite-750);
+  --knob-knurl-b: var(--graphite-850);
+  --key-white: var(--graphite-100);
+  --key-black: var(--graphite-950);
+  --grain-opacity: 0.05;
+  color-scheme: dark;
+}
+
+/* More contrast is not shipped: landing scope, and every text pair already measures 4.6:1 or more (FOUNDATIONS.md §8). */
+
+/* Density: one step is 4 px. A region sets data-density="compact" (the spec table). Controls stay --tap-min or more
+   on a coarse pointer, whatever the density. */
+[data-density='compact'] {
+  --control-h: 36px;
+  --row-h: 36px;
+  --knob-size: 52px;
+}
+@media (pointer: coarse) {
+  :root,
+  [data-density] {
+    --control-h: var(--tap-min);
+    --row-h: var(--tap-min);
+  }
+}
+
+/* Reduced motion keeps the state change and drops the travel (guides/motion.md Reduced motion). Written twice, like
+   dark: the system setting, and the in-app switch <html data-motion="reduced"> motion.ts reads. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --travel-sm: 0px;
+    --travel-md: 0px;
+    --travel-lg: 0px;
+    --scale-from: 1;
+    --press-scale: 1;
+    --key-travel: 0px;
+    --stagger-ui: 0ms;
+    --stagger-scene: 0ms;
+    --dur-toast-in: var(--dur-reduced);
+    --dur-toast-out: var(--dur-reduced);
+    --dur-list-in: var(--dur-reduced);
+    --dur-list-out: var(--dur-reduced);
+    --dur-disclosure: var(--dur-reduced);
+    --dur-scene: var(--dur-reduced);
+    --dur-power-on: var(--dur-reduced);
+    --dur-type: var(--dur-instant);
+    --dur-knob: var(--dur-instant);
+  }
+}
+:root[data-motion='reduced'] {
+  --travel-sm: 0px;
+  --travel-md: 0px;
+  --travel-lg: 0px;
+  --scale-from: 1;
+  --press-scale: 1;
+  --key-travel: 0px;
+  --stagger-ui: 0ms;
+  --stagger-scene: 0ms;
+  --dur-toast-in: var(--dur-reduced);
+  --dur-toast-out: var(--dur-reduced);
+  --dur-list-in: var(--dur-reduced);
+  --dur-list-out: var(--dur-reduced);
+  --dur-disclosure: var(--dur-reduced);
+  --dur-scene: var(--dur-reduced);
+  --dur-power-on: var(--dur-reduced);
+  --dur-type: var(--dur-instant);
+  --dur-knob: var(--dur-instant);
+}
+
+/* Document base, from the roles. It sits in the base layer so Tailwind utilities and component styles win. */
+@layer base {
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    font-weight: var(--weight-body);
+    font-stretch: var(--stretch-body);
+    line-height: var(--leading-body);
+  }
+  ::selection {
+    background: var(--selection-bg);
+    color: var(--selection-ink);
+  }
+  :focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+  a {
+    text-underline-offset: 0.2em;
+  }
+  :is(h1, h2, h3) {
+    font-family: var(--font-display);
+    font-weight: var(--weight-display);
+    font-stretch: var(--stretch-display);
+    line-height: var(--leading-heading);
+    text-wrap: balance;
+  }
+  h1 {
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+  }
+  p {
+    text-wrap: pretty;
+  }
+}

@@ -1,0 +1,206 @@
+/*
+ * S3 Patches: the page's one tonal break. The band keeps the black-glass look in both themes, so it gets its own role
+ * set from the system's primitives (guides/design-system.md §2); the system components inside read it unchanged.
+ */
+[data-page='pulse-landing'] .patches {
+  --bg: var(--scope-bg);
+  --surface: var(--graphite-950);
+  --raised: var(--graphite-850);
+  --sunken: var(--graphite-900);
+  --ink: var(--graphite-100);
+  --muted: var(--graphite-300);
+  --subtle: var(--graphite-400);
+  --line: var(--oled-line);
+  --line-strong: var(--graphite-500);
+  --accent: var(--amber-400);
+  --accent-hover: var(--amber-350);
+  --on-accent: var(--graphite-900);
+  --accent-ink: var(--amber-300);
+  --focus: var(--amber-400);
+  --edge-light: rgb(255 255 255 / 0.07);
+  --edge-dark: rgb(0 0 0 / 0.45);
+  --knob-knurl-a: var(--graphite-750);
+  --knob-knurl-b: var(--graphite-850);
+  --key-white: var(--graphite-100);
+  --key-black: var(--graphite-950);
+  color-scheme: dark;
+  background: var(--bg);
+  color: var(--ink);
+  padding-block: var(--gap-section);
+  padding-inline: var(--gutter);
+}
+[data-page='pulse-landing'] .patches__inner {
+  display: grid;
+  gap: var(--gap-group);
+  max-inline-size: var(--container);
+  margin-inline: auto;
+  min-inline-size: 0;
+}
+[data-page='pulse-landing'] .patches__head {
+  display: grid;
+  gap: var(--space-3);
+  max-inline-size: var(--measure);
+}
+[data-page='pulse-landing'] .patches__title {
+  margin: 0;
+  font-size: var(--step-3);
+  color: var(--ink);
+}
+[data-page='pulse-landing'] .patches__sub {
+  margin: 0;
+  font-size: var(--step-1);
+  color: var(--ink);
+}
+[data-page='pulse-landing'] .patches__hear {
+  margin: 0;
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+
+/* The list: one module, hairlines between rows ----------------------------------------------------------------- */
+[data-page='pulse-landing'] .patches__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: inset 0 1px 2px var(--edge-dark), 0 1px 0 var(--edge-light); /* taste-skill-ignore: FOUNDATIONS.md §10, sunken well (Machined edge) */
+  overflow: hidden;
+}
+[data-page='pulse-landing'] .patches__item + .patches__item {
+  border-block-start: var(--border) solid var(--line);
+}
+[data-page='pulse-landing'] .patches__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    'num name type'
+    'blurb blurb blurb'
+    'trace trace status';
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  inline-size: 100%;
+  min-block-size: var(--tap-min);
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  box-shadow: inset 3px 0 0 transparent; /* taste-skill-ignore: FOUNDATIONS.md §10, loaded-row indicator bar, unlit (Amber LED) */
+  transition: background-color var(--dur-xs) steps(2, jump-end);
+}
+[data-page='pulse-landing'] .patches__row:hover {
+  background: var(--raised);
+}
+[data-page='pulse-landing'] .patches__row:active {
+  background: var(--sunken);
+}
+[data-page='pulse-landing'] .patches__row[data-loaded] {
+  background: var(--raised);
+  box-shadow: inset 3px 0 0 var(--accent); /* taste-skill-ignore: FOUNDATIONS.md §10, loaded-row indicator bar (Amber LED) */
+}
+[data-page='pulse-landing'] .patches__row:focus-visible {
+  outline-offset: -3px;
+}
+[data-page='pulse-landing'] .patches__num {
+  grid-area: num;
+  font-family: var(--font-readout);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--oled-ink);
+  text-transform: none;
+}
+[data-page='pulse-landing'] .patches__name {
+  grid-area: name;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: var(--weight-display);
+  line-height: var(--leading-heading);
+}
+[data-page='pulse-landing'] .patches__type {
+  grid-area: type;
+}
+[data-page='pulse-landing'] .patches__blurb {
+  grid-area: blurb;
+  font-size: var(--step-0);
+  color: var(--muted);
+  text-wrap: pretty;
+}
+[data-page='pulse-landing'] .patches__trace {
+  grid-area: trace;
+  inline-size: 6rem;
+  block-size: 1.75rem;
+  overflow: visible;
+}
+[data-page='pulse-landing'] .patches__trace-axis {
+  stroke: var(--oled-line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+[data-page='pulse-landing'] .patches__trace-line {
+  fill: none;
+  stroke: var(--oled-muted);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+[data-page='pulse-landing'] .patches__trace[data-on] .patches__trace-line {
+  stroke: var(--trace-1);
+}
+[data-page='pulse-landing'] .patches__status {
+  grid-area: status;
+  justify-self: end;
+  min-inline-size: 1.5rem;
+  display: inline-flex;
+  justify-content: flex-end;
+}
+[data-page='pulse-landing'] .patches__status .pi-led__word {
+  color: var(--ink);
+}
+
+@media (min-width: 48rem) {
+  [data-page='pulse-landing'] .patches__row {
+    grid-template-columns: 3.5ch minmax(9rem, 12rem) 4.5rem minmax(0, 1fr) 6rem 6.5rem;
+    grid-template-areas: 'num name type blurb trace status';
+    gap: var(--space-4);
+    padding-inline: var(--space-5);
+  }
+}
+
+/* Under the list, then the compact play panel -------------------------------------------------------------------- */
+[data-page='pulse-landing'] .patches__after {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+}
+[data-page='pulse-landing'] .patches__note {
+  margin: 0;
+  max-inline-size: var(--measure);
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+[data-page='pulse-landing'] .patches__back {
+  min-block-size: calc(var(--target-min) + var(--space-2));
+}
+[data-page='pulse-landing'] .patches__panel {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+  padding: var(--space-4);
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: inset 0 1px 2px var(--edge-dark), 0 1px 0 var(--edge-light); /* taste-skill-ignore: FOUNDATIONS.md §10, sunken well (Machined edge) */
+}
+[data-page='pulse-landing'] .patches__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-3) var(--space-5);
+}

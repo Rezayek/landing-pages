@@ -1,0 +1,46 @@
+/* Page-local parts of pulse-landing (patch tag, phosphor CRT, signal path, patch cable). System tokens only. */
+[data-page='pulse-landing'] {
+  /* the tag */
+  .pl-tag {
+    position: relative; display: grid; gap: var(--space-2); padding: var(--space-6) var(--space-4) var(--space-4);
+    background: var(--bone-100); color: var(--bone-900);
+    clip-path: polygon(14% 0, 86% 0, 100% 10%, 100% 100%, 0 100%, 0 10%);
+    rotate: -2deg; filter: drop-shadow(0 14px 18px rgb(0 0 0 / 0.6)); /* taste-skill-ignore: FOUNDATIONS.md §10, the hanging tag casts a shadow (a physical tag) */
+  }
+  .pl-tag .pi-legend { color: var(--bone-700); }
+  .pl-tag__hole {
+    position: absolute; inset: 0.6rem auto auto 50%; translate: -50% 0; inline-size: 0.75rem; block-size: 0.75rem;
+    border-radius: 50%; background: var(--bg); box-shadow: inset 0 0 0 2px var(--bone-400); /* taste-skill-ignore: FOUNDATIONS.md §10, tag eyelet (a physical tag) */
+  }
+  .pl-tag strong { font-family: var(--font-readout); font-size: var(--step-2); letter-spacing: 0.04em; color: var(--amber-800); overflow-wrap: anywhere; }
+  .pl-tag__edited { font-size: var(--step--1); color: var(--bone-700); }
+  .pl-tag dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); margin: 0; }
+  .pl-tag dd { margin: 0; font-family: var(--font-readout); font-weight: 700; font-size: 0.875rem; }
+}
+
+/* the phone's sticky pre-order bar (OrderBar.tsx): a raised strip with a machined top edge, between the hero and the
+   order section; it comes up from the screen's edge in steps, and under reduced motion it simply appears */
+[data-page='pulse-landing'] {
+  .pl-bar { display: none; }
+  @media (max-width: 40rem) {
+    .pl-bar {
+      --bar-h: 4.5rem;
+      position: fixed; inset: auto 0 0; z-index: var(--z-sticky);
+      display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'patch key' 'terms terms';
+      align-items: center; gap: var(--space-1) var(--space-3);
+      padding: var(--space-2) var(--space-4) calc(var(--space-2) + env(safe-area-inset-bottom));
+      background: var(--raised); border-block-start: 1px solid var(--edge-light);
+      outline: 1px solid var(--edge-dark); outline-offset: -2px;
+      translate: 0 100%; visibility: hidden;
+      transition: translate var(--dur-sheet-in) var(--ease-step), visibility 0s linear var(--dur-sheet-in);
+    }
+    .pl-bar[data-on] { translate: 0 0; visibility: visible; transition: translate var(--dur-sheet-in) var(--ease-step), visibility 0s; }
+    .pl-bar__patch { grid-area: patch; display: grid; min-inline-size: 0; }
+    .pl-bar__name { overflow: hidden; color: var(--oled-ink); font-family: var(--font-readout); font-weight: 700; letter-spacing: 0.04em; white-space: nowrap; text-overflow: ellipsis; }
+    .pl-bar .fb-btn { grid-area: key; }
+    .pl-bar__terms { grid-area: terms; color: var(--muted); font-size: var(--step--1); }
+  }
+  @media (max-width: 40rem) and (prefers-reduced-motion: reduce) { .pl-bar, .pl-bar[data-on] { transition: none; } }
+}
+:root[data-motion='reduced'] [data-page='pulse-landing'] .pl-bar { transition: none; }
+

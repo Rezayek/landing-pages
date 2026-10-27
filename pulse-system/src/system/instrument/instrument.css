@@ -1,0 +1,657 @@
+/*
+ * PULSE-1 instrument components: the style contract (FOUNDATIONS.md §10) as CSS. Every value is a token from
+ * tokens.css; the only literals are the knob's 300° sweep geometry (the instrument's own proportion) and percentages.
+ */
+@layer components {
+  /* Shared ---------------------------------------------------------------------------------------------------- */
+  .pi-legend {
+    font-family: var(--font-body);
+    font-size: var(--step-legend);
+    font-weight: var(--weight-legend);
+    font-stretch: var(--stretch-legend);
+    letter-spacing: var(--tracking-legend);
+    text-transform: uppercase;
+    line-height: 1.2;
+    color: var(--subtle);
+  }
+  .pi-help {
+    margin: 0;
+    max-inline-size: 65ch;
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+  /* an inline link in small text: inline padding grows its target to 24 px without moving the line */
+  .pi-help a { padding-block: 0.3125rem; }
+  /* on touch the link inside a help line is a full 44 px target, still in the sentence */
+  @media (pointer: coarse) { .pi-help a { display: inline-flex; align-items: center; min-block-size: var(--tap-min); padding-block: 0; } }
+  /* A small key cap: quiet, but it reads as a control (edge and machined top), never as plain text */
+  /* a small key cap: one crisp height, the label centred, a fine machined edge; a press sinks it by a hair */
+  .pi-quiet {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    box-sizing: border-box;
+    min-block-size: 2.25rem;
+    min-inline-size: 2.25rem;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-1);
+    background: linear-gradient(var(--raised), var(--surface));
+    box-shadow: var(--shadow-raised), 0 1px 0 rgb(0 0 0 / 0.35);
+    color: var(--ink);
+    font: inherit;
+    font-size: var(--step--1);
+    font-weight: var(--weight-strong);
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    transition: background-color var(--dur-hover) var(--ease-enter), transform var(--dur-xs) var(--ease-enter), box-shadow var(--dur-xs) var(--ease-enter);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pi-quiet:hover { background: linear-gradient(var(--hover-bg), var(--raised)); border-color: var(--line-strong); }
+  }
+  /* page keys: the bank switch of a synth panel (PageKeys.tsx) */
+  .pi-pagekeys { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .pi-pagekey { color: var(--muted); }
+  .pi-pagekey[aria-selected='true'] { color: var(--ink); }
+  /* disabled, with its reason beside it (the octave readout): quiet ink, no press */
+  .pi-quiet[aria-disabled='true'] { color: var(--subtle); box-shadow: none; background: var(--surface); cursor: not-allowed; }
+  .pi-quiet[aria-disabled='true']:active { transform: none; box-shadow: none; }
+  .pi-quiet:active { transform: translateY(1px); box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.45); background: var(--surface); }
+  .pi-quiet[aria-pressed='true'] { color: var(--accent-ink); }
+  @media (pointer: coarse) {
+    .pi-quiet { min-block-size: var(--tap-min); min-inline-size: var(--tap-min); }
+  }
+
+  /* LED ------------------------------------------------------------------------------------------------------- */
+  .pi-led {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--step--1);
+    color: var(--ink);
+  }
+  .pi-led__dot {
+    inline-size: 7px;
+    block-size: 7px;
+    border-radius: var(--radius-full);
+    background: var(--led-off);
+    box-shadow: 0 0 0 1px var(--edge-dark);
+    flex: none;
+  }
+  .pi-led[data-state='on'] .pi-led__dot,
+  .pi-led[data-state='blink'] .pi-led__dot {
+    background: var(--led-on);
+    box-shadow: 0 0 0 1px var(--edge-dark), 0 0 6px color-mix(in srgb, var(--led-on) 70%, transparent);
+  }
+  .pi-led[data-state='positive'] .pi-led__dot { background: var(--positive); }
+  .pi-led[data-state='negative'] .pi-led__dot { background: var(--negative); }
+  .pi-led[data-state='warning'] .pi-led__dot { background: var(--warning); }
+
+  /* OLED ------------------------------------------------------------------------------------------------------ */
+  .pi-oled {
+    display: inline-grid;
+    align-content: center;
+    gap: 2px;
+    min-inline-size: calc(16ch + 2 * var(--space-3));
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-control);
+    background: var(--oled-bg);
+    box-shadow: inset 0 1px 2px var(--edge-dark), 0 1px 0 var(--edge-light);
+    font-family: var(--font-readout);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    color: var(--oled-ink);
+  }
+  .pi-oled__l1 { font-size: var(--step-1); white-space: nowrap; }
+  .pi-oled__l2 { font-size: var(--step--1); color: var(--oled-muted); white-space: nowrap; }
+  .pi-oled[data-size='sm'] .pi-oled__l1 { font-size: var(--step-0); }
+  .pi-oled[data-error] { box-shadow: inset 0 0 0 1px var(--negative); }
+
+  /* Knob ------------------------------------------------------------------------------------------------------ */
+  .pi-knob {
+    --_size: var(--knob-size);
+    display: inline-grid;
+    justify-items: center;
+    gap: var(--space-1);
+    inline-size: max-content;
+  }
+  .pi-knob[data-size='lg'] { --_size: var(--knob-size-lg); }
+  .pi-knob[data-size='sm'] { --_size: var(--knob-size-sm); }
+  .pi-knob[data-size='sm'] .pi-knob__readout { font-size: var(--step-legend); }
+
+  /* Fader: a long-throw slider in a machined slot; the cap is a key cap, the fill an amber line */
+  .pi-fader { display: inline-grid; justify-items: center; gap: var(--space-1); inline-size: max-content; }
+  .pi-fader__readout { font-family: var(--font-readout); font-size: var(--step-legend); font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; min-inline-size: 5ch; text-align: center; }
+  .pi-fader__track {
+    position: relative; display: block; inline-size: var(--tap-min); block-size: var(--fader-h);
+    cursor: ns-resize; touch-action: none; border-radius: var(--radius-1);
+    background: linear-gradient(90deg, transparent calc(50% - 2px), var(--sunken) calc(50% - 2px) calc(50% + 2px), transparent calc(50% + 2px));
+  }
+  .pi-fader__track:focus-visible { outline: var(--focus-width) solid var(--focus); outline-offset: var(--focus-offset); }
+  .pi-fader__fill {
+    position: absolute; inset: auto calc(50% - 1px) 0; block-size: calc(var(--fader-t) * 100%);
+    background: var(--accent); border-radius: 1px;
+  }
+  .pi-fader__cap {
+    position: absolute; inset-inline: 6px; block-size: 14px; inset-block-end: calc(var(--fader-t) * (100% - 14px));
+    border-radius: 3px; background: var(--raised); box-shadow: var(--shadow-raised), inset 0 -2px 0 rgb(0 0 0 / 0.25);
+  }
+  .pi-fader__cap::after { content: ''; position: absolute; inset: 50% 4px auto; block-size: 2px; translate: 0 -50%; background: var(--accent-ink); }
+  .pi-fader[data-active] .pi-fader__cap { background: var(--accent); }
+  .pi-fader[data-active] .pi-legend, .pi-fader__track:focus-visible + .pi-legend { color: var(--ink); }
+  .pi-knob__dial {
+    position: relative;
+    display: grid;
+    place-items: center;
+    inline-size: var(--_size);
+    block-size: var(--_size);
+    border-radius: var(--radius-knob);
+    cursor: ns-resize;
+    touch-action: none;
+    outline-offset: var(--focus-offset);
+  }
+  .pi-knob__arc {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    transform: rotate(120deg);
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+  }
+  .pi-knob__track { stroke: var(--line); stroke-dasharray: 300 360; }
+  .pi-knob__value {
+    stroke: var(--accent);
+    stroke-dasharray: calc(var(--knob-t) * 300) 360;
+  }
+  .pi-knob__dial[data-gliding] .pi-knob__value {
+    transition: stroke-dasharray var(--dur-knob) var(--ease-step-fine);
+  }
+  .pi-knob__cap {
+    position: relative;
+    inline-size: 72%;
+    block-size: 72%;
+    border-radius: var(--radius-knob);
+    background:
+      radial-gradient(circle at 50% 50%, var(--knob-cap) 0 58%, transparent 59%),
+      repeating-conic-gradient(var(--knob-knurl-a) 0 5deg, var(--knob-knurl-b) 5deg 10deg);
+    box-shadow: var(--shadow-raised), 0 2px 0 var(--edge-dark);
+    transform: rotate(var(--knob-turn));
+  }
+  .pi-knob__dial[data-gliding] .pi-knob__cap { transition: transform var(--dur-knob) var(--ease-step-fine); }
+  .pi-knob__needle {
+    position: absolute;
+    inset-inline-start: calc(50% - 1px);
+    inset-block-start: 8%;
+    inline-size: 2px;
+    block-size: 34%;
+    border-radius: var(--radius-1);
+    background: var(--ink);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pi-knob__dial:hover { background: var(--hover-bg); }
+  }
+  .pi-knob__dial[data-preview='hover'] { background: var(--hover-bg); }
+  .pi-knob__dial[data-preview='focus'] { outline: var(--focus-width) solid var(--focus); }
+  .pi-knob__dial:focus-visible + .pi-legend,
+  .pi-knob[data-active] .pi-legend,
+  .pi-knob:has(.pi-knob__dial[data-preview='focus']) .pi-legend { color: var(--ink); }
+  .pi-knob[data-active] .pi-knob__value { stroke: var(--accent-hover); }
+  .pi-knob__readout {
+    font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+  .pi-knob__steps { display: none; gap: var(--space-1); }
+  @media (pointer: coarse) {
+    .pi-knob__steps { display: inline-flex; }
+  }
+
+  /* Keyboard -------------------------------------------------------------------------------------------------- */
+  .pi-keys { display: grid; gap: var(--space-2); min-inline-size: 0; }
+  .pi-keys__bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+  .pi-keys__frame {
+    overflow-x: auto;
+    padding: var(--space-2);
+    border-radius: var(--radius-card);
+    background: var(--sunken);
+    scrollbar-color: var(--line-strong) transparent;
+  }
+  .pi-keys__bed {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--whites), minmax(calc(var(--key-w) + 2px), 1fr));
+    block-size: var(--key-h);
+    /* the bed fills its frame when the keys fit at their floor width, and scrolls in the frame when they do not */
+    inline-size: max-content;
+    min-inline-size: 100%;
+  }
+  .pi-key {
+    position: relative;
+    grid-row: 1;
+    grid-column: calc(var(--i) + 1);
+    margin-inline-end: 2px;
+    border: 0;
+    border-radius: 0 0 var(--radius-control) var(--radius-control);
+    background: var(--key-white);
+    box-shadow: var(--shadow-raised), inset 0 -4px 0 var(--edge-dark);
+    cursor: pointer;
+    touch-action: none;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-block-end: var(--space-2);
+    transition: transform var(--dur-xs) var(--ease-enter);
+  }
+  .pi-key::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 0;
+    block-size: 3px;
+    background: transparent;
+    transition: background-color var(--dur-xl) steps(4, jump-end);
+  }
+  .pi-key--black {
+    z-index: 1;
+    grid-column: calc(var(--i) + 1) / span 2;
+    justify-self: center;
+    inline-size: max(var(--target-min), calc(var(--key-w) * 0.62));
+    block-size: 62%;
+    margin: 0;
+    background: var(--key-black);
+    box-shadow: inset 0 -3px 0 var(--edge-light);
+  }
+  .pi-key[aria-pressed='true'] {
+    transform: translateY(var(--key-travel));
+    box-shadow: inset 0 -1px 0 var(--edge-dark);
+  }
+  .pi-key[aria-pressed='true']::before { background: var(--accent); transition: none; }
+  .pi-key:focus-visible { outline-offset: -4px; }
+  .pi-key__hint {
+    font-size: var(--step-legend);
+    font-weight: var(--weight-legend);
+    font-stretch: var(--stretch-legend);
+    color: var(--key-white-ink);
+    pointer-events: none;
+  }
+  .pi-key--black .pi-key__hint { color: var(--key-black-ink); }
+  /* with a mouse, the keys narrow to --key-w-fine so a full keybed fits a desktop frame without scrolling */
+  @media (pointer: fine) { .pi-keys { --key-w: var(--key-w-fine); } }
+  @media (pointer: coarse) {
+    .pi-key__hint { display: none; }
+    .pi-keys { --key-w: 56px; }
+    .pi-key--black { inline-size: var(--tap-min); }
+  }
+
+  /* Waveform jacks and bank tabs ------------------------------------------------------------------------------ */
+  .pi-waves, .pi-finish { display: grid; gap: var(--space-2); }
+  .pi-waves__row, .pi-finish__row { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .pi-jack {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-1);
+    min-inline-size: var(--tap-min);
+    padding: var(--space-1);
+    border: 0;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .pi-jack__ring {
+    display: grid;
+    place-items: center;
+    inline-size: 40px;
+    block-size: 40px;
+    border-radius: var(--radius-full);
+    background: var(--sunken);
+    box-shadow: inset 0 0 0 2px var(--line-strong), inset 0 2px 3px var(--edge-dark);
+  }
+  .pi-jack__icon { inline-size: 22px; block-size: 22px; fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linejoin: round; }
+  .pi-jack[aria-checked='true'] .pi-jack__ring { box-shadow: inset 0 0 0 2px var(--accent), inset 0 2px 3px var(--edge-dark); color: var(--accent-ink); }
+  .pi-jack[aria-checked='true'] .pi-legend { color: var(--ink); }
+  @media (hover: hover) and (pointer: fine) { .pi-jack:hover, .pi-tab:hover, .pi-swatch:hover { background: var(--hover-bg); } }
+  .pi-jack:active .pi-jack__ring { background: var(--ink); color: var(--bg); }
+
+  .pi-tab, .pi-swatch {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-block-size: var(--target-min);
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-control);
+    background: var(--raised);
+    box-shadow: var(--shadow-raised);
+    color: var(--ink);
+    font: inherit;
+    font-size: var(--step--1);
+    font-weight: var(--weight-strong);
+    cursor: pointer;
+  }
+  @media (pointer: coarse) { .pi-tab, .pi-swatch { min-block-size: var(--tap-min); } }
+  .pi-tab__led { inline-size: 6px; block-size: 6px; border-radius: var(--radius-full); background: var(--led-off); }
+  .pi-tab[aria-checked='true'] { border-color: var(--accent); }
+  .pi-tab[aria-checked='true'] .pi-tab__led { background: var(--led-on); }
+  .pi-tab:active, .pi-swatch:active { background: var(--ink); color: var(--bg); }
+  .pi-swatch[aria-checked='true'] { border-color: var(--accent); box-shadow: var(--shadow-raised), inset 0 0 0 1px var(--accent); }
+  .pi-swatch__chip { inline-size: 14px; block-size: 14px; border-radius: var(--radius-1); box-shadow: inset 0 0 0 1px var(--line-strong); }
+  .pi-swatch[data-finish='graphite'] .pi-swatch__chip { background: var(--finish-graphite); }
+  .pi-swatch[data-finish='bone'] .pi-swatch__chip { background: var(--finish-bone); }
+
+  /* Scope ----------------------------------------------------------------------------------------------------- */
+  .pi-scope { margin: 0; display: grid; gap: var(--space-2); min-inline-size: 0; }
+  .pi-scope__glass {
+    position: relative;
+    aspect-ratio: 2 / 1;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background: var(--scope-bg);
+    box-shadow: inset 0 2px 4px var(--edge-dark), 0 1px 0 var(--edge-light);
+  }
+  .pi-scope[data-variant='hero'] .pi-scope__glass { aspect-ratio: 3 / 1; }
+  .pi-scope__canvas, .pi-scope__poster, .pi-scope__grid {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+  .pi-scope__canvas { opacity: 0; }
+  .pi-scope__canvas[data-on] { opacity: 1; }
+  .pi-scope__poster { fill: none; stroke: var(--trace-1); stroke-width: 2; vector-effect: non-scaling-stroke; }
+  .pi-scope__poster[data-hidden] { display: none; }
+  .pi-scope__grid line { stroke: var(--scope-grid); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  /* LED, readout, pause: three fixed columns on one line; the readout gives way (ellipsis) rather than wrap */
+  .pi-scope__bar {
+    display: grid;
+    grid-template-columns: minmax(7.5rem, auto) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-3);
+    min-block-size: var(--tap-min);
+    font-size: var(--step--1);
+  }
+  .pi-scope__bar > .pi-quiet { white-space: nowrap; }
+  /* a narrow scope: LED and pause on the first line, the readout on its own second line, always both */
+  .pi-scope { container: pi-scope / inline-size; }
+  @container pi-scope (width < 34rem) {
+    .pi-scope__bar { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'led pause' 'read read'; }
+    .pi-scope__bar > .pi-led { grid-area: led; }
+    .pi-scope__bar > .pi-quiet { grid-area: pause; }
+    .pi-scope__readout { grid-area: read; }
+  }
+  .pi-scope__readout {
+    overflow: hidden;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .pi-scope__plate {
+    position: absolute;
+    inset: var(--space-2) auto auto var(--space-2);
+    z-index: 2;
+    max-inline-size: calc(100% - 2 * var(--space-2));
+    padding: 0.125rem var(--space-2);
+    border: 1px solid var(--trace-1);
+    border-radius: var(--radius-1);
+    background: var(--scope-bg);
+    color: var(--trace-1);
+    font-size: var(--step-legend);
+    font-weight: var(--weight-legend);
+    font-stretch: var(--stretch-legend);
+    letter-spacing: var(--tracking-legend);
+    text-transform: uppercase;
+  }
+
+  /* Envelope -------------------------------------------------------------------------------------------------- */
+  .pi-env {
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 4 / 1;
+    border-radius: var(--radius-card);
+    background: var(--scope-bg);
+  }
+  .pi-env__seg { fill: none; stroke: var(--trace-2); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+  .pi-env__seg[data-editing] { stroke: var(--trace-1); stroke-width: 2.5; }
+  .pi-env[data-playing] .pi-env__seg { stroke: var(--trace-1); }
+  .pi-env__dot { fill: var(--trace-2); }
+  .pi-env__letter { fill: var(--oled-muted); font: 700 9px var(--font-readout); text-anchor: middle; }
+
+  /* Sound switch ---------------------------------------------------------------------------------------------- */
+  .pi-sound { display: grid; gap: var(--space-2); }
+  .pi-sound__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+  .pi-sound__msg { min-block-size: 1.5em; }
+
+  /* Field ----------------------------------------------------------------------------------------------------- */
+  .pi-field { display: grid; gap: var(--space-1); min-inline-size: 0; }
+  .pi-field__input {
+    box-sizing: border-box;
+    inline-size: 100%;
+    max-inline-size: calc(16ch + 2 * var(--space-3) + 1ch);
+    min-block-size: var(--control-h);
+    padding: 0 var(--space-3);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-control);
+    background: var(--sunken);
+    color: var(--ink);
+    caret-color: var(--accent);
+    font-family: var(--font-readout);
+    font-size: var(--step-1);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .pi-field__input::placeholder { color: var(--subtle); }
+  .pi-field__input[data-preview='focus'] { outline: var(--focus-width) solid var(--focus); outline-offset: var(--focus-offset); }
+  @media (hover: hover) { .pi-field__input:hover { border-color: var(--ink); } }
+  .pi-field[data-invalid] .pi-field__input { border-color: var(--negative); }
+  /* the counter sits at the end of the input's own row, so it never drifts with the hint */
+  .pi-field__row { display: flex; align-items: center; gap: var(--space-3); }
+  .pi-field__count { font-size: var(--step--1); color: var(--subtle); font-variant-numeric: tabular-nums; }
+  .pi-field__error { display: flex; align-items: center; gap: var(--space-2); font-size: var(--step--1); color: var(--negative-ink); }
+  .pi-field__error svg { inline-size: var(--icon-sm); block-size: var(--icon-sm); fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); flex: none; }
+
+  /* Patch bank ------------------------------------------------------------------------------------------------ */
+  .pi-bank { display: grid; gap: var(--space-3); min-inline-size: 0; }
+  .pi-bank[data-dim] .pi-patch { color: var(--subtle); }
+  .pi-bank__filters { display: grid; gap: var(--space-2); }
+  .pi-bank__filter-row { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  /* under 30rem a row has two lines (name, then its status): every row reserves both, so a status never adds one */
+  .pi-bank { --pi-row: var(--row-h); }
+  @media (width < 30rem) { .pi-bank { --pi-row: calc(var(--row-h) + 0.75rem); } }
+  .pi-bank__region { min-block-size: calc(var(--pi-row) * 6 + var(--space-1) * 5); }
+  .pi-bank__list {
+    display: grid;
+    gap: var(--space-1);
+    max-block-size: calc(var(--pi-row) * 8 + var(--space-1) * 7);
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+  }
+  .pi-patch {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'num name type' 'num state state';
+    align-items: center;
+    column-gap: var(--space-3);
+    min-block-size: var(--pi-row, var(--row-h));
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+    cursor: pointer;
+  }
+  @media (min-width: 30rem) {
+    .pi-patch { grid-template-columns: auto minmax(0, 1fr) auto auto; grid-template-areas: 'num name type state'; }
+  }
+  @media (hover: hover) and (pointer: fine) { .pi-patch:hover { background: color-mix(in srgb, var(--ink) 6%, var(--surface)); } }
+  .pi-patch[aria-selected='true'] { background: var(--accent-bg); box-shadow: inset 0 0 0 1px var(--accent); }
+  .pi-patch:focus-visible { outline-offset: -2px; }
+  .pi-patch[data-status='saving'], .pi-patch[data-status='syncing'] { animation: pulse-power-on var(--dur-power-on) var(--ease-step) both; }
+  .pi-patch__num { grid-area: num; font-family: var(--font-readout); font-weight: 700; color: var(--accent-ink); font-variant-numeric: tabular-nums; }
+  .pi-patch__name { grid-area: name; font-weight: var(--weight-strong); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pi-patch__type { grid-area: type; display: inline-grid; justify-items: end; min-inline-size: 4ch; font-size: var(--step-legend); font-weight: var(--weight-legend); font-stretch: var(--stretch-legend); letter-spacing: var(--tracking-legend); color: var(--subtle); }
+  .pi-patch__state { grid-area: state; display: inline-flex; align-items: center; gap: var(--space-2); justify-self: start; }
+  @media (min-width: 30rem) { .pi-patch__state { justify-self: end; } }
+  .pi-patch--skeleton { cursor: default; box-shadow: none; background: var(--skeleton-bg); }
+  .pi-vent {
+    grid-column: 1 / -1;
+    block-size: 12px;
+    border-radius: var(--radius-1);
+    background: repeating-linear-gradient(90deg, var(--skeleton-slot) 0 14px, transparent 14px 20px);
+  }
+  .pi-bank__list[data-vfx~='vent-scan'] > * { animation-name: pulse-vent-row; }
+  @keyframes pulse-vent-row {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  /* Specs ----------------------------------------------------------------------------------------------------- */
+  .pi-specs { display: grid; gap: var(--space-3); }
+  .pi-specs__caption { margin: 0; font-size: var(--step-2); }
+  .pi-specs__list { display: grid; margin: 0; }
+  @media (min-width: 48rem) { .pi-specs__list { grid-template-columns: 1fr 1fr; column-gap: var(--space-6); } }
+  .pi-specs__row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-block: var(--space-2);
+    border-block-end: 1px solid var(--line);
+  }
+  .pi-specs__row dd { margin: 0; font-size: var(--step--1); font-variant-numeric: tabular-nums; text-align: end; }
+
+  /* Rails ----------------------------------------------------------------------------------------------------- */
+  .pi-rail {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-5);
+    padding: var(--space-3) var(--gutter);
+    background: var(--bg);
+  }
+  .pi-rail--top { border-block-end: 1px solid var(--line); }
+  .pi-rail--bottom { border-block-start: 1px solid var(--line); }
+  .pi-skip {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
+    box-sizing: border-box;
+    position: absolute;
+    inset-inline-start: var(--space-3);
+    inset-block-start: var(--space-3);
+    z-index: var(--z-modal);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-control);
+    background: var(--raised);
+    color: var(--ink);
+    transform: translateY(-200%);
+  }
+  .pi-skip:focus { transform: none; }
+  .pi-brand { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--ink); text-decoration: none; min-block-size: var(--tap-min); }
+  .pi-brand__word { font-weight: 700; font-stretch: var(--stretch-legend); letter-spacing: 0.06em; white-space: nowrap; }
+  .pi-mark__arc { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 300 360; transform: rotate(120deg); transform-origin: 50% 50%; }
+  .pi-mark__led { fill: var(--led-on); }
+  .pi-nav { position: relative; margin-inline-start: auto; }
+  .pi-nav__list { display: flex; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
+  .pi-nav__list a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
+    padding-inline: var(--space-3);
+    color: var(--muted);
+    text-decoration: none;
+    font-weight: var(--weight-strong);
+  }
+  .pi-nav__list a[aria-current='true'] { color: var(--ink); }
+  .pi-nav__menu { display: none; }
+  .pi-nav__finish { display: none; }
+  @media (max-width: 44.99rem) {
+    /* one row: the mark, the page's actions, the menu; the finish switch moves into the menu */
+    .pi-rail--top { flex-wrap: nowrap; gap: var(--space-3); }
+    .pi-rail--top > .pi-finish { display: none; }
+    .pi-rail--top .pi-rail__actions { order: 1; }
+    .pi-nav { order: 2; margin-inline-start: 0; }
+    .pi-nav__finish { display: block; padding: var(--space-3) var(--space-2) var(--space-2); border-block-start: 1px solid var(--line); margin-block-start: var(--space-2); }
+    .pi-nav__finish .pi-swatch { min-block-size: var(--tap-min); }
+    .pi-nav__menu { display: inline-flex; min-block-size: var(--tap-min); }
+    .pi-nav__list {
+      position: absolute;
+      inset-inline-end: 0;
+      inset-block-start: calc(100% + var(--space-2));
+      z-index: var(--z-dropdown);
+      display: grid;
+      min-inline-size: 12rem;
+      padding: var(--space-2);
+      border: var(--overlay-border);
+      border-radius: var(--radius-card);
+      background: var(--raised);
+      box-shadow: var(--shadow-overlay);
+      clip-path: inset(0 0 100% 0);
+      visibility: hidden;
+    }
+    .pi-nav__list[data-open] {
+      visibility: visible;
+      clip-path: inset(0 0 0 0);
+      transition: clip-path var(--dur-disclosure) var(--ease-step);
+    }
+  }
+  .pi-vents {
+    inline-size: 100%;
+    block-size: 8px;
+    border-radius: var(--radius-1);
+    background: repeating-linear-gradient(90deg, var(--skeleton-slot) 0 18px, transparent 18px 26px);
+  }
+  .pi-footer__notice { margin: 0; flex: 1 1 20rem; max-inline-size: 65ch; font-size: var(--step--1); color: var(--muted); }
+  .pi-footer__links { display: flex; align-items: center; gap: var(--space-3); }
+  .pi-footer__links { flex-wrap: wrap; }
+  .pi-footer__links a { display: inline-flex; align-items: center; min-block-size: var(--tap-min); color: var(--ink); text-decoration-color: var(--accent-ink); }
+  .pi-footer__links .pi-quiet, .pi-nav__menu { white-space: nowrap; }
+  @media (max-width: 22rem) { .pi-brand__word { display: none; } .pi-brand { min-inline-size: var(--tap-min); justify-content: center; } }
+}
+
+/* Reduced motion: stills (MOTION-SYSTEM.md §Reduced motion) */
+@media (prefers-reduced-motion: reduce) {
+  .pi-key, .pi-key::before, .pi-knob__dial[data-gliding] :is(.pi-knob__cap, .pi-knob__value), .pi-nav__list[data-open] { transition: none; }
+  .pi-patch[data-status] { animation: none; }
+  .pi-bank__list[data-vfx~='vent-scan'] > * { animation: none; }
+}
+:root[data-motion='reduced'] :is(.pi-key, .pi-key::before, .pi-nav__list[data-open]),
+:root[data-motion='reduced'] .pi-knob__dial[data-gliding] :is(.pi-knob__cap, .pi-knob__value) { transition: none; }
+:root[data-motion='reduced'] .pi-patch[data-status],
+:root[data-motion='reduced'] .pi-bank__list[data-vfx~='vent-scan'] > * { animation: none; }
+
+/* StepLoop: 32 pads in two rows of 16; a pad's height is its gate, the beat pads carry a notch, the playing pad lights */
+@layer components {
+  .pi-loop { display: grid; gap: var(--space-3); }
+  .pi-loop__bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-4); }
+  .pi-loop__patterns { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+  .pi-loop__patterns [aria-checked='true'], .pi-loop__patterns [aria-pressed='true'], .pi-loop__key[aria-pressed='true'] { color: var(--accent-ink); border-color: var(--accent); }
+  .pi-loop__pads { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 4px; margin: 0; padding: 0; list-style: none; }
+  .pi-loop__pads li {
+    position: relative; block-size: 1.5rem; border-radius: 3px; background: var(--sunken);
+    box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.35);
+  }
+  .pi-loop__pads li[data-note]::before {
+    content: ''; position: absolute; inset: auto 3px 3px; block-size: calc(var(--pad-h) * (100% - 6px));
+    border-radius: 2px; background: color-mix(in srgb, var(--accent) 35%, var(--sunken));
+  }
+  .pi-loop__pads li[data-accent]::before { background: color-mix(in srgb, var(--accent) 60%, var(--sunken)); }
+  .pi-loop__pads li[data-beat]::after { content: ''; position: absolute; inset: -5px auto auto 50%; inline-size: 2px; block-size: 3px; translate: -50% 0; background: var(--subtle); }
+  .pi-loop__pads li[data-on] { background: var(--accent); box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 70%, transparent); }
+  .pi-loop__pads li[data-on]::before { background: var(--accent-ink); opacity: 0.5; }
+}
+
+@layer components {
+  /* the header's page actions (a page's sound key, its pre-order link) sit between the nav and the finish switch */
+  .pi-rail__actions { display: flex; align-items: center; gap: var(--space-3); margin-inline-start: auto; white-space: nowrap; }
+}

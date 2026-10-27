@@ -1,0 +1,107 @@
+/*
+ * Page-level extensions for `pulse-landing`. The SYSTEM owns the tokens.
+ *
+ * Primitives, roles (colour, type, space, shape, elevation, motion, density), component tokens, the dark theme and
+ * the document base rules (body, selection, focus ring, headings) live in the system's tokens.css (FOUNDATIONS.md;
+ * format in guides/design-system.md §2), which Page.tsx imports first. This file is imported after it and holds only
+ * the few extra tokens that this one page needs, built from system tokens with var().
+ *
+ * Rules for this file:
+ *   - Never redefine a system token here, never override one for a system component, and never write a raw colour,
+ *     size, duration or curve. A missing value is a missing system token: extend the system the way
+ *     guides/design-system.md §7 says (start here, promote it when a second page needs it).
+ *   - Add a token only when one section of this page needs it and no system token fits. Name it for the section.
+ *   - An extension that must differ in dark is written twice with identical values, like the system's own: under the
+ *     prefers-color-scheme media query (skipped when <html data-theme="light">) and under <html data-theme="dark">.
+ *   - Reduced motion is handled by the system's token overrides, so this file needs no reduced-motion block unless an
+ *     extension token is itself a distance or a duration.
+ * Everything below is a placeholder: delete what the page does not use.
+ */
+[data-page='pulse-landing'] {
+  /* Page extensions: one line each, named for the section that needs it. For example:
+     --hero-art-height: clamp(18rem, 48vh, 36rem);           the hero art's box, reserved before it loads
+     --proof-card-min: 16rem;                                the proof grid's minimum card width
+     A section that keeps its look in both themes gets its own role set, which no theme block re-points
+     (guides/design-system.md §2). Take the values from the system's primitives:
+     --band-bg: var(--gray-950); --band-ink: var(--gray-50);
+     --band-muted: var(--gray-400); --band-line: var(--gray-800); */
+  /* the hero's power-on (MOTION.md, the hero sequence): when each part comes up, from the system's durations */
+  --boot-knob-at: var(--dur-4xl);                          /* the knobs sweep to their values */
+  --boot-fader-at: calc(var(--dur-4xl) + var(--dur-sm));   /* then the faders rise */
+  --boot-led-at: var(--dur-hero);                          /* the path LEDs light from oscillator to output */
+  --boot-led-step: var(--dur-md);
+  --boot-tag-at: calc(var(--dur-hero) + var(--dur-lg));    /* the patch tag swings in last */
+
+  /* the device panel follows the finish (Bone: a light machined panel; Graphite below): face, falloff light, rim,
+     seams, the edge band, screws, vents and the loop pads */
+  --panel-face: var(--bone-200);
+  --panel-hi: var(--bone-50);
+  --panel-rim: var(--edge-light);
+  --panel-line: var(--bone-400);
+  --panel-deep: var(--bone-600);
+  --panel-seam: var(--bone-400);
+  --panel-band-a: var(--bone-100);
+  --panel-band-b: var(--bone-200);
+  --panel-screw-hi: var(--bone-50);
+  --panel-screw: var(--bone-400);
+  --panel-vent: var(--bone-600);
+  --panel-pad: var(--bone-300);
+  --panel-engrave: 0 1px 0 var(--edge-light);
+}
+/* Graphite: the same panel in dark metal. Written twice, like the system: the colour-scheme query (unless Bone is
+   picked) and the picked Graphite finish */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) [data-page='pulse-landing'] {
+    --panel-face: var(--graphite-850); --panel-hi: var(--graphite-750); --panel-rim: color-mix(in srgb, var(--graphite-100) 14%, transparent);
+    --panel-line: var(--graphite-750); --panel-deep: var(--graphite-950); --panel-seam: color-mix(in srgb, var(--graphite-975) 70%, transparent);
+    --panel-band-a: var(--graphite-800); --panel-band-b: var(--graphite-850); --panel-screw-hi: var(--graphite-400); --panel-screw: var(--graphite-750);
+    --panel-vent: var(--graphite-975); --panel-pad: var(--graphite-800);
+    --panel-engrave: 0 1px 0 var(--edge-dark), 0 -1px 0 color-mix(in srgb, var(--graphite-100) 10%, transparent);
+  }
+}
+:root[data-theme='dark'] [data-page='pulse-landing'] {
+  --panel-face: var(--graphite-850); --panel-hi: var(--graphite-750); --panel-rim: color-mix(in srgb, var(--graphite-100) 14%, transparent);
+  --panel-line: var(--graphite-750); --panel-deep: var(--graphite-950); --panel-seam: color-mix(in srgb, var(--graphite-975) 70%, transparent);
+  --panel-band-a: var(--graphite-800); --panel-band-b: var(--graphite-850); --panel-screw-hi: var(--graphite-400); --panel-screw: var(--graphite-750);
+  --panel-vent: var(--graphite-975); --panel-pad: var(--graphite-800);
+  --panel-engrave: 0 1px 0 var(--edge-dark), 0 -1px 0 color-mix(in srgb, var(--graphite-100) 10%, transparent);
+}
+
+/* the scope housing (the tube, the copy on it, the signal path, the cable lane) is a screen: dark in both finishes,
+   so what sits on it reads the Graphite roles whatever the finish */
+[data-page='pulse-landing'] .d-scene {
+  --bg: var(--graphite-900); --surface: var(--graphite-850); --raised: var(--graphite-800); --sunken: var(--graphite-950);
+  --ink: var(--graphite-100); --muted: var(--graphite-300); --subtle: var(--graphite-400);
+  --line: var(--graphite-750); --line-strong: var(--graphite-500);
+  --accent: var(--amber-400); --accent-hover: var(--amber-350); --on-accent: var(--graphite-900); --accent-ink: var(--amber-300);
+  --focus: var(--amber-400);
+  --negative: var(--red-300); --negative-ink: var(--red-250); --negative-bg: var(--red-900);
+  color-scheme: dark; color: var(--ink);
+}
+
+/* page-level bits the header carries */
+[data-page='pulse-landing'] {
+  .pl-study { color: var(--subtle); white-space: nowrap; }
+  .pl-sound-off { display: inline-flex; align-items: center; gap: var(--space-2); }
+  @media (max-width: 64rem) { .pl-study { display: none; } }
+}
+
+/* the header on phones (the finish switch is in the menu, SiteHeader) */
+[data-page='pulse-landing'] {
+  @media (max-width: 40rem) {
+    /* the header keeps one row on phones: the device's own quiet key turns the sound off there */
+    .pl-sound-off { display: none; }
+  }
+}
+
+/* section arrivals (MOTION.md): a scope line sweeps down the patches card once; the order tag swings in once */
+[data-page='pulse-landing'] {
+  [data-section='patches'] { position: relative; overflow-y: clip; }
+  [data-section='patches'][data-seen]::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+    background: linear-gradient(var(--trace-1) 0 2px, color-mix(in srgb, var(--trace-1) 35%, transparent) 2px, transparent 18px); /* taste-skill-ignore: FOUNDATIONS.md §10, the scope scan line (Scope screen) */
+    animation: pl-scan calc(var(--dur-hero) * 1.6) linear both;
+  }
+  [data-section='order'][data-seen] .pl-tag { animation: pl-tag-swing var(--dur-hero) var(--ease-standard) both; }
+}
+@keyframes pl-scan { from { translate: 0 0; opacity: 1; } 92% { opacity: 1; } to { translate: 0 100%; opacity: 0; } }

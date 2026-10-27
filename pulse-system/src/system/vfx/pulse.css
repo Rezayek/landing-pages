@@ -1,0 +1,134 @@
+/*
+ * PULSE-1's own effects: the "dot-matrix power-on" language (MOTION-SYSTEM.md §Theme expression). They sit next to
+ * the primitives in vfx.css and attach the same way: standing effects with data-vfx words, one-shots with
+ * data-vfx-play (set by play() or pulsePlay()). Every timing is a token.
+ *
+ *   invert       a press: the cap shows its negative for one step (colour only, so it survives reduced motion)
+ *   power-on     a module, message or row switches on: two short opacity dips, once (never over 3 a second)
+ *   type-on      text types on from the left, one character per step (--type-chars sets the count)
+ *   dots         a pending readout steps its ellipsis (standing, while [data-pending])
+ *   led-flash    an LED snaps on and off once (success)
+ *   led-blink    an LED blinks (standing, while live or saving: at most 2 per second)
+ *   vent-scan    skeleton vent slots light one by one, then stop after 5 s (standing)
+ *   spin-step    the knob-arc spinner turns in 8 detents (standing)
+ *   clip         a trace clips: the scope frame shows the negative edge for one step (error, one-shot)
+ *   dim          an offline module drops to its subtle tone (standing, colour only)
+ */
+
+@layer components {
+  /* invert (press). Colour swap in one step; the key travel is the component's own. */
+  :where([data-vfx~='invert']):active:not([aria-disabled='true']),
+  :where([data-vfx-play='invert']) {
+    background-color: var(--ink);
+    color: var(--bg);
+    transition: none;
+  }
+  :where([data-vfx~='invert']) {
+    transition:
+      background-color 0ms var(--dur-invert),
+      color 0ms var(--dur-invert);
+  }
+
+  /* power-on: two dips, then on. Used once per arrival. */
+  :where([data-vfx-play='power-on']) {
+    animation: pulse-power-on var(--dur-power-on) var(--ease-step) both;
+  }
+  @keyframes pulse-power-on {
+    0%, 22% { opacity: 1; }
+    23%, 34% { opacity: 0.25; }
+    35%, 56% { opacity: 1; }
+    57%, 66% { opacity: 0.25; }
+    67%, 100% { opacity: 1; }
+  }
+
+  /* type-on: needs a single-line box; --type-chars is set by typeOn() to the text length. */
+  :where([data-vfx-play='type-on']) {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: bottom;
+    animation: pulse-type var(--dur-type) steps(var(--type-chars, 16), jump-end) both;
+  }
+  @keyframes pulse-type {
+    from { max-width: 0; }
+    to { max-width: calc(var(--type-chars, 16) * 1ch + 1ch); }
+  }
+
+  /* dots: a stepped ellipsis after a pending readout's text */
+  :where([data-vfx~='dots'][data-pending])::after {
+    content: '';
+    display: inline-block;
+    width: 3ch;
+    text-align: left;
+    animation: pulse-dots calc(var(--dur-spin) * 0.75) var(--ease-step) infinite;
+  }
+  @keyframes pulse-dots {
+    0% { content: ''; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75%, 100% { content: '...'; }
+  }
+
+  /* LEDs */
+  :where([data-vfx-play='led-flash']) {
+    animation: pulse-led-flash calc(var(--dur-led) * 6) steps(1) both;
+  }
+  @keyframes pulse-led-flash {
+    0%, 49% { background-color: var(--led-on); box-shadow: 0 0 6px var(--led-on); }
+    50%, 100% { background-color: var(--led-on); box-shadow: none; }
+  }
+  :where([data-vfx~='led-blink']) {
+    animation: pulse-led-blink var(--dur-blink) steps(1) infinite;
+  }
+  @keyframes pulse-led-blink {
+    0%, 49% { background-color: var(--led-on); }
+    50%, 100% { background-color: var(--led-off); }
+  }
+
+  /* vent-scan: each slot carries --i (its index); stops after 5 s (10 rounds of the scan) */
+  :where([data-vfx~='vent-scan']) > * {
+    animation: pulse-vent var(--dur-power-on) var(--ease-step) calc(var(--i, 0) * var(--stagger-scene)) 8 both;
+  }
+  @keyframes pulse-vent {
+    0%, 100% { background-color: var(--skeleton-slot); }
+    50% { background-color: color-mix(in srgb, var(--ink) 10%, var(--sunken)); }
+  }
+
+  /* spin-step: the knob-arc spinner */
+  :where([data-vfx~='spin-step']) {
+    animation: pulse-spin var(--dur-spin) var(--ease-step-fine) infinite;
+  }
+  @keyframes pulse-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* clip: the frame shows a negative edge for one step (error on the scope or a readout) */
+  :where([data-vfx-play='clip']) {
+    animation: pulse-clip calc(var(--dur-led) * 6) steps(1) both;
+  }
+  @keyframes pulse-clip {
+    0%, 59% { box-shadow: inset 0 0 0 2px var(--negative); }
+    60%, 100% { box-shadow: inset 0 0 0 1px var(--negative); }
+  }
+
+  /* dim: offline */
+  :where([data-vfx~='dim']) {
+    color: var(--subtle);
+  }
+
+  /* Reduced motion: stills. invert, dim and led-flash keep their colour (they carry state); the rest stop. */
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-vfx-play='power-on'], [data-vfx-play='type-on'], [data-vfx~='vent-scan']) > *,
+    :where([data-vfx-play='power-on'], [data-vfx-play='type-on'], [data-vfx~='led-blink']) {
+      animation: none;
+    }
+    :where([data-vfx~='led-blink']) { background-color: var(--led-on); }
+    :where([data-vfx~='dots'][data-pending])::after { animation: none; content: '...'; }
+  }
+  :root[data-motion='reduced'] :where([data-vfx-play='power-on'], [data-vfx-play='type-on'], [data-vfx~='led-blink']),
+  :root[data-motion='reduced'] :where([data-vfx~='vent-scan']) > * {
+    animation: none;
+  }
+  :root[data-motion='reduced'] :where([data-vfx~='led-blink']) { background-color: var(--led-on); }
+  :root[data-motion='reduced'] :where([data-vfx~='dots'][data-pending])::after { animation: none; content: '...'; }
+}
