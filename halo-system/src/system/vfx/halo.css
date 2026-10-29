@@ -1,0 +1,158 @@
+/*
+ * HALO's own effects: the studio-light motion language (MOTION-SYSTEM.md §Theme expression), next to the
+ * primitives in vfx.css. Every knob is a token from tokens.css.
+ *
+ *   sheen     one light sweep across a surface, once: a result is final (success) or the product shows its finish
+ *   settle    the product lands on its stage: a short drop on the weight curve, no overshoot
+ *   rise      the hero watch rises into its contact shadow, once per load
+ *   detent    the dial's index dips one pixel as it steps, like a detent clicking
+ *   ring      the halo ring: the loading indicator, a slow arc turning (.halo-ring)
+ *   cut       a stage change is a hard cut: no fade, no slide (.halo-cut documents and enforces it)
+ *   stale     content on screen waiting for new values: it goes muted and a 2 px bar runs (.halo-stale)
+ *
+ * One-shots attach with data-vfx-play, set by playHalo() in halo.ts. Under reduced motion sheen, settle, rise and
+ * detent are skipped (the state they decorate is already shown); the ring keeps turning at half speed (it carries
+ * status); cut and stale have no motion to remove.
+ */
+
+@layer components {
+  /* sheen: a soft specular band crosses the host once, left to right, like a softbox reflection sliding over metal */
+  :where([data-vfx-play='sheen']) {
+    overflow: hidden;
+  }
+  :where([data-vfx-play='sheen'])::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent 22%, var(--vfx-color) 46%, var(--vfx-color) 54%, transparent 78%); /* taste-skill-ignore: the sheen: one studio light sweep, a style-contract device */
+    transform: translateX(-90%);
+    animation: halo-sheen var(--dur-sheen) var(--ease-standard) both;
+  }
+  @keyframes halo-sheen {
+    to {
+      transform: translateX(90%);
+    }
+  }
+
+  /* settle: the product (or a panel that holds it) comes down onto its stage */
+  :where([data-vfx-play='settle']) {
+    animation: halo-settle var(--dur-scene) var(--ease-weight) both;
+  }
+  @keyframes halo-settle {
+    from {
+      transform: translateY(var(--travel-md));
+    }
+  }
+
+  /* rise: the hero watch rises into place; its shadow (.halo-shadow, a sibling) tightens with it */
+  :where([data-vfx-play='rise']) {
+    animation: halo-rise var(--dur-hero) var(--ease-weight) both;
+  }
+  :where([data-vfx-play='rise']) + .halo-shadow,
+  .halo-shadow[data-vfx-play='rise'] {
+    animation: halo-shadow var(--dur-hero) var(--ease-weight) both;
+  }
+  @keyframes halo-rise {
+    from {
+      transform: translateY(var(--travel-lg));
+    }
+  }
+  @keyframes halo-shadow {
+    from {
+      transform: scale(1.6);
+      opacity: 0.2;
+    }
+  }
+  .halo-shadow {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 46%;
+    height: 6%;
+    translate: -50% 0;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(var(--shadow-rgb) / 0.42), transparent); /* taste-skill-ignore: the product's contact shadow on its stage */
+    pointer-events: none;
+  }
+  [data-stage='black'] .halo-shadow {
+    background: radial-gradient(closest-side, rgb(255 255 255 / 0.1), transparent); /* taste-skill-ignore: the product's contact shadow on its stage */
+  }
+
+  /* detent: one step of the dial's index, a 1 px dip and back inside the detent duration */
+  :where([data-vfx-play='detent']) {
+    animation: halo-detent var(--dur-detent) var(--ease-standard) both;
+  }
+  @keyframes halo-detent {
+    50% {
+      transform: translateY(var(--press-depth));
+    }
+  }
+
+  /* ring: the halo ring, the system's loading indicator */
+  .halo-ring {
+    animation: halo-ring var(--dur-ring) linear infinite;
+    transform-origin: 50% 50%;
+  }
+  @keyframes halo-ring {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* cut: a stage change never fades or slides */
+  .halo-cut {
+    transition: none;
+  }
+
+  /* stale: values stay readable (muted passes 4.5:1 on every surface), a 2 px bar runs along the top edge */
+  .halo-stale {
+    position: relative;
+    color: var(--muted);
+  }
+  .halo-stale::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--ink) 50%, transparent) 0 0 / 40% 100% no-repeat, /* taste-skill-ignore: the stale bar: an effect of the style contract */
+      var(--line);
+    animation: halo-stale 1200ms linear infinite;
+  }
+  @keyframes halo-stale {
+    from {
+      background-position: -40% 0, 0 0;
+    }
+    to {
+      background-position: 140% 0, 0 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-vfx-play='sheen'])::after {
+      display: none;
+    }
+    :where([data-vfx-play='settle'], [data-vfx-play='rise'], [data-vfx-play='detent']),
+    .halo-shadow[data-vfx-play='rise'] {
+      animation: none;
+    }
+    .halo-stale::before {
+      animation: none;
+      background: var(--ink);
+      opacity: 0.4;
+    }
+  }
+  :root[data-motion='reduced'] :where([data-vfx-play='sheen'])::after {
+    display: none;
+  }
+  :root[data-motion='reduced'] :is([data-vfx-play='settle'], [data-vfx-play='rise'], [data-vfx-play='detent']),
+  :root[data-motion='reduced'] .halo-shadow[data-vfx-play='rise'] {
+    animation: none;
+  }
+  :root[data-motion='reduced'] .halo-stale::before {
+    animation: none;
+    background: var(--ink);
+    opacity: 0.4;
+  }
+}

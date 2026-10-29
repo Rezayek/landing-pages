@@ -1,0 +1,252 @@
+/*
+ * Effect primitives: the building blocks of the system's motion language (guides/expression.md). They are
+ * style-neutral on purpose: phase 8 picks the ones the style contract (FOUNDATIONS.md §10) calls for, tunes their
+ * knobs in tokens.css, layers them into each situation of MOTION-SYSTEM.md §Theme expression, and adds the style's
+ * own effects next to them in this folder.
+ *
+ * How they attach
+ *   data-vfx="<words>"        marks a host and turns on its standing effects: `ignite` (edge lights on hover, focus
+ *                             and [data-vfx-on]), `scanlines` or `noise` (a texture layer, still)
+ *   data-vfx-play="<name>"    a one-shot, set by play() in vfx.ts: sweep, scan, glitch, shake, pulse, wipe, flicker
+ * One texture (::before) and one pass (::after) per host. A host keeps its own `position` when it sets one; the
+ * default here is `relative` at zero specificity so the pseudo layers have a box.
+ *
+ * Knobs (set them in tokens.css or on the host)
+ *   --vfx-color, --vfx-color-2   the effect's light and its second channel (chromatic split, scan core)
+ *   --vfx-dur                    one-shot length (defaults to a motion token)
+ *   --vfx-strength               0-1, how much of the effect shows (texture opacity, glow spread)
+ *
+ * Safety (guides/motion.md Reduced motion, flashing): no one-shot repeats by itself; flicker dips twice in 600 ms
+ * on small elements only; under reduced motion every one-shot is skipped or becomes a still, textures stay still,
+ * and the state the effect decorates always shows without it.
+ */
+
+@layer components {
+  :where([data-vfx], [data-vfx-play]) {
+    --vfx-color: var(--accent, #2f66e0);
+    --vfx-color-2: var(--info, #00a3c4);
+    --vfx-dur: var(--dur-2xl, 400ms);
+    --vfx-strength: 0.6;
+    position: relative;
+    isolation: isolate;
+  }
+
+  /* Standing: ignite. Colour and shadow only, at the hover duration: fine for frequent interactions. */
+  :where([data-vfx~='ignite']) {
+    transition:
+      box-shadow var(--dur-hover, 100ms) var(--ease-enter, ease-out),
+      border-color var(--dur-hover, 100ms) var(--ease-enter, ease-out),
+      color var(--dur-hover, 100ms) var(--ease-enter, ease-out);
+  }
+  :where([data-vfx~='ignite']):is(:focus-visible, [data-vfx-on]),
+  :where([data-vfx~='ignite']):hover:not(:disabled) {
+    box-shadow:
+      0 0 0 1px var(--vfx-color),
+      0 0 calc(18px * var(--vfx-strength)) color-mix(in srgb, var(--vfx-color) 55%, transparent);
+  }
+  @media not ((hover: hover) and (pointer: fine)) {
+    :where([data-vfx~='ignite']):hover:not(:focus-visible, [data-vfx-on]) {
+      box-shadow: none;
+    }
+  }
+
+  /* Standing textures (::before, still). */
+  :where([data-vfx~='scanlines'], [data-vfx~='noise'])::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: calc(var(--vfx-strength) * 0.35);
+  }
+  :where([data-vfx~='scanlines'])::before {
+    background: repeating-linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--vfx-color) 40%, transparent) 0 1px,
+      transparent 1px 3px
+    );
+  }
+  :where([data-vfx~='noise'])::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+  }
+
+  /* One-shot passes (::after). */
+  :where([data-vfx-play='sweep'], [data-vfx-play='scan'])::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background-repeat: no-repeat;
+  }
+  :where([data-vfx-play='sweep'])::after {
+    background-image: linear-gradient(
+      100deg,
+      transparent 30%,
+      color-mix(in srgb, var(--vfx-color) 45%, transparent) 50%,
+      transparent 70%
+    );
+    background-size: 250% 100%;
+    animation: vfx-sweep var(--vfx-dur) var(--ease-standard, ease) both;
+  }
+  :where([data-vfx-play='scan'])::after {
+    background-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      color-mix(in srgb, var(--vfx-color-2) 70%, transparent) 50%,
+      transparent 100%
+    );
+    background-size: 100% 18%;
+    animation: vfx-scan var(--vfx-dur) linear both;
+  }
+
+  /* One-shots on the host itself. */
+  :where([data-vfx-play='glitch']) {
+    animation: vfx-glitch min(var(--vfx-dur), 300ms) steps(6, end) both;
+  }
+  :where([data-vfx-play='shake']) {
+    animation: vfx-shake min(var(--vfx-dur), 300ms) var(--ease-standard, ease) both;
+  }
+  :where([data-vfx-play='pulse']) {
+    animation: vfx-pulse var(--vfx-dur) var(--ease-enter, ease-out) both;
+  }
+  :where([data-vfx-play='wipe']) {
+    animation: vfx-wipe var(--vfx-dur) var(--ease-enter-emphasized, ease-out) both;
+  }
+  :where([data-vfx-play='flicker']) {
+    animation: vfx-flicker 600ms linear both;
+  }
+
+  @keyframes vfx-sweep {
+    from {
+      background-position: 120% 0;
+    }
+    to {
+      background-position: -20% 0;
+    }
+  }
+  @keyframes vfx-scan {
+    from {
+      background-position: 0 -20%;
+    }
+    to {
+      background-position: 0 120%;
+    }
+  }
+  @keyframes vfx-glitch {
+    0%,
+    100% {
+      transform: none;
+      clip-path: none;
+      filter: none;
+    }
+    20% {
+      transform: translateX(-3px);
+      clip-path: inset(12% 0 58% 0);
+      filter: drop-shadow(2px 0 var(--vfx-color)) drop-shadow(-2px 0 var(--vfx-color-2));
+    }
+    40% {
+      transform: translateX(3px);
+      clip-path: inset(54% 0 18% 0);
+    }
+    60% {
+      transform: translateX(-1px);
+      clip-path: inset(30% 0 40% 0);
+      filter: drop-shadow(-2px 0 var(--vfx-color)) drop-shadow(2px 0 var(--vfx-color-2));
+    }
+    80% {
+      transform: none;
+      clip-path: none;
+      filter: none;
+    }
+  }
+  @keyframes vfx-shake {
+    0%,
+    100% {
+      transform: none;
+    }
+    20% {
+      transform: translateX(-5px);
+    }
+    40% {
+      transform: translateX(5px);
+    }
+    60% {
+      transform: translateX(-3px);
+    }
+    80% {
+      transform: translateX(2px);
+    }
+  }
+  @keyframes vfx-pulse {
+    from {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--vfx-color) 60%, transparent);
+    }
+    to {
+      box-shadow: 0 0 0 calc(16px * var(--vfx-strength)) transparent;
+    }
+  }
+  @keyframes vfx-wipe {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  /* Two dips in 600 ms: under three flashes a second. Small elements only (a sign, a label, an icon). */
+  @keyframes vfx-flicker {
+    0% {
+      opacity: 0.2;
+    }
+    18% {
+      opacity: 1;
+    }
+    30% {
+      opacity: 0.45;
+    }
+    42%,
+    100% {
+      opacity: 1;
+    }
+  }
+
+  /* Decode (vfx.ts): the real text for assistive tech while the glyphs run. */
+  .vfx-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px; /* taste-skill-ignore: a primitive scan line; HALO does not use it */
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Reduced motion: written twice, the system setting and the in-app switch. Wipe becomes a fade; the rest are
+     skipped by play() and would be still here anyway. */
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-vfx-play]),
+    :where([data-vfx-play])::after {
+      animation: none;
+    }
+    :where([data-vfx-play='wipe']) {
+      animation: vfx-fade var(--dur-sm, 100ms) linear both;
+    }
+  }
+  :root[data-motion='reduced'] :where([data-vfx-play]),
+  :root[data-motion='reduced'] :where([data-vfx-play])::after {
+    animation: none;
+  }
+  :root[data-motion='reduced'] :where([data-vfx-play='wipe']) {
+    animation: vfx-fade var(--dur-sm, 100ms) linear both;
+  }
+  @keyframes vfx-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

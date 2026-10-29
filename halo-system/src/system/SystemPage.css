@@ -1,0 +1,874 @@
+/*
+ * Layout for the /system page. The page's own chrome (toolbar, grids, tables) reads the same `--fb-*` roles as the
+ * feedback components, so it follows the system's tokens once they exist and falls back to neutral values before.
+ * It is a working tool, not a designed page: restyle the components, not this file.
+ */
+@layer components {
+  :where(.sys) {
+    color-scheme: light dark;
+  }
+  :root[data-theme='light'] :where(.sys) {
+    color-scheme: light;
+  }
+  :root[data-theme='dark'] :where(.sys) {
+    color-scheme: dark;
+  }
+
+  .sys {
+    min-block-size: 100dvh;
+    background: var(--bg, var(--fb-bg));
+    color: var(--fb-ink);
+    font-family: var(--fb-font);
+    font-size: var(--fb-text);
+    line-height: var(--fb-leading);
+  }
+  .sys :where(h1, h2, h3, h4, p) {
+    margin: 0;
+  }
+  .sys code {
+    font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+    font-size: 0.8125em;
+    overflow-wrap: anywhere;
+  }
+  .sys a {
+    color: var(--fb-accent-ink);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  /* Header and toolbar */
+  .sys-header {
+    z-index: 20;
+    border-block-end: 1px solid var(--fb-line);
+    background: color-mix(in srgb, var(--bg, var(--fb-bg)) 94%, transparent);
+    backdrop-filter: blur(10px);
+  }
+  /* Sticky only where it leaves room for the page: wide and tall enough. */
+  @media (min-width: 64rem) and (min-height: 46rem) {
+    .sys-header {
+      position: sticky;
+      inset-block-start: 0;
+    }
+  }
+  .sys-header__inner {
+    display: grid;
+    gap: 0.75rem;
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding: 0.75rem 1rem;
+  }
+  .sys-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+  }
+  .sys-title h1 {
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+  .sys-title p {
+    color: var(--fb-muted);
+    font-size: var(--fb-text-sm);
+  }
+  .sys-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+  .sys-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .sys-group__label {
+    padding: 0;
+    color: var(--fb-muted);
+    font-size: var(--fb-text-sm);
+  }
+  .sys-seg {
+    display: inline-flex;
+    flex-wrap: wrap;
+    overflow: hidden;
+    border: 1px solid var(--fb-line-strong);
+    border-radius: var(--fb-radius);
+  }
+  .sys-seg > button {
+    min-block-size: var(--fb-tap);
+    padding: 0 0.875rem;
+    border: 0;
+    border-inline-start: 1px solid var(--fb-line-strong);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--fb-text-sm);
+    cursor: pointer;
+  }
+  .sys-seg > button:first-child {
+    border-inline-start: 0;
+  }
+  /* HALO: a selected setting is an ink plate; orange stays on the primary action only */
+  .sys-seg > button[aria-pressed='true'] {
+    background: var(--fb-sunken);
+    color: var(--fb-ink);
+    font-weight: var(--weight-ui, 600);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.35em;
+  }
+  .sys-group__hint {
+    flex-basis: 100%;
+    color: var(--fb-muted);
+    font-size: var(--fb-text-sm);
+  }
+
+  /* Layout */
+  .sys-layout {
+    display: grid;
+    gap: 1.5rem;
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding: 1.5rem 1rem 6rem;
+  }
+  @media (min-width: 64rem) {
+    .sys-layout {
+      grid-template-columns: 11rem minmax(0, 1fr);
+      gap: 2.5rem;
+    }
+    .sys-nav {
+      position: sticky;
+      inset-block-start: calc(var(--sticky-top, 0px) + 1.5rem);
+      align-self: start;
+    }
+    .sys-nav ul {
+      flex-direction: column;
+    }
+  }
+  .sys-nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sys-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--fb-tap);
+    color: var(--fb-muted);
+    text-decoration: none;
+  }
+  .sys-nav a:hover {
+    color: var(--fb-ink);
+    text-decoration: underline;
+  }
+  .sys-main {
+    min-inline-size: 0;
+  }
+  .sys-frame {
+    display: grid;
+    gap: 3.5rem;
+    min-inline-size: 0;
+    margin-inline: auto;
+  }
+  .sys-frame[data-width='320'] {
+    max-inline-size: 320px;
+  }
+  .sys-frame[data-width='768'] {
+    max-inline-size: 768px;
+  }
+  .sys-frame[data-width='1280'] {
+    max-inline-size: 1280px;
+  }
+  .sys-frame:not([data-width='full']) {
+    padding: 0.75rem;
+    border: 1px dashed var(--fb-line-strong);
+  }
+  .sys-section {
+    display: grid;
+    gap: 1rem;
+    min-inline-size: 0;
+    scroll-margin-block-start: calc(var(--sticky-top, 0px) + 1rem);
+  }
+  .sys-section > h2 {
+    font-size: 1.375rem;
+    line-height: 1.25;
+  }
+  .sys-subsection {
+    display: grid;
+    gap: 0.75rem;
+    min-inline-size: 0;
+  }
+  .sys-lead {
+    max-inline-size: 70ch;
+    color: var(--fb-muted);
+  }
+
+  /* Cards and grids */
+  .sys-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  }
+  .sys-card {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    min-inline-size: 0;
+    padding: 1.25rem;
+    border: 1px solid var(--fb-line);
+    border-radius: var(--fb-radius-card);
+    background: var(--fb-bg);
+  }
+  .sys-card--wide {
+    grid-column: 1 / -1;
+  }
+  .sys-card > h3 {
+    font-size: 1.0625rem;
+    line-height: 1.3;
+  }
+  .sys-note {
+    color: var(--fb-muted);
+    font-size: var(--fb-text-sm);
+    line-height: 1.45;
+  }
+  .sys-note__label {
+    color: var(--fb-ink);
+    font-weight: 600;
+  }
+  .sys-row-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+  .sys-stack {
+    display: grid;
+    gap: 0.75rem;
+    min-inline-size: 0;
+  }
+  .sys-stack .fb-toast {
+    inline-size: 100%;
+  }
+  .sys-stack > :is(.fb-btn, .sys-btn) {
+    justify-self: start;
+  }
+  .sys-pair {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  }
+  .sys-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border: 1px solid var(--fb-line-strong);
+    border-radius: var(--fb-radius-full);
+    color: var(--fb-ink);
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .sys-badge[data-pass='true'] {
+    border-color: var(--fb-positive-ink);
+    color: var(--fb-positive-ink);
+  }
+  .sys-badge[data-pass='false'] {
+    border-color: var(--fb-negative-ink);
+    color: var(--fb-negative-ink);
+  }
+
+  /* Tokens */
+  .sys-group-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+  }
+  .sys-group-title h3 {
+    font-size: 1.0625rem;
+  }
+  .sys-tokens {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  }
+  .sys-token {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: center;
+    min-inline-size: 0;
+    padding: 0.5rem;
+    border: 1px solid var(--fb-line);
+    border-radius: var(--fb-radius-card);
+  }
+  .sys-token__preview {
+    display: grid;
+    align-items: center;
+    min-inline-size: 0;
+  }
+  .sys-token__name {
+    display: block;
+    font-weight: 600;
+  }
+  .sys-token__value {
+    display: block;
+    color: var(--fb-muted);
+  }
+  .sys-token__value[data-missing='true'] {
+    font-style: italic;
+  }
+  .sys-swatch {
+    --sw: transparent;
+    block-size: 2.5rem;
+    border: 1px solid var(--fb-line-strong);
+    border-radius: calc(var(--fb-radius) / 2);
+    background:
+      linear-gradient(var(--sw), var(--sw)), /* taste-skill-ignore: the system page swatch over a checker, to show alpha tokens */
+      repeating-conic-gradient(color-mix(in srgb, var(--fb-ink) 18%, transparent) 0 25%, transparent 0 50%) 0 0 / 12px 12px; /* taste-skill-ignore: the checker behind alpha swatches */
+  }
+  .sys-bar {
+    display: block;
+    block-size: 0.75rem;
+    border-radius: 2px;
+    background: var(--fb-accent);
+  }
+  .sys-corner {
+    display: block;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    border: 2px solid var(--fb-accent);
+    background: var(--fb-wash);
+  }
+  .sys-lift {
+    display: block;
+    block-size: 2.5rem;
+    border-radius: calc(var(--fb-radius) / 2);
+    background: var(--fb-raised);
+  }
+  .sys-glyph {
+    color: var(--fb-muted);
+    font-size: 0.75rem;
+  }
+
+  /* Contrast and type */
+  .sys-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--fb-line);
+    border-radius: var(--fb-radius-card);
+  }
+  .sys-table {
+    inline-size: 100%;
+    min-inline-size: 40rem;
+    border-collapse: collapse;
+    font-size: var(--fb-text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+  .sys-table th,
+  .sys-table td {
+    padding: 0.5rem 0.75rem;
+    border-block-end: 1px solid var(--fb-line);
+    text-align: start;
+    vertical-align: top;
+  }
+  .sys-table thead th {
+    color: var(--fb-muted);
+    font-weight: 600;
+  }
+  .sys-table th code {
+    display: block;
+    color: var(--fb-muted);
+    font-weight: 400;
+  }
+  .sys-table td > * {
+    margin-inline-end: 0.5rem;
+  }
+  .sys-contrast {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
+  }
+  .sys-contrast__item {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.5rem;
+    border: 1px solid var(--fb-line);
+    border-radius: var(--fb-radius-card);
+  }
+  .sys-contrast__sample {
+    display: grid;
+    place-items: center;
+    block-size: 2.5rem;
+    border: 1px solid var(--fb-line);
+    border-radius: calc(var(--fb-radius) / 2);
+    font-weight: 700;
+  }
+  .sys-contrast__meta {
+    display: grid;
+    min-inline-size: 0;
+  }
+  .sys-contrast__result {
+    display: grid;
+    justify-items: end;
+    gap: 0.125rem;
+    font-size: var(--fb-text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+  .sys-type {
+    display: grid;
+    gap: 0.25rem;
+    padding-block: 0.75rem;
+    border-block-end: 1px solid var(--fb-line);
+  }
+  .sys-type__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    color: var(--fb-muted);
+    font-size: var(--fb-text-sm);
+  }
+  .sys-type__sample {
+    font-family: var(--font-body, var(--fb-font));
+    line-height: var(--leading-heading, 1.2);
+    overflow-wrap: anywhere;
+  }
+
+  /* Motion player */
+  .sys-motion {
+    display: grid;
+    gap: 0.5rem;
+    margin-block-start: 0.5rem;
+  }
+  .sys-motion__row {
+    display: grid;
+    grid-template-columns: minmax(6rem, 12rem) minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: center;
+    font-size: var(--fb-text-sm);
+  }
+  .sys-motion__track {
+    position: relative;
+    container-type: inline-size;
+    block-size: 1.5rem;
+    border-radius: var(--fb-radius-full);
+    background: var(--fb-wash);
+  }
+  .sys-motion__dot {
+    position: absolute;
+    inset-block: 0;
+    inline-size: 1.5rem;
+    border-radius: 50%;
+    background: var(--fb-accent);
+  }
+  .sys-motion__dot[data-run] {
+    animation: sys-run var(--d, 200ms) var(--e, ease) both;
+  }
+  .sys-motion[data-reduced='true'] .sys-motion__dot[data-run] {
+    animation-name: sys-fade;
+  }
+
+  /* State matrix */
+  .sys-matrix {
+    display: grid;
+    gap: 1rem;
+  }
+  .sys-matrix__row {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .sys-matrix__row > h4 {
+    color: var(--fb-muted);
+    font-size: var(--fb-text-sm);
+    font-weight: 600;
+  }
+  .sys-cells {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+  }
+  .sys-cell {
+    display: grid;
+    justify-items: start;
+    gap: 0.375rem;
+    min-inline-size: 0;
+    margin: 0;
+  }
+  .sys-cell > figcaption {
+    color: var(--fb-muted);
+    font-size: 0.75rem;
+  }
+
+  /* Demos */
+  .sys-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .sys-btn {
+    min-block-size: var(--fb-tap);
+    padding: 0 0.875rem;
+    border: 1px solid var(--fb-line-strong);
+    border-radius: var(--fb-radius);
+    background: var(--fb-bg);
+    color: var(--fb-ink);
+    font: inherit;
+    font-size: var(--fb-text-sm);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .sys-btn[aria-pressed='true'] {
+    border-color: var(--fb-ink);
+    color: var(--fb-ink);
+    font-weight: var(--weight-ui, 600);
+  }
+  @media (hover: hover) {
+    .sys-btn:hover {
+      background: var(--fb-wash);
+    }
+  }
+  .sys-field {
+    display: grid;
+    gap: 0.25rem;
+    font-size: var(--fb-text-sm);
+  }
+  .sys-field > input {
+    box-sizing: border-box;
+    min-block-size: max(var(--fb-control-h), var(--fb-tap));
+    padding: 0 0.875rem;
+    border: 1px solid var(--fb-line-strong);
+    border-radius: var(--fb-radius);
+    background: var(--fb-bg);
+    color: inherit;
+    font: inherit;
+  }
+  .sys-list {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--fb-line);
+    border-radius: var(--fb-radius-card);
+    list-style: none;
+  }
+  .sys-project {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: center;
+    box-sizing: border-box;
+    min-block-size: 4.25rem;
+    padding: 0.625rem 0.875rem;
+    border-block-end: 1px solid var(--fb-line);
+    line-height: 1.5;
+  }
+  .sys-list > :last-child {
+    border-block-end: 0;
+  }
+  .sys-project__avatar {
+    display: grid;
+    place-items: center;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    border-radius: 50%;
+    background: var(--fb-wash);
+    font-size: var(--fb-text-sm);
+    font-weight: 700;
+  }
+  .sys-project__title {
+    display: block;
+    font-weight: 600;
+  }
+  .sys-project__meta {
+    display: block;
+    color: var(--fb-muted);
+    font-size: var(--fb-text-sm);
+  }
+  .sys-project__text {
+    min-inline-size: 0;
+  }
+  .sys-project__title > .fb-skeleton-text {
+    inline-size: 70%;
+  }
+  .sys-project__meta > .fb-skeleton-text {
+    inline-size: 45%;
+  }
+  .sys-readout {
+    padding: 0.625rem 0.75rem;
+    border-radius: calc(var(--fb-radius) / 2);
+    background: var(--fb-wash);
+    font-size: var(--fb-text-sm);
+  }
+  .sys-log {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--fb-text-sm);
+  }
+  .sys-log > li {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+  }
+}
+
+@keyframes sys-run {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(100cqw - 1.5rem));
+  }
+}
+@keyframes sys-fade {
+  from {
+    opacity: 0.15;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Field error text in the scenarios (red is never the only signal: the text says what to fix). */
+.sys-error {
+  margin: 0.25rem 0 0;
+  color: var(--danger-ink, var(--fb-danger, #b42318));
+  font-size: 0.875rem;
+}
+
+/* Effects section: one target per primitive. */
+.sys-effect {
+  display: grid;
+  place-items: center;
+  min-height: 5.5rem;
+  margin-block: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--line, #dde1e6);
+  border-radius: var(--radius-md, 8px);
+  background: var(--raised, var(--surface, #ffffff));
+  color: var(--ink, #15181d);
+  font-variant-numeric: tabular-nums;
+}
+
+/* HALO effect targets */
+.sys-effect__index {
+  display: block;
+  inline-size: 2px;
+  block-size: 16px;
+  border-radius: 1px;
+  background: var(--accent);
+}
+.sys-effect__stale {
+  display: block;
+  padding-top: var(--space-3);
+  font-variant-numeric: tabular-nums;
+}
+.sys-effect__cut {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  inline-size: 100%;
+  border-radius: var(--radius-control);
+  overflow: hidden;
+}
+.sys-effect__cut > span {
+  padding: var(--space-4);
+  font-weight: var(--weight-display);
+  font-size: var(--step-1);
+}
+.sys-contrast__mark {
+  display: block;
+  inline-size: 60%;
+  block-size: 6px;
+  border-radius: 3px;
+}
+
+@media (pointer: coarse) {
+  .sys-nav a {
+    min-inline-size: var(--tap-min, 44px);
+    justify-content: center;
+  }
+}
+
+/* View settings fold into one line on every width; the latency control stays out, because it drives the demos */
+.sys-settings {
+  flex-basis: 100%;
+}
+.sys-settings > summary {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tap-min, 44px);
+  color: var(--fb-muted);
+  font-size: var(--fb-text-sm);
+  cursor: pointer;
+}
+.sys-settings__body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  padding-block: 0.5rem 0.75rem;
+}
+.sys-title h1 {
+  font-size: var(--step-3);
+  font-weight: var(--weight-display);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
+}
+.sys-title p {
+  color: var(--fb-muted);
+}
+.sys-header {
+  background: var(--bg, var(--fb-bg)); /* opaque: nothing bleeds through the sticky bar */
+  backdrop-filter: none;
+}
+.sys-grid {
+  align-items: start;
+}
+@media (max-width: 25rem) {
+  .sys-seg {
+    flex-wrap: nowrap;
+  }
+  .sys-seg > button {
+    min-inline-size: var(--tap-min, 44px);
+    padding: 0 0.5rem;
+  }
+}
+/* "Watch for" is the reviewer's footnote, quieter than the card's own content */
+.sys-card > .sys-note:last-child {
+  margin-block-start: var(--space-4, 1rem);
+  padding-block-start: var(--space-3, 0.75rem);
+  border-block-start: 1px solid var(--fb-line);
+  color: var(--fb-muted);
+  font-size: var(--fb-text-sm);
+}
+.sys-log {
+  min-block-size: 9rem;
+}
+
+/* Round 5: one slim sticky row; the title opens the page; headings step by weight as well as size */
+.sys-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding-block: 0.375rem;
+}
+.sys-brand {
+  font-weight: var(--weight-ui, 500);
+  font-size: var(--fb-text-sm);
+}
+.sys-header .sys-toolbar {
+  position: relative;
+  flex: 1;
+  justify-content: flex-end;
+  align-items: center;
+}
+.sys-header .sys-group__hint {
+  display: none;
+}
+.sys-header .sys-group {
+  align-items: center;
+  gap: 0.5rem;
+}
+.sys-settings {
+  flex-basis: auto;
+  position: static; /* the panel hangs from the toolbar, which spans the bar, so it never leaves the screen */
+}
+.sys-settings > summary {
+  gap: 0.375rem;
+  padding: 0 0.875rem;
+  border: 1px solid var(--fb-line-strong);
+  border-radius: var(--fb-radius);
+  color: var(--fb-ink);
+  list-style: none;
+}
+.sys-settings > summary::-webkit-details-marker {
+  display: none;
+}
+.sys-settings[open] > summary svg {
+  transform: rotate(180deg);
+}
+.sys-settings__body {
+  position: absolute;
+  inset-block-start: calc(100% + 0.5rem);
+  inset-inline-end: 0;
+  z-index: 30;
+  inline-size: max-content;
+  max-inline-size: min(36rem, calc(100vw - 2rem));
+  padding: 1rem;
+  border: var(--overlay-border, 1px solid var(--fb-line));
+  border-radius: var(--fb-radius-card);
+  background: var(--raised, var(--fb-bg));
+  box-shadow: var(--shadow-overlay); /* taste-skill-ignore: a dropdown panel is an overlay */
+}
+.sys-settings__body .sys-group__label {
+  display: block;
+}
+.sys-title {
+  display: grid;
+  gap: 0.75rem;
+  max-inline-size: 76rem;
+  margin-inline: auto;
+  padding: 2rem 1rem 0.5rem;
+}
+.sys-title h1 {
+  /* one line at every width, so the font swap cannot rewrap it */
+  font-size: clamp(2.5rem, 1rem + 6vw, 8rem);
+  white-space: nowrap;
+}
+.sys-title p {
+  max-inline-size: 60ch;
+  font-size: var(--step-0);
+}
+.sys-section > h2 {
+  font-size: var(--step-3);
+  font-weight: var(--weight-display, 300);
+  letter-spacing: var(--tracking-heading, -0.02em);
+}
+.sys-card > h3 {
+  font-size: var(--step-1);
+  font-weight: var(--weight-ui, 500);
+  letter-spacing: -0.01em;
+}
+@media (max-width: 47.99rem) {
+  .sys-header__inner {
+    padding-inline: 1rem;
+  }
+  .sys-brand {
+    display: none;
+  }
+  .sys-header .sys-toolbar {
+    justify-content: space-between;
+  }
+}
+@media (max-width: 47.99rem) {
+  .sys-settings__body {
+    inset-inline-start: 0;
+    inset-inline-end: auto;
+  }
+}
+/* the lead wraps one line longer in the fallback face at tablet widths: reserve it so the font swap moves nothing */
+@media (min-width: 40rem) and (max-width: 64rem) {
+  .sys-title p {
+    min-block-size: calc(4 * 1.55em);
+  }
+}
+.sys-settings:not([open]) .sys-settings__body {
+  display: none;
+}

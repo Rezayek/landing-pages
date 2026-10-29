@@ -1,0 +1,23 @@
+/*
+ * Page-level extensions for `halo-landing`. The SYSTEM owns the tokens.
+ *
+ * Primitives, roles (colour, type, space, shape, elevation, motion, density), component tokens, the dark theme and
+ * the document base rules (body, selection, focus ring, headings) live in the system's tokens.css (FOUNDATIONS.md;
+ * format in guides/design-system.md §2), which Page.tsx imports first. This file is imported after it and holds only
+ * the few extra tokens that this one page needs, built from system tokens with var().
+ *
+ * Rules for this file:
+ *   - Never redefine a system token here, never override one for a system component, and never write a raw colour,
+ *     size, duration or curve. A missing value is a missing system token: extend the system the way
+ *     guides/design-system.md §7 says (start here, promote it when a second page needs it).
+ *   - Add a token only when one section of this page needs it and no system token fits. Name it for the section.
+ *   - An extension that must differ in dark is written twice with identical values, like the system's own: under the
+ *     prefers-color-scheme media query (skipped when <html data-theme="light">) and under <html data-theme="dark">.
+ *   - Reduced motion is handled by the system's token overrides, so this file needs no reduced-motion block unless an
+ *     extension token is itself a distance or a duration.
+ * Everything below is a placeholder: delete what the page does not use.
+ */
+[data-page='halo-landing'] {
+  /* one step of the pinned stories (S2, S3): a scroll distance, not a duration (MOTION.md Token extensions) */
+  --halo-step: 100svh;
+}

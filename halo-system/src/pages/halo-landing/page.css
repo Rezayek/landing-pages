@@ -1,0 +1,817 @@
+/*
+ * halo-landing: the page's own layout, from the system's tokens only (tokens.css holds the page's few extensions).
+ * The stages are the system's [data-stage] fields; the story canvas sits behind the hero, the teardown and the worn
+ * moments, over the stage colour, and every stage change is a cut.
+ */
+@layer components {
+  .halo {
+    min-height: 100svh;
+  }
+  .halo__skip:focus {
+    position: fixed;
+    inset: var(--space-3) auto auto var(--space-3);
+    z-index: 40;
+    width: auto;
+    height: auto;
+    clip: auto;
+    padding: var(--space-3);
+    background: var(--surface);
+  }
+  .halo__header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 20;
+  }
+
+  /* ---- the loading screen: the halo ring fills as the watch loads ------------------------------------------ */
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: var(--space-5);
+    background: var(--bg);
+    color: var(--ink);
+    transition: opacity var(--dur-scene) var(--ease-weight);
+  }
+  .loader[data-done] {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .loader__mark {
+    margin-bottom: var(--space-4);
+  }
+  .loader__ring {
+    position: relative;
+    display: grid;
+    place-items: center;
+  }
+  .loader__ring svg {
+    overflow: visible;
+    filter: drop-shadow(0 0 4px var(--accent)) drop-shadow(0 0 16px color-mix(in srgb, var(--accent) 50%, transparent)); /* taste-skill-ignore: the halo's own light (a glow), not a resting shadow */
+  }
+  .loader__ring circle {
+    fill: none;
+    stroke-width: 3;
+  }
+  .loader__track {
+    stroke: var(--line);
+  }
+  .loader__arc {
+    stroke: var(--accent);
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset var(--dur-scene) var(--ease-weight);
+  }
+  .loader__pct {
+    position: absolute;
+    font-size: var(--step-2);
+    font-weight: var(--weight-display);
+    font-variant-numeric: tabular-nums;
+  }
+  .loader__pct span {
+    color: var(--muted);
+    font-size: var(--step-0);
+  }
+  .loader__label {
+    margin: 0;
+    color: var(--muted);
+  }
+  .loader__skip {
+    min-block-size: var(--tap-min);
+    padding: 0 var(--space-3);
+    border: 0;
+    background: none;
+    color: var(--ink);
+    font: inherit;
+    font-size: var(--step--1);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+    cursor: pointer;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :root:not([data-motion='full']) .loader,
+    :root:not([data-motion='full']) .loader__arc {
+      transition: none;
+    }
+  }
+  [data-motion='reduced'] .loader,
+  [data-motion='reduced'] .loader__arc {
+    transition: none;
+  }
+
+  /* ---- the story: one canvas held behind three sections ---------------------------------------------------- */
+  /* the sticky layer's negative margin lets it hang a screen past the story's end: clip it to the story, so the
+     canvas never covers the next section (overflow: clip keeps the pins sticky; it makes no scroll container) */
+  .story {
+    position: relative;
+    overflow: clip;
+  }
+  .story__layer {
+    position: sticky;
+    top: 0;
+    z-index: 0;
+    height: 100svh;
+    margin-bottom: -100svh;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .story__poster,
+  .story__poster img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .story__poster[data-hidden] {
+    visibility: hidden;
+  }
+  /* R3F sets pointer-events on its canvas, which would override the layer's none: the drag is DOM, so the canvas
+     never takes a pointer, and the controls above it always get their clicks */
+  .story__canvas,
+  .story__canvas canvas {
+    pointer-events: none !important;
+  }
+  .story__canvas {
+    position: absolute !important;
+    inset: 0;
+  }
+
+  .section-title,
+  .story-section__title {
+    margin: 0;
+    font-size: var(--step-3);
+    font-weight: var(--weight-display);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-heading);
+    color: var(--ink);
+  }
+  .section-sub,
+  .story-section__sub {
+    margin: var(--space-4) 0 0;
+    max-width: 34ch;
+    font-size: var(--step-1);
+    line-height: 1.35;
+    color: var(--muted);
+  }
+
+  /* ---- S1 hero ------------------------------------------------------------------------------------------------ */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100svh;
+    pointer-events: none;
+  }
+  .hero__copy {
+    position: relative;
+    z-index: 2;
+    max-width: 44rem;
+    padding: calc(var(--sticky-top) + 10svh) var(--gutter) var(--space-7);
+    pointer-events: auto;
+  }
+  .hero__title {
+    margin: 0;
+    font-size: var(--step-display);
+    font-weight: var(--weight-display);
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+    color: var(--ink);
+  }
+  .hero__lead {
+    margin: var(--space-5) 0 0;
+    max-width: 30ch;
+    font-size: var(--step-1);
+    line-height: 1.35;
+    color: var(--muted);
+  }
+  .hero__action {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4) var(--space-5);
+    margin-top: var(--space-7);
+  }
+  .hero__note {
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .hero__specline {
+    display: none;
+    margin: var(--space-3) 0 0;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .hero__link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
+    margin-top: var(--space-3);
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+    text-decoration-thickness: 1px;
+  }
+  .hero__specs {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: start;
+    gap: 0 var(--space-7);
+    margin: var(--space-7) 0 0;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--line); /* taste-skill-ignore: the style contract's annotating hairline over a spec row (FOUNDATIONS.md §10) */
+  }
+  /* the figure first, its label under it (Polestar's spec grid), never a label above a figure like an eyebrow */
+  .hero__specs > div {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: start;
+  }
+  .hero__specs dt {
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+  .hero__specs dd {
+    margin: 0 0 var(--space-1);
+    font-size: var(--step-2);
+    font-weight: var(--weight-display);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .hero__specs dd span {
+    color: var(--muted);
+  }
+  .hero__stage {
+    position: absolute;
+    inset: var(--sticky-top) 0 0 44%;
+    z-index: 1;
+    pointer-events: auto;
+    touch-action: pan-y;
+  }
+  .hero__stage[data-live] {
+    cursor: grab;
+  }
+  .hero__stage[data-live]:active {
+    cursor: grabbing;
+  }
+  .hero__controls {
+    position: absolute;
+    top: 50%;
+    right: var(--space-3);
+    z-index: 2;
+    display: grid;
+    justify-items: center;
+    gap: var(--space-2);
+    transform: translateY(-50%);
+    pointer-events: auto;
+  }
+  .hero__caption {
+    margin: var(--space-4) 0 0;
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+  .hero__turn {
+    display: grid;
+    gap: var(--space-1);
+  }
+  .hero__hint {
+    max-inline-size: 4.5em;
+    font-size: var(--step--1);
+    line-height: 1.25;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  /* ---- S2 and S3: the pinned step stories -------------------------------------------------------------------- */
+  .story-section {
+    position: relative;
+    z-index: 1;
+    height: calc((var(--steps) + 1) * var(--halo-step));
+  }
+  .story-section__pin {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    height: 100svh;
+    padding: var(--sticky-top) var(--gutter) 0;
+  }
+  .story-section__copy {
+    max-width: 26rem;
+  }
+  /* the worn moments are full-bleed: the wrist across the frame, the watch centred, the words a caption at the foot,
+     clear of the order bar (the teardown and the configurator keep the split) */
+  @media (min-width: 64rem) {
+    #training .story-section__pin {
+      align-items: end;
+      justify-content: start;
+      padding-bottom: calc(var(--space-9) + var(--space-6));
+    }
+    /* the caption sits on the stage, not on the arm: the stage's own black rises behind it */
+    #training .story-section__pin::before {
+      content: '';
+      position: absolute;
+      inset: auto 0 0;
+      block-size: 42%;
+      background: linear-gradient(to top, var(--bg) 35%, transparent); /* taste-skill-ignore: a neutral scrim over the 3D scene, so the caption reads */
+      pointer-events: none;
+    }
+    #training .story-section__copy {
+      position: relative;
+    }
+    /* one caption block on the page's left edge, clear of the ring (the watch sits right of centre) */
+    #training .story-section__copy {
+      max-width: 21rem;
+    }
+    #training .story-section__title {
+      font-size: var(--step-2);
+    }
+    #training .story-section__sub {
+      display: none;
+    }
+    #training .story-section__steps {
+      margin-top: var(--space-5);
+    }
+    #training .story-section__note {
+      grid-column: 1 / -1;
+    }
+  }
+  .story-section__steps {
+    margin: var(--space-8) 0 0;
+    padding: 0;
+    list-style: none;
+    /* every step's copy takes the same box, so a cut never moves the layout */
+    display: grid;
+  }
+  .story-step {
+    grid-area: 1 / 1;
+    visibility: hidden;
+  }
+  .story-step[data-active] {
+    visibility: visible;
+  }
+  .story-step__count {
+    margin: 0;
+    font-size: var(--step--1);
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .story-step__index {
+    color: var(--ink);
+  }
+  .story-step__title {
+    margin: var(--space-2) 0 0;
+    font-size: var(--step-2);
+    font-weight: var(--weight-display);
+    letter-spacing: var(--tracking-heading);
+  }
+  .story-step__body {
+    font-variant-numeric: tabular-nums;
+    margin: var(--space-3) 0 0;
+    font-size: var(--step-1);
+    line-height: 1.4;
+    color: var(--muted);
+  }
+  .accent-figure {
+    color: var(--accent-ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .story-section__note {
+    margin: var(--space-6) 0 0;
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  /* ---- S4 design --------------------------------------------------------------------------------------------- */
+  .design {
+    display: grid;
+    grid-template-columns: minmax(0, 30rem) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: center;
+    padding: var(--gap-section) var(--gutter);
+  }
+  .design__copy {
+    min-width: 0;
+  }
+  .design__controls {
+    display: grid;
+    gap: var(--space-6);
+    margin: var(--space-7) 0 var(--space-6);
+  }
+  .design__action {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+  .design__note {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+  .design__stage {
+    position: relative;
+    height: min(80svh, 46rem);
+    display: grid;
+    place-items: center;
+  }
+
+  /* ---- S5 bands ---------------------------------------------------------------------------------------------- */
+  /* a split: the chosen band large on its own card, the five as rows beside it (critique round 2, D4) */
+  .bands {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--space-9);
+    align-items: center;
+    padding: var(--gap-section) var(--gutter);
+  }
+  .bands__feature {
+    margin: 0;
+  }
+  .bands__stage {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 5 / 4;
+    border-radius: var(--radius-3);
+    background: var(--raised);
+  }
+  /* the stills cross-fade on the product, as the band does on the model; the crop brings the watch up close */
+  .bands__still {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* the crop brings the watch up close without the image overflowing its frame */
+    object-view-box: inset(12%);
+    opacity: 0;
+    transition: opacity var(--dur-scene) var(--ease-weight);
+  }
+  .bands__still[data-on] {
+    opacity: 1;
+  }
+  .bands__caption {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: var(--space-4);
+  }
+  .bands__chosen {
+    font-size: var(--step-2);
+    font-weight: 300;
+  }
+  .bands__spec {
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+  .bands__row {
+    /* a fieldset keeps its content's width unless told otherwise */
+    min-inline-size: 0;
+    display: grid;
+    gap: var(--space-2);
+    margin: var(--space-8) 0 0;
+    padding: 0;
+    border: 0;
+  }
+  .band-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr);
+    gap: var(--space-4);
+    align-items: center;
+    padding: var(--space-2);
+    border-radius: var(--radius-3);
+    cursor: pointer;
+    transition: background-color var(--dur-hover) var(--ease-enter);
+  }
+  .band-card:hover {
+    background: color-mix(in srgb, var(--raised) 55%, transparent);
+  }
+  .band-card[data-on] {
+    background: var(--raised);
+  }
+  .band-card:has(:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  /* the radio covers its whole row, so the target is the row (no 13 px dot to aim at) */
+  .band-card__input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .band-card__crop {
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 1;
+    border-radius: var(--radius-2);
+    background: var(--bg);
+  }
+  .band-card__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-view-box: inset(24%);
+  }
+  .band-card__text {
+    display: grid;
+    gap: 2px;
+  }
+  .band-card__name {
+    font-size: var(--step-0);
+  }
+  .band-card[data-on] .band-card__name::before {
+    content: '';
+    display: inline-block;
+    width: 0.5em;
+    height: 0.5em;
+    margin-right: 0.5em;
+    border-radius: 50%;
+    background: var(--accent);
+    vertical-align: 0.1em;
+  }
+  .band-card__note {
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  /* ---- S6 specs ---------------------------------------------------------------------------------------------- */
+  .specs {
+    padding: var(--gap-section) var(--gutter);
+  }
+  .specs__figures {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-6);
+    margin: var(--space-8) 0;
+  }
+  .specs__note {
+    margin: var(--space-5) 0 0;
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  /* ---- S7 pre-order and the sheet ---------------------------------------------------------------------------- */
+  .preorder {
+    padding: var(--gap-section) var(--gutter);
+  }
+  .preorder__summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    gap: var(--space-5);
+    max-width: 36rem;
+    margin: var(--space-7) 0 0;
+  }
+  .preorder__change {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+    text-decoration-thickness: 1px;
+  }
+  .preorder__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-7);
+  }
+  .preorder__hint,
+  .preorder__study {
+    margin: var(--space-3) 0 0;
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+  .preorder__reserve {
+    max-width: 32rem;
+    margin-top: var(--space-5);
+  }
+  .preorder__reserved p:first-child:focus {
+    outline: none;
+  }
+  .order__foot {
+    display: grid;
+    gap: var(--space-3);
+    width: 100%;
+  }
+  .order__total {
+    font-variant-numeric: tabular-nums;
+  }
+  .order__study {
+    margin: 0;
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+  .order__form {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .order__build {
+    margin: 0;
+    color: var(--muted);
+  }
+  .order__build strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .order__msg:empty {
+    display: none;
+  }
+  .order__confirm {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-3);
+  }
+  .order__state {
+    margin: 0;
+    font-size: var(--step-2);
+    font-weight: var(--weight-display);
+  }
+  .order__state:focus {
+    outline: none;
+  }
+  .order__ref {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+  .order__cancel {
+    min-block-size: var(--tap-min);
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+    cursor: pointer;
+  }
+
+  /* the thread closes: a full halo ring draws round "Pre-ordered" once */
+  .closed-ring circle {
+    fill: none;
+    stroke-width: 6;
+  }
+  .closed-ring__track {
+    stroke: var(--line);
+  }
+  /* the same halo of light as the scenes': a lit core and a soft glow that falls off */
+  .closed-ring svg {
+    overflow: visible;
+    filter: drop-shadow(0 0 4px var(--accent)) drop-shadow(0 0 14px color-mix(in srgb, var(--accent) 55%, transparent)); /* taste-skill-ignore: the halo's own light (a glow), not a resting shadow */
+  }
+  .closed-ring__arc {
+    stroke: var(--accent);
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    animation: closed-ring var(--dur-ring) var(--ease-weight) forwards;
+  }
+  @keyframes closed-ring {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :root:not([data-motion='full']) .closed-ring__arc {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+  }
+  [data-motion='reduced'] .closed-ring__arc {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+
+  /* poster capture: only the stage and the watch */
+  [data-poster] .halo__header,
+  [data-poster] .hero__copy,
+  [data-poster] .hero__controls,
+  [data-poster] .story-section,
+  [data-poster] .story__poster,
+  [data-poster] .h-orderbar {
+    visibility: hidden;
+  }
+
+  /* ---- phones: their own composition, the watch above the words ------------------------------------------------ */
+  @media (max-width: 63.99rem) {
+    .hero__copy {
+      position: absolute;
+      inset: auto 0 0;
+      padding: 0 var(--gutter) var(--space-7);
+    }
+    .hero__title {
+      font-size: clamp(2.75rem, 1rem + 9vw, 4rem);
+    }
+    .hero__lead {
+      font-size: var(--step-0);
+    }
+    .hero__action {
+      margin-top: var(--space-5);
+    }
+    .hero__specs {
+      grid-template-columns: repeat(3, minmax(0, auto));
+      gap: 0 var(--space-4);
+      margin-top: var(--space-5);
+    }
+    .hero__specs dd {
+      font-size: var(--step-1);
+    }
+    @media (max-width: 22.5rem) {
+      .hero__specs {
+        gap: 0 var(--space-3);
+      }
+      .hero__specs dd {
+        font-size: var(--step-0);
+      }
+    }
+    .hero__stage {
+      inset: var(--sticky-top) 0 56% 0;
+    }
+    .hero__controls {
+      top: calc(var(--sticky-top) + var(--space-3));
+      right: var(--space-2);
+      transform: none;
+    }
+    .hero__hint,
+    .hero__caption {
+      display: none;
+    }
+    /* a short phone screen keeps the watch above the headline: the spec row folds away (the specs section has it) */
+    @media (max-height: 43.75rem) {
+      .hero__specs {
+        display: none;
+      }
+      .hero__specline {
+        display: block;
+      }
+      .hero__copy {
+        padding-bottom: var(--space-6);
+      }
+    }
+    /* the copy ends above the order bar (one 56 px line plus its inset), so the footnote is never under it */
+    .story-section__pin {
+      align-items: end;
+      padding-bottom: calc(var(--tap-min) + var(--space-4) + var(--space-8));
+    }
+    .story-section__title {
+      font-size: var(--step-2);
+    }
+    .story-section__sub {
+      display: none;
+    }
+    .story-section__steps {
+      margin-top: var(--space-4);
+    }
+    .design {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .design__stage {
+      order: -1;
+      height: 52svh;
+    }
+    /* the watch stays pinned at the top; the controls scroll up over it as one solid panel, never across it */
+    /* the panel runs to the section's end, so the pinned watch never shows through below the last line */
+    .design {
+      padding-bottom: 0;
+    }
+    .design__copy {
+      position: relative;
+      z-index: 2;
+      margin-inline: calc(var(--gutter) * -1);
+      padding: var(--space-6) var(--gutter) var(--gap-section);
+      background: var(--bg);
+    }
+    /* phones: the words, then the chosen band, then the five rows */
+    .bands {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-6);
+    }
+    .bands__side {
+      display: contents;
+    }
+    .bands__copy {
+      order: -1;
+    }
+    .bands__row {
+      margin-top: 0;
+    }
+    .specs__figures {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}

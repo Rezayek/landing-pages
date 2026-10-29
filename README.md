@@ -7,6 +7,16 @@ Made with a tool I'm building. More on that soon.
 
 ---
 
+## HALO — a training watch that comes apart on scroll
+
+![HALO demo](demos/halo.gif)
+
+A pre-order page for a titanium training watch, built around a real-time 3D model. Scroll and the watch lifts apart
+layer by layer: glass, display, sensors, battery, case. Then it's worn through a run, a night, a pool session and a
+coach's message, before a configurator where the case size and band colour change the watch live.
+
+`halo-system/`
+
 ## PULSE-1 — a desktop synth you can play on the page
 
 ![PULSE-1 demo](demos/pulse.gif)
@@ -75,7 +85,7 @@ npm install
 npm run dev
 ```
 
-The page opens at `http://localhost:5190/p/<slug>`: `pulse-landing`, `voltcart-landing`, `maison-sucre-landing`, `fintech-landing`,
+The page opens at `http://localhost:5190/p/<slug>`: `halo-landing`, `pulse-landing`, `voltcart-landing`, `maison-sucre-landing`, `fintech-landing`,
 `blockfeed-landing` or `tidelog-landing`. For the production build, run `npm run build && npm run preview`
 (port 5191).
 
@@ -89,4 +99,5 @@ The page opens at `http://localhost:5190/p/<slug>`: `pulse-landing`, `voltcart-l
 - The VOLTCART and Maison Sucre films were rendered in Blender with CC0 assets from [Poly Haven](https://polyhaven.com)
   and free models from [BlenderKit](https://www.blenderkit.com). The PULSE-1 film was modelled and rendered in
   Blender from scratch. Only the rendered frames ship here.
-- PULSE-1 is a fictional product. Its line-in track is not included; the page works without it.
+- PULSE-1 and HALO are fictional products. PULSE-1's line-in track is not included; the page works without it.
+- The HALO watch is modelled in code with three.js; no third-party 3D models are used.

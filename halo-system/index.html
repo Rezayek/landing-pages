@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4f4f1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#050506" media="(prefers-color-scheme: dark)" />
+    <title>HALO</title>
+    <script>
+      // Apply a stored theme choice before first paint (system, light or dark).
+      try {
+        var t = localStorage.getItem('halo-theme')
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t
+      } catch (e) {}
+      // A page that opens on the black stage (halo-landing's loading screen) paints it before any script loads, so
+      // the shell never flashes the paper ground first; the page clears it once it has mounted.
+      if (/^\/p\/halo-landing\/?$/.test(location.pathname)) document.documentElement.style.background = '#000'
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
