@@ -1,0 +1,13 @@
+/*
+ * Page-level extensions for `signalcon-landing`. The SYSTEM owns the tokens (src/system/tokens.css); this file holds
+ * only what this one page's concept needs, built from system tokens. One theme (FOUNDATIONS.md §8), so no dark block.
+ */
+[data-page='signalcon-landing'] {
+  /* the diagonal section join (the hard wipe's edge, at rest) */
+  --pg-cut: clamp(24px, 6vw, 72px);
+  /* hero: the key art's crop on desktop (16:9 screen) and phone (4:5 screen), on the girl and the TV stack */
+  --hero-art-pos: 58% 42%;
+  --hero-art-pos-phone: 46% 40%;
+  /* the header bar's height (also --sticky-top in the system) */
+  --pg-header-h: var(--sticky-top);
+}

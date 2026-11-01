@@ -1,0 +1,292 @@
+/*
+ * The style's own effects (FOUNDATIONS.md §10, MOTION-SYSTEM.md §Theme expression): the late-night street TV menu.
+ * Verbs: slam (arrives), squash (pressed), flip (changes channel), tune (comes on air), wipe (a new section), drop
+ * (stock falls). Every one is transform or opacity, plays once, and leaves the state readable without it.
+ *
+ * How they attach (signal.ts arms them; without JavaScript nothing is armed and everything shows at rest)
+ *   [data-slam]                    an element that slams in: armed -> "in"; --slam-rot sets the resting tilt
+ *   [data-wipe]                    a section with a diagonal slab that wipes off it: armed -> "in"; --wipe-color
+ *   [data-flip-play]               the channel-change glitch on a host, set by flip(): static + RGB split, 240 ms
+ *   .sg-squash                     a pressable that squashes and springs back
+ *   .sg-bars                       the four-bar signal loader
+ *   .sg-halftone                   the halftone skeleton; its drift stops after 5 s
+ *   .sg-static                     a still static texture (test cards, empty and error states)
+ */
+
+@layer components {
+  /* Squash on press: wider and shorter, released with the overshoot ease. */
+  .sg-squash {
+    transition: transform var(--dur-lg) var(--ease-overshoot);
+  }
+  .sg-squash:active:not([aria-disabled='true'], :disabled) {
+    transform: scale(var(--squash-x), var(--squash-y));
+    transition-duration: var(--dur-press);
+    transition-timing-function: var(--ease-enter);
+  }
+
+  /* Slam in and settle. Armed elements are off screen when armed, so nothing visible ever disappears. */
+  [data-slam='armed'] {
+    opacity: 0;
+    transform: scale(1.3) rotate(calc(var(--slam-rot, 0deg) - 6deg));
+  }
+  [data-slam='in'] {
+    animation: sg-slam var(--dur-slam) var(--ease-overshoot) both;
+    animation-delay: var(--slam-delay, 0ms);
+  }
+  @keyframes sg-slam {
+    0% {
+      opacity: 0;
+      transform: scale(1.3) rotate(calc(var(--slam-rot, 0deg) - 6deg));
+    }
+    35% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(var(--slam-rot, 0deg));
+    }
+  }
+
+  /* The hard diagonal wipe: a slab of the previous band's colour covers the section, then leaves on a diagonal. */
+  [data-wipe] {
+    position: relative;
+  }
+  [data-wipe]::after {
+    content: '';
+    position: absolute;
+    inset: -2px -20%;
+    z-index: 3;
+    pointer-events: none;
+    background: var(--wipe-color, var(--bg));
+    transform: translateX(130%) skewX(-14deg);
+  }
+  [data-wipe='armed']::after {
+    transform: translateX(0) skewX(-14deg);
+  }
+  [data-wipe='in']::after {
+    animation: sg-wipe var(--dur-wipe) var(--ease-wipe) both;
+  }
+  @keyframes sg-wipe {
+    from {
+      transform: translateX(0) skewX(-14deg);
+    }
+    to {
+      transform: translateX(130%) skewX(-14deg);
+    }
+  }
+
+  /* The channel flip: the host jitters on a step curve while two split copies of its outline flash. */
+  [data-flip-play] {
+    animation: sg-flip var(--dur-flip) steps(6, end) both;
+  }
+  [data-flip-play]::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    border-radius: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: sg-static var(--dur-flip) steps(4, end) both;
+  }
+  [data-flip-play] .sg-split {
+    animation: sg-split var(--dur-flip) steps(5, end) both;
+  }
+  @keyframes sg-flip {
+    0% {
+      transform: translate(0, 0);
+    }
+    20% {
+      transform: translate(-4px, 1px);
+    }
+    40% {
+      transform: translate(3px, -2px);
+    }
+    60% {
+      transform: translate(-2px, 0);
+    }
+    80% {
+      transform: translate(1px, 1px);
+    }
+    100% {
+      transform: none;
+    }
+  }
+  @keyframes sg-static {
+    0% {
+      opacity: 0.95;
+      background-position: 0 0;
+    }
+    50% {
+      opacity: 0.7;
+      background-position: 37px 61px;
+    }
+    100% {
+      opacity: 0;
+      background-position: 80px 13px;
+    }
+  }
+  /* The RGB split on the outlined display word: text-shadow on a small area for 240 ms (profiled, written in
+     MOTION-SYSTEM.md). */
+  @keyframes sg-split {
+    0% {
+      text-shadow:
+        5px 0 var(--split-a),
+        -5px 0 var(--split-b);
+    }
+    60% {
+      text-shadow:
+        -3px 0 var(--split-a),
+        3px 0 var(--split-b);
+    }
+    100% {
+      text-shadow: none;
+    }
+  }
+
+  /* Four-bar signal loader: the lit bar steps along. */
+  .sg-bars {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 1em;
+  }
+  .sg-bars > i {
+    width: 0.18em;
+    background: currentColor;
+    border-radius: 1px;
+    opacity: 0.35;
+    animation: sg-bar 480ms steps(1, end) infinite;
+  }
+  .sg-bars > i:nth-child(1) {
+    height: 30%;
+  }
+  .sg-bars > i:nth-child(2) {
+    height: 55%;
+    animation-delay: 120ms;
+  }
+  .sg-bars > i:nth-child(3) {
+    height: 78%;
+    animation-delay: 240ms;
+  }
+  .sg-bars > i:nth-child(4) {
+    height: 100%;
+    animation-delay: 360ms;
+  }
+  @keyframes sg-bar {
+    0% {
+      opacity: 1;
+      background: var(--signal);
+    }
+    25% {
+      opacity: 0.35;
+      background: currentColor;
+    }
+  }
+
+  /* Halftone skeleton: the dot field drifts for at most 5 s, then holds still. */
+  .sg-halftone {
+    background-color: var(--skeleton-bg);
+    background-image: radial-gradient(color-mix(in srgb, var(--ink) 22%, transparent) 28%, transparent 30%);
+    background-size: var(--halftone-size) var(--halftone-size);
+    animation: sg-drift 1250ms linear 4;
+  }
+  @keyframes sg-drift {
+    to {
+      background-position: var(--halftone-size) var(--halftone-size);
+    }
+  }
+
+  /* A still static texture for test cards and signal states. */
+  .sg-static {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+
+  /* Stock gauge: a bar that goes dark drops (scaleY) instead of blinking. */
+  .sg-gauge > i {
+    transform-origin: bottom;
+    transition:
+      transform var(--dur-slam) var(--ease-overshoot),
+      background-color var(--dur-lg) var(--ease-enter);
+  }
+  .sg-gauge > i[data-off] {
+    transform: scaleY(0.25);
+  }
+
+  /* Reduced motion: no travel, no glitch, no loops. Wipes become fades; the state shows at once. */
+  @media (prefers-reduced-motion: reduce) {
+    [data-slam='armed'] {
+      transform: none;
+    }
+    [data-slam='in'] {
+      animation-name: sg-fade;
+      animation-duration: var(--dur-reduced);
+      animation-timing-function: linear;
+    }
+    [data-wipe='armed']::after,
+    [data-wipe='in']::after {
+      transform: none;
+    }
+    [data-wipe='in']::after {
+      animation-name: sg-wipe-fade;
+      animation-timing-function: linear;
+    }
+    [data-flip-play],
+    [data-flip-play]::before,
+    [data-flip-play] .sg-split {
+      animation: none;
+    }
+    [data-flip-play]::before {
+      content: none;
+    }
+    .sg-bars > i,
+    .sg-halftone {
+      animation: none;
+    }
+    .sg-bars > i:nth-child(-n + 2) {
+      opacity: 1;
+    }
+  }
+  :root[data-motion='reduced'] [data-slam='armed'] {
+    transform: none;
+  }
+  :root[data-motion='reduced'] [data-slam='in'] {
+    animation-name: sg-fade;
+    animation-duration: var(--dur-reduced);
+    animation-timing-function: linear;
+  }
+  :root[data-motion='reduced'] [data-wipe='armed']::after,
+  :root[data-motion='reduced'] [data-wipe='in']::after {
+    transform: none;
+  }
+  :root[data-motion='reduced'] [data-wipe='in']::after {
+    animation-name: sg-wipe-fade;
+    animation-timing-function: linear;
+  }
+  :root[data-motion='reduced'] :is([data-flip-play], [data-flip-play]::before, [data-flip-play] .sg-split),
+  :root[data-motion='reduced'] :is(.sg-bars > i, .sg-halftone) {
+    animation: none;
+  }
+  :root[data-motion='reduced'] [data-flip-play]::before {
+    content: none;
+  }
+  :root[data-motion='reduced'] .sg-bars > i:nth-child(-n + 2) {
+    opacity: 1;
+  }
+  @keyframes sg-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes sg-wipe-fade {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+}

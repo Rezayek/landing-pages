@@ -1,0 +1,354 @@
+/*
+ * S6 Venue and travel + S7 FAQ. System tokens only (page.css owns the section contract: .pg-section, .pg-wrap).
+ * Phone first: one column, the map screen on top. Two columns from 1024 px.
+ */
+
+/* ---------- S6 Venue ---------- */
+#venue-sec {
+  /* the map screen's crop: 4:5 on a phone (the tall viewBox), 16:10 from 640 px (the wide one) */
+  --vf-map-ratio: 4 / 5;
+}
+@media (min-width: 640px) {
+  #venue-sec {
+    --vf-map-ratio: 16 / 10;
+  }
+}
+/* desktop: the map is as tall as the info column beside it, so no blank band sits under it */
+@media (min-width: 1024px) {
+  #venue-sec {
+    --vf-map-ratio: 4 / 5;
+  }
+}
+
+.vf-grid {
+  display: grid;
+  gap: var(--space-7);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+@media (min-width: 1024px) {
+  .vf-grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: var(--space-8);
+  }
+  .vf-map-col {
+    position: sticky;
+    inset-block-start: calc(var(--sticky-top) + var(--space-6));
+  }
+}
+
+.vf-map-col {
+  min-inline-size: 0;
+}
+.vf-info {
+  display: grid;
+  gap: var(--space-6);
+  min-inline-size: 0;
+}
+
+/* the address, in display type */
+.vf-address {
+  margin: 0;
+  font-style: normal;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 75%;
+  font-size: var(--step-2);
+  line-height: 1.02;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* travel rows: 2 px rules, 44 px or taller */
+.vf-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-block-start: var(--border-thin) solid var(--line);
+}
+.vf-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+  min-block-size: max(var(--tap-min), 64px);
+  padding-block: var(--space-3);
+  border-block-end: var(--border-thin) solid var(--line);
+}
+.vf-ico {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  inline-size: 44px;
+  block-size: 44px;
+  border: var(--border-thin) solid currentColor;
+  border-radius: var(--radius-full);
+}
+.vf-ico[data-tone='signal'] {
+  background: var(--signal);
+  color: var(--on-signal);
+  border-color: var(--night-950);
+}
+.vf-ico[data-tone='accent'] {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--night-950);
+}
+.vf-row-text {
+  margin: 0;
+  font-size: var(--step-0);
+  line-height: 1.35;
+  max-inline-size: var(--measure);
+}
+
+/* doors */
+.vf-doors {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+}
+.vf-doors-list {
+  display: grid;
+  inline-size: 100%;
+  margin: 0;
+  border-block-start: var(--border-thin) solid var(--line);
+}
+.vf-doors-list > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  min-block-size: var(--tap-min);
+  padding-block: var(--space-2);
+  border-block-end: var(--border-thin) solid var(--line);
+}
+.vf-doors-list dt {
+  margin: 0;
+  font-family: var(--font-mono); /* taste-skill-ignore: mono only on real data (times, counts, channels): FOUNDATIONS §3 */
+  font-weight: 700;
+  font-stretch: 85%;
+  font-size: var(--step--1);
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+}
+.vf-doors-list dd {
+  margin: 0;
+  font-family: var(--font-mono); /* taste-skill-ignore: mono only on real data (times, counts, channels): FOUNDATIONS §3 */
+  font-stretch: 85%;
+  font-size: var(--step-0);
+  font-variant-numeric: tabular-nums;
+}
+.vf-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin: 0;
+  max-inline-size: var(--measure);
+  line-height: 1.4;
+}
+.vf-note > svg {
+  flex: none;
+  margin-block-start: 0.15em;
+}
+.vf-note[data-strong] {
+  font-weight: 600;
+}
+
+.vf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+/* long labels wrap on a 320 px phone instead of running off the screen */
+.vf-actions .sc-btn,
+.vf-cta .sc-btn {
+  max-inline-size: 100%;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.05;
+  padding-block: var(--space-2);
+  padding-inline: var(--space-5);
+}
+
+/* the map (inline SVG, system tokens only) */
+.vf-svg {
+  overflow: hidden;
+}
+.vf-g-ground {
+  fill: var(--night-950);
+}
+.vf-g-grid {
+  stroke: var(--night-800);
+  stroke-width: 2;
+  fill: none;
+}
+.vf-g-block {
+  fill: var(--night-900);
+}
+.vf-g-canal {
+  stroke: var(--paper-50);
+  stroke-width: 18;
+  stroke-linecap: round;
+  fill: none;
+}
+.vf-g-canal-edge {
+  stroke: var(--night-600);
+  stroke-width: 24;
+  stroke-linecap: round;
+  fill: none;
+}
+.vf-g-road {
+  stroke: var(--night-850);
+  stroke-width: 50;
+  fill: none;
+}
+.vf-g-road-edge {
+  stroke: var(--night-600);
+  stroke-width: 56;
+  fill: none;
+}
+.vf-g-tram {
+  stroke: var(--paper-50);
+  stroke-width: 5;
+  stroke-dasharray: 14 9;
+  stroke-linecap: butt;
+  fill: none;
+}
+.vf-g-night {
+  stroke: var(--hot-500);
+  stroke-width: 5;
+  stroke-dasharray: 14 9;
+  stroke-linecap: butt;
+  fill: none;
+}
+.vf-g-walk {
+  stroke: var(--acid-400);
+  stroke-width: 4;
+  stroke-dasharray: 2 8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+.vf-g-hall {
+  fill: var(--acid-400);
+  stroke: var(--night-950);
+  stroke-width: 4;
+}
+.vf-g-hall-edge {
+  fill: none;
+  stroke: var(--paper-50);
+  stroke-width: 3;
+}
+.vf-g-stop {
+  fill: var(--paper-50);
+  stroke: var(--night-950);
+  stroke-width: 4;
+}
+.vf-g-gate {
+  fill: var(--paper-50);
+  stroke: var(--night-950);
+  stroke-width: 3;
+}
+.vf-g-plate[data-tone='night'] {
+  fill: var(--night-950);
+  stroke: var(--acid-400);
+  stroke-width: 2;
+}
+.vf-g-plate[data-tone='paper'] {
+  fill: var(--paper-50);
+  stroke: var(--night-950);
+  stroke-width: 2;
+}
+.vf-g-plate[data-tone='hot'] {
+  fill: var(--hot-500);
+  stroke: var(--night-950);
+  stroke-width: 2;
+}
+.vf-g-text {
+  font-family: var(--font-mono); /* taste-skill-ignore: mono only on real data (times, counts, channels): FOUNDATIONS §3 */
+  font-weight: 700;
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+}
+.vf-g-text[data-tone='acid'] {
+  fill: var(--acid-400);
+}
+.vf-g-text[data-tone='night'] {
+  fill: var(--night-950);
+}
+.vf-g-text[data-tone='paper'] {
+  fill: var(--paper-50);
+  paint-order: stroke;
+  stroke: var(--night-950);
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+.vf-g-text[data-tone='muted'] {
+  fill: var(--night-300);
+}
+
+/* ---------- S7 FAQ ---------- */
+.vf-faq {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+.vf-faq-head > .sc-section-head {
+  margin-block-end: 0;
+}
+@media (min-width: 1024px) {
+  .vf-faq {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--space-8);
+  }
+  .vf-faq-head {
+    position: sticky;
+    inset-block-start: calc(var(--sticky-top) + var(--space-6));
+  }
+}
+.vf-faq-body {
+  min-inline-size: 0;
+}
+.vf-faq-body .sc-acc-q {
+  text-wrap: balance;
+}
+.vf-faq-body .sc-acc-a p {
+  margin: 0;
+  line-height: 1.5;
+}
+.vf-cta {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+  margin-block-start: var(--space-7);
+}
+.vf-cta-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+
+/* a button label that carries an icon keeps the icon on the last line, beside the words */
+.vf-actions .sc-btn-label {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+.vf-actions .sc-btn-label > svg {
+  flex: none;
+}
+
+.vf-cta-ready {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 900;
+  font-stretch: var(--display-stretch);
+  font-size: var(--step-2);
+  text-transform: uppercase;
+}

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#0b0b0c" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIGNAL//CON 2027: anime + games expo, Varo City</title>
+    <meta name="description" content="A fictional 3-day anime and games expo, 23-25 July 2027. A design study: no tickets are sold." />
+    <!--
+      The first part of signalcon-landing's Boot (src/pages/signalcon-landing/sections/Boot.tsx): it paints with the
+      first frame, before any stylesheet or script, so the start of loading is never a blank screen. Tokens are not
+      loaded yet, so its few colours repeat them: --night-950 #0b0b0c, --paper-50 #f2efe6. Boot.tsx takes over when
+      the page's code arrives and removes it; if that never happens it hides itself after 6 s.
+    -->
+    <style>
+      #preboot {
+        position: fixed;
+        inset: 0;
+        z-index: 2147483647;
+        display: grid;
+        place-content: center;
+        overflow: hidden;
+        background: #0b0b0c;
+        animation: preboot-giveup 0s linear 6s forwards;
+      }
+      #preboot .pb-screen {
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='144'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 192px 144px;
+        image-rendering: pixelated;
+        opacity: 0.4;
+        transform-origin: 50% 50%;
+        animation:
+          preboot-on 400ms cubic-bezier(0.2, 0, 0, 1) both,
+          preboot-static 0.24s steps(1) infinite;
+      }
+      #preboot::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(to bottom, transparent 0 3px, rgb(11 11 12 / 0.45) 3px 4px);
+      }
+      #preboot .pb-line {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        padding: 4px 12px;
+        background: #0b0b0c;
+        color: #f2efe6;
+        font: 700 13px/1.4 ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        animation: preboot-fade 200ms linear 300ms both;
+      }
+      @keyframes preboot-on {
+        0% { transform: scale(0, 0.004); filter: brightness(4); }
+        35% { transform: scale(1, 0.004); filter: brightness(4); }
+        100% { transform: scale(1, 1); filter: brightness(1); }
+      }
+      @keyframes preboot-static {
+        0% { background-position: 0 0; }
+        25% { background-position: -61px -37px; }
+        50% { background-position: -127px -91px; }
+        75% { background-position: -23px -113px; }
+      }
+      @keyframes preboot-fade {
+        from { opacity: 0; }
+      }
+      @keyframes preboot-giveup {
+        to { visibility: hidden; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="preboot" aria-hidden="true">
+      <div class="pb-screen"></div>
+      <p class="pb-line">Searching · CH 01</p>
+    </div>
+    <script>
+      // Only signalcon-landing boots, once per session (?boot=on replays it), never under reduced motion; the same
+      // rules as boot-state.ts.
+      ;(function () {
+        var el = document.getElementById('preboot')
+        var on = /^\/p\/signalcon-landing\/?$/.test(location.pathname) && !/[?&]boot=off/.test(location.search)
+        try {
+          if (sessionStorage.getItem('signalcon:booted') === '1' && !/[?&]boot=on/.test(location.search)) on = false
+          if (localStorage.getItem('signalcon:motion') === 'reduced') on = false
+        } catch (e) {}
+        if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) on = false
+        if (on) document.documentElement.setAttribute('data-preboot', '')
+        else el.remove()
+      })()
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

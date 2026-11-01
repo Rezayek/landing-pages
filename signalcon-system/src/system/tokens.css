@@ -1,0 +1,432 @@
+/*
+ * System tokens for SIGNAL//CON (FOUNDATIONS.md; format and rules in guides/design-system.md §2). Three tiers:
+ *   1. primitives: raw values; components never read them;
+ *   2. roles: what components read (colour, type, space, shape, elevation, density, motion);
+ *   3. component tokens: only for a part a theme must change that no role covers (COMPONENTS.md names each one).
+ * One theme on purpose (FOUNDATIONS.md §8): a late-night broadcast is night in any OS setting, so there are no dark
+ * blocks; color-scheme is set once below. The off-white "paper" bands are fixed-look sections with their own role set.
+ * Names are the contract: the feedback components, the /system page and every page template read these roles. Add a
+ * role, never rename one, and add a line to the SYSTEM.md changelog.
+ * Import this file once, after Tailwind (`@import 'tailwindcss'` first), so the base rules at the end sit in the
+ * right layer.
+ */
+/* Fallback faces sized to Archivo's condensed black italic (measured 2026-11-01: Impact at 96.7%, Arial at 63.5% of
+   the same line), so the display headline keeps its width before the web font arrives. */
+@font-face {
+  font-family: 'Archivo Fallback Impact';
+  src: local('Impact');
+  size-adjust: 96.7%;
+}
+@font-face {
+  font-family: 'Archivo Fallback Arial';
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Arial');
+  size-adjust: 63.5%;
+}
+
+/* Instrument Sans measured at 100.3% of Arial on a running line (2026-11-01): Arial, not the system UI face, is the
+   fallback that keeps line breaks and control widths still when the web font arrives. */
+@font-face {
+  font-family: 'Instrument Sans Fallback';
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans');
+  size-adjust: 100.3%;
+}
+
+:root {
+  /* 1. Primitives ------------------------------------------------------------------------------------------- */
+  /* night: the street after dark; higher steps are lighter (a raised panel catches more light) */
+  --night-1000: #060607;
+  --night-950: #0b0b0c;
+  --night-900: #141416;
+  --night-850: #1d1d21;
+  --night-800: #2c2c31;
+  --night-600: #76747c;
+  --night-500: #94918a;
+  --night-300: #bdb9ae;
+  /* paper: flyers, tape and the printed guide */
+  --paper-50: #f2efe6;
+  --paper-100: #e4e0d4;
+  --paper-ink-muted: #45444a;
+  --paper-ink-subtle: #5c5b60;
+
+  /* acid: the one action colour (fills on night; on paper it needs its night outline, 1:1 against paper) */
+  --acid-300: #e4ff70;
+  --acid-400: #d4ff1e;
+  --acid-900: #26300a;
+  --acid-ink-paper: #4d5e00;
+  /* hot: the live signal (ON AIR, selling fast, the channel-flip split). Text on it is always night (5.5:1) */
+  --hot-500: #ff2e63;
+  --hot-ink-paper: #c2003d;
+  /* the RGB split's second channel: decoration only, never text */
+  --cyan-split: #2ee6ff;
+
+  /* status hues, for status only (never decoration) */
+  --green-400: #5be38a;
+  --green-900: #0f2a1a;
+  --red-400: #ff6b5b;
+  --red-900: #331310;
+  --amber-400: #ffb627;
+  --amber-900: #33250a;
+  --blue-400: #7cc4ff;
+  --blue-900: #0e2333;
+  --shadow-rgb: 0 0 0;
+
+  /* families: heavy condensed italic display (outlined variant), a clean reading sans, a small data mono */
+  --family-display: 'Archivo Variable', 'Archivo Fallback Impact', 'Archivo Fallback Arial', sans-serif;
+  --family-body: 'Instrument Sans Variable', 'Instrument Sans Fallback', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --family-mono: 'Martian Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  /* modular scale, ratio 1.25 on a 16 px base, fluid at the top; nothing below 12 px */
+  --size--2: 0.8125rem;
+  --size--1: 0.875rem;
+  --size-0: 1.0625rem;
+  --size-1: 1.25rem;
+  --size-2: clamp(1.5rem, 1.3rem + 0.9vw, 2rem);
+  --size-3: clamp(2.5rem, 1.6rem + 4.2vw, 5rem);
+  --size-display: clamp(3.4rem, 1.6rem + 7.6vw, 7.25rem);
+
+  /* spacing on a 4 px base */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  --radius-0: 0;
+  --radius-1: 4px;
+  --radius-2: 10px;
+  --radius-3: 18px;
+  --radius-4: 28px;
+  --radius-full: 999px;
+
+  /* 2. Roles ------------------------------------------------------------------------------------------------- */
+  /* surfaces: night tone steps; --overlay is the scrim behind a dialog */
+  --bg: var(--night-950);
+  --surface: var(--night-900);
+  --raised: var(--night-850);
+  --sunken: var(--night-1000);
+  --overlay: rgb(var(--shadow-rgb) / 0.78);
+
+  /* text and lines on night: --line divides, --line-strong draws a control (3.6:1 or more on every surface) */
+  --ink: var(--paper-50);
+  --muted: var(--night-300);
+  --subtle: var(--night-500);
+  --line: var(--night-800);
+  --line-strong: var(--night-600);
+
+  /* accent: the primary action. Acid text is safe on every night surface (14.5:1+) */
+  --accent: var(--acid-400);
+  --accent-hover: var(--acid-300);
+  --on-accent: var(--night-950);
+  --accent-ink: var(--acid-400);
+  --accent-bg: var(--acid-900);
+
+  /* the live signal: ON AIR, selling fast, the channel number's split. Not a status, never the action */
+  --signal: var(--hot-500);
+  --on-signal: var(--night-950);
+  --signal-ink: var(--hot-500);
+  /* the RGB split of a channel flip: two offset copies, decoration only */
+  --split-a: var(--hot-500);
+  --split-b: var(--cyan-split);
+
+  /* status: each a set (fill/icon/border, text on it, text, quiet container). Always with an icon and a word. */
+  --positive: var(--green-400);
+  --on-positive: var(--night-950);
+  --positive-ink: var(--green-400);
+  --positive-bg: var(--green-900);
+  --negative: var(--red-400);
+  --on-negative: var(--night-950);
+  --negative-ink: var(--red-400);
+  --negative-bg: var(--red-900);
+  --warning: var(--amber-400);
+  --on-warning: var(--night-950);
+  --warning-ink: var(--amber-400);
+  --warning-bg: var(--amber-900);
+  --info: var(--blue-400);
+  --on-info: var(--night-950);
+  --info-ink: var(--blue-400);
+  --info-bg: var(--blue-900);
+
+  /* focus: acid ring, 14.5:1 on night; on paper bands the ring turns night (see the band set) */
+  --focus: var(--acid-400);
+  --focus-width: 3px;
+  --focus-offset: 3px;
+  --selection-bg: var(--acid-400);
+  --selection-ink: var(--night-950);
+  --hover-bg: color-mix(in srgb, var(--ink) 8%, transparent);
+  --pressed-bg: color-mix(in srgb, var(--ink) 12%, transparent);
+  --disabled-opacity: 0.38;
+
+  /* depth: tone steps and thick outlines carry it. No blur shadows on night; a dialog lifts on tone + outline */
+  --shadow-raised: 0 0 0 1px var(--line);
+  --shadow-overlay: 0 0 0 3px var(--ink), 0 24px 60px -12px rgb(var(--shadow-rgb) / 0.8);
+  --overlay-border: 3px solid var(--ink);
+  --z-base: 0;
+  --z-sticky: 100;
+  --z-dropdown: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* type: six named steps plus the data size */
+  --font-display: var(--family-display);
+  --font-body: var(--family-body);
+  --font-mono: var(--family-mono);
+  --step--2: var(--size--2);
+  --step--1: var(--size--1);
+  --step-0: var(--size-0);
+  --step-1: var(--size-1);
+  --step-2: var(--size-2);
+  --step-3: var(--size-3);
+  --step-display: var(--size-display);
+  --leading-body: 1.55;
+  --leading-heading: 0.92;
+  --leading-display: 0.86;
+  --tracking-display: -0.005em;
+  --tracking-mono: 0.04em;
+  /* the display cut: condensed (font-stretch) and black, italic */
+  --display-stretch: 62%;
+  --display-weight: 900;
+  --outline-width: 0.028em;
+  --measure: 62ch;
+
+  /* space */
+  --gap-tight: var(--space-2);
+  --gap-group: var(--space-5);
+  --gap-section: clamp(var(--space-8), 9vw, var(--space-10));
+  --inset-control: var(--space-4);
+  --inset-card: var(--space-5);
+  --gutter: clamp(16px, 4vw, 48px);
+  --container: 82rem;
+  --sticky-top: 64px;
+  --sticky-bottom: 0px;
+
+  /* shape: chunky pills for controls (the sticker UI), rounded screens for cards, near-square tape */
+  --radius-control: var(--radius-full);
+  --radius-card: var(--radius-3);
+  --radius-screen: var(--radius-4);
+  --radius-sheet: var(--radius-4);
+  --radius-tag: var(--radius-1);
+  --border: 3px;
+  --border-thin: 2px;
+  /* the comic panel cut: a corner clipped off a card or screen */
+  --cut: 28px;
+
+  /* icons: drawn for this system, 2.5 px stroke, round caps */
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-stroke: 2.5;
+
+  /* targets and density */
+  --target-min: 24px;
+  --tap-min: 44px;
+  --control-h: 48px;
+  --row-h: 52px;
+
+  /* Motion tokens (MOTION-SYSTEM.md; the same values as motion.ts) ---------------------------------------------- */
+  --dur-instant: 0ms;
+  --dur-xs: 50ms;
+  --dur-sm: 100ms;
+  --dur-md: 150ms;
+  --dur-lg: 200ms;
+  --dur-xl: 250ms;
+  --dur-2xl: 300ms;
+  --dur-3xl: 400ms;
+  --dur-4xl: 600ms;
+  --dur-hero: 800ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-enter: cubic-bezier(0, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+  --ease-enter-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-exit-emphasized: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-symmetric: cubic-bezier(0.42, 0, 0.58, 1);
+  --ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-wipe: cubic-bezier(0.83, 0, 0.17, 1);
+  /* the style's own timings (MOTION-SYSTEM.md §Theme expression) */
+  --dur-flip: 240ms;
+  --dur-wipe: 520ms;
+  --dur-slam: 450ms;
+  --dur-tune: 1200ms;
+  --squash-x: 1.05;
+  --squash-y: 0.9;
+  /* by role: components read these, not the scale */
+  --dur-press: var(--dur-sm);
+  --dur-hover: var(--dur-sm);
+  --dur-tooltip-in: var(--dur-md);
+  --dur-tooltip-out: var(--dur-sm);
+  --dur-popover-in: var(--dur-md);
+  --dur-popover-out: var(--dur-sm);
+  --dur-modal-in: var(--dur-xl);
+  --dur-modal-out: var(--dur-lg);
+  --dur-sheet-in: var(--dur-3xl);
+  --dur-sheet-out: var(--dur-2xl);
+  --dur-toast-in: var(--dur-xl);
+  --dur-toast-out: var(--dur-lg);
+  --dur-disclosure: var(--dur-lg);
+  --dur-list-in: var(--dur-lg);
+  --dur-list-out: var(--dur-md);
+  --dur-tab: var(--dur-lg);
+  --dur-route-in: var(--dur-xl);
+  --dur-route-out: var(--dur-lg);
+  --dur-swap: var(--dur-lg);
+  --dur-success-swap: var(--dur-md);
+  --dur-scene: var(--dur-4xl);
+  --dur-reduced: var(--dur-sm);
+  --hold-success: 1500ms;
+  --stagger-ui: 30ms;
+  --stagger-scene: 60ms;
+  --travel-sm: 8px; /* how far things move; 0 under reduced motion */
+  --travel-md: 16px;
+  --travel-lg: 24px;
+  --scale-from: 0.95; /* what an overlay grows from; never 0 */
+  --press-scale: 0.97;
+
+  /* 3. Component tokens ---------------------------------------------------------------------------------------- */
+  --toast-gap: var(--space-2);
+  --skeleton-bg: var(--raised);
+  /* halftone dots: the print texture on paper and on art placeholders */
+  --halftone-size: 7px;
+
+  /* Fixed-look paper band: the printed guide and flyer sections. Same in every setting; no theme re-points it. */
+  --band-bg: var(--paper-50);
+  --band-surface: var(--paper-100);
+  --band-ink: var(--night-950);
+  --band-muted: var(--paper-ink-muted);
+  --band-subtle: var(--paper-ink-subtle);
+  --band-line: var(--night-950);
+  --band-accent-ink: var(--acid-ink-paper);
+  --band-signal-ink: var(--hot-ink-paper);
+  --band-focus: var(--night-950);
+
+  /* The document, from the roles */
+  color-scheme: dark;
+  caret-color: var(--accent);
+  accent-color: var(--accent);
+  scrollbar-color: var(--line-strong) var(--bg);
+  scroll-padding-top: var(--sticky-top);
+  scroll-padding-bottom: var(--sticky-bottom);
+}
+
+/* A paper band re-points the text, line and focus roles inside it, so every component works on paper unchanged. */
+[data-band='paper'] {
+  --ink: var(--band-ink);
+  --muted: var(--band-muted);
+  --subtle: var(--band-subtle);
+  --line: var(--band-line);
+  --line-strong: var(--band-line);
+  --surface: var(--band-surface);
+  --raised: var(--band-bg);
+  --accent-ink: var(--band-accent-ink);
+  --signal-ink: var(--band-signal-ink);
+  --focus: var(--band-focus);
+  --hover-bg: color-mix(in srgb, var(--night-950) 7%, transparent);
+  --pressed-bg: color-mix(in srgb, var(--night-950) 12%, transparent);
+  --skeleton-bg: var(--band-surface);
+  background: var(--band-bg);
+  color: var(--band-ink);
+}
+
+/* More contrast: not shipped (landing scope); the base pairs already sit at 5.3:1 or more (FOUNDATIONS.md §8). */
+
+/* Density: one step is 4 px. Controls are --tap-min or more on a coarse pointer, whatever the density. */
+[data-density='compact'] {
+  --control-h: 40px;
+  --row-h: 44px;
+}
+@media (pointer: coarse) {
+  :root,
+  [data-density] {
+    --control-h: max(var(--tap-min), 48px);
+    --row-h: max(var(--tap-min), 52px);
+  }
+}
+
+/* Reduced motion keeps the state change and drops the travel (guides/motion.md Reduced motion). Written
+   twice, like dark: the system setting, and the in-app switch <html data-motion="reduced"> motion.ts reads. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --travel-sm: 0px;
+    --travel-md: 0px;
+    --travel-lg: 0px;
+    --scale-from: 1;
+    --press-scale: 1;
+    --stagger-ui: 0ms;
+    --stagger-scene: 0ms;
+    --squash-x: 1;
+    --squash-y: 1;
+    --dur-modal-in: var(--dur-reduced);
+    --dur-modal-out: var(--dur-reduced);
+    --dur-sheet-in: var(--dur-reduced);
+    --dur-sheet-out: var(--dur-reduced);
+    --dur-list-in: var(--dur-reduced);
+    --dur-list-out: var(--dur-reduced);
+    --dur-disclosure: var(--dur-reduced);
+    --dur-scene: var(--dur-reduced);
+    --dur-wipe: var(--dur-2xl);
+    --dur-slam: var(--dur-reduced);
+  }
+}
+:root[data-motion='reduced'] {
+  --travel-sm: 0px;
+  --travel-md: 0px;
+  --travel-lg: 0px;
+  --scale-from: 1;
+  --press-scale: 1;
+  --stagger-ui: 0ms;
+  --stagger-scene: 0ms;
+  --squash-x: 1;
+  --squash-y: 1;
+  --dur-modal-in: var(--dur-reduced);
+  --dur-modal-out: var(--dur-reduced);
+  --dur-sheet-in: var(--dur-reduced);
+  --dur-sheet-out: var(--dur-reduced);
+  --dur-list-in: var(--dur-reduced);
+  --dur-list-out: var(--dur-reduced);
+  --dur-disclosure: var(--dur-reduced);
+  --dur-scene: var(--dur-reduced);
+  --dur-wipe: var(--dur-2xl);
+  --dur-slam: var(--dur-reduced);
+}
+
+/* Document base, from the roles. It sits in the base layer so Tailwind utilities and component styles win. The
+   heading rules carry :root so they beat Tailwind's preflight reset in the same layer whatever the load order. */
+@layer base {
+  :root body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    line-height: var(--leading-body);
+  }
+  ::selection {
+    background: var(--selection-bg);
+    color: var(--selection-ink);
+  }
+  :focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+  a {
+    text-underline-offset: 0.2em;
+  }
+  :root :is(h1, h2, h3) {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: var(--display-weight);
+    font-stretch: var(--display-stretch);
+    line-height: var(--leading-heading);
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+  :root h1 {
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+  }
+  p {
+    text-wrap: pretty;
+  }
+}

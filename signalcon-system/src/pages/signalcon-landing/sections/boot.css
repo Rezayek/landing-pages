@@ -1,0 +1,100 @@
+/*
+ * The boot (Boot.tsx, MOTION.md "Boot"): the set powers on over the page, then wipes off on the diagonal. System
+ * tokens only; the literals are the tube's geometry (the power-on line, the wipe's slant) and the scanline pitch.
+ */
+.pg-boot {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-toast) + 1); /* over everything, the sticky bar and any sheet included */
+  overflow: hidden;
+  background: var(--night-950);
+}
+/* the tube switches on: a bright line across the middle, then the full screen */
+.pg-boot-screen {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-5);
+  padding-inline: var(--gutter);
+  transform-origin: 50% 50%;
+  animation: pg-boot-on var(--dur-3xl) var(--ease-standard) both;
+}
+@keyframes pg-boot-on {
+  0% {
+    transform: scale(0, 0.004);
+    filter: brightness(4);
+  }
+  35% {
+    transform: scale(1, 0.004);
+    filter: brightness(4);
+  }
+  100% {
+    transform: scale(1, 1);
+    filter: brightness(1);
+  }
+}
+.pg-boot-static {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  opacity: 0.4;
+  image-rendering: pixelated;
+}
+/* scanlines over everything, like the hero screen */
+.pg-boot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom, transparent 0 3px, color-mix(in srgb, var(--night-950) 45%, transparent) 3px 4px); /* taste-skill-ignore: CRT scanlines, style contract device */
+}
+.pg-boot-mark {
+  position: relative;
+  z-index: 1;
+  animation: sg-slam var(--dur-slam) var(--ease-overshoot) var(--dur-lg) both;
+}
+.pg-boot-mark .sc-wordmark {
+  font-size: clamp(3rem, 14vw, 9rem);
+  color: var(--paper-50);
+  text-shadow:
+    -3px 0 var(--split-a),
+    3px 0 var(--split-b);
+}
+.pg-boot-line {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  background: var(--night-950);
+  color: var(--paper-50);
+  font-family: var(--font-mono); /* taste-skill-ignore: a channel readout */
+  font-weight: 700;
+  font-stretch: 85%;
+  font-size: var(--step--1);
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+.pg-boot-line[data-found] {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+/* off it goes: the same diagonal as the section wipes, sweeping left to right */
+.pg-boot[data-phase='out'] {
+  animation: pg-boot-out var(--dur-wipe) var(--ease-wipe) forwards;
+}
+@keyframes pg-boot-out {
+  from {
+    clip-path: polygon(0% 0, 130% 0, 130% 100%, -30% 100%);
+  }
+  to {
+    clip-path: polygon(130% 0, 130% 0, 130% 100%, 100% 100%);
+  }
+}
+/* taking over from index.html's #preboot: the set is already on */
+.pg-boot[data-continued] .pg-boot-screen {
+  animation: none;
+}

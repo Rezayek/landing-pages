@@ -1,0 +1,169 @@
+/*
+ * S4 Schedule (CH03). System tokens only. Phone first: time and kind share the first line, the title wraps below, the
+ * place closes the row. From 768 px the row is a four-column grid (time | title | place | kind).
+ */
+.sc-sched-filter {
+  display: grid;
+  gap: var(--space-3);
+  margin-block-end: var(--gap-group);
+  min-inline-size: 0;
+}
+
+.sc-sched-meta {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  font-family: var(--font-mono); /* taste-skill-ignore: mono only on real data (times, counts, channels): FOUNDATIONS §3 */
+  font-stretch: 85%;
+  font-size: var(--step--2);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* the reserved box: the panel keeps its height while the filter changes */
+.sc-sched-box {
+  min-block-size: calc(var(--row-h) * 6);
+  min-inline-size: 0;
+}
+.sc-sched-box[data-density='compact'] {
+  --row-h: 44px;
+}
+.sc-sched-box > .sc-signal-state {
+  min-block-size: calc(var(--row-h) * 6);
+  align-content: center;
+}
+
+.sc-sched-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-block: var(--border) solid var(--ink);
+}
+
+.sc-sched-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'time kind'
+    'title title'
+    'place place';
+  align-items: center;
+  column-gap: var(--space-4);
+  row-gap: var(--space-1);
+  min-block-size: var(--row-h);
+  padding-block: var(--space-3);
+  padding-inline: var(--space-1);
+  border-block-end: var(--border-thin) solid var(--line);
+}
+.sc-sched-row:last-child {
+  border-block-end: 0;
+}
+
+.sc-sched-time {
+  grid-area: time;
+  font-family: var(--font-mono); /* taste-skill-ignore: mono only on real data (times, counts, channels): FOUNDATIONS §3 */
+  font-stretch: 85%;
+  font-weight: 700;
+  font-size: var(--step-1);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-mono);
+  color: var(--ink);
+}
+
+.sc-sched-title {
+  grid-area: title;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  min-inline-size: 0;
+}
+.sc-sched-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  min-inline-size: 0;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--step-0);
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.sc-sched-place {
+  grid-area: place;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono); /* taste-skill-ignore: mono only on real data (times, counts, channels): FOUNDATIONS §3 */
+  font-stretch: 85%;
+  font-size: var(--step--1);
+  letter-spacing: var(--tracking-mono);
+  color: var(--muted);
+}
+
+.sc-sched-kind {
+  grid-area: kind;
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono); /* taste-skill-ignore: mono only on real data (times, counts, channels): FOUNDATIONS §3 */
+  font-stretch: 85%;
+  font-weight: 600;
+  font-size: var(--step--2);
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.sc-sched-kind svg {
+  flex: none;
+}
+
+/* the day's headline slot: a bigger title and a hot bar at the start of the row, with the tape as the text cue */
+.sc-sched-row[data-main] {
+  padding-block: var(--space-4);
+  box-shadow: inset var(--space-2) 0 0 var(--signal-ink); /* taste-skill-ignore: an inset bar, not elevation */
+  padding-inline-start: var(--space-4);
+}
+.sc-sched-row[data-main] .sc-sched-name {
+  font-size: var(--step-1);
+  font-weight: 700;
+}
+.sc-sched-tape {
+  flex: none;
+}
+
+.sc-sched-after {
+  margin: var(--space-5) 0 0;
+}
+.sc-sched-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--step-0);
+}
+
+@media (min-width: 768px) {
+  .sc-sched-row {
+    grid-template-columns: minmax(4.5rem, 6rem) minmax(0, 1fr) minmax(6rem, 11rem) minmax(9rem, 12rem);
+    grid-template-areas: 'time title place kind';
+    column-gap: var(--space-5);
+    padding-inline: var(--space-3);
+  }
+  .sc-sched-row[data-main] {
+    padding-inline-start: var(--space-5);
+  }
+  .sc-sched-kind {
+    justify-self: start;
+  }
+  .sc-sched-box[data-density='compact'] .sc-sched-row {
+    padding-block: var(--space-2);
+  }
+  .sc-sched-box[data-density='compact'] .sc-sched-row[data-main] {
+    padding-block: var(--space-3);
+  }
+}

@@ -7,6 +7,16 @@ Made with a tool I'm building. More on that soon.
 
 ---
 
+## SIGNAL//CON — an anime and games expo, tuned in like late-night TV
+
+![SIGNAL//CON demo](demos/signalcon.gif)
+
+A ticket page for a three-day expo, built as a night-street TV menu. It boots on static and tunes into the key art,
+then every section is a channel: what's on, the guest lineup, a day-by-day schedule with filters, passes with live
+stock, a transit map to the venue and the FAQ, ending on an "end of transmission" card.
+
+`signalcon-system/`
+
 ## HALO — a training watch that comes apart on scroll
 
 ![HALO demo](demos/halo.gif)
@@ -85,7 +95,7 @@ npm install
 npm run dev
 ```
 
-The page opens at `http://localhost:5190/p/<slug>`: `halo-landing`, `pulse-landing`, `voltcart-landing`, `maison-sucre-landing`, `fintech-landing`,
+The page opens at `http://localhost:5190/p/<slug>`: `signalcon-landing`, `halo-landing`, `pulse-landing`, `voltcart-landing`, `maison-sucre-landing`, `fintech-landing`,
 `blockfeed-landing` or `tidelog-landing`. For the production build, run `npm run build && npm run preview`
 (port 5191).
 
@@ -101,3 +111,5 @@ The page opens at `http://localhost:5190/p/<slug>`: `halo-landing`, `pulse-landi
   Blender from scratch. Only the rendered frames ship here.
 - PULSE-1 and HALO are fictional products. PULSE-1's line-in track is not included; the page works without it.
 - The HALO watch is modelled in code with three.js; no third-party 3D models are used.
+- SIGNAL//CON is a fictional event. Its key art and guest portraits are AI-generated illustrations of original
+  characters, made for this page; no existing characters or brands are used.

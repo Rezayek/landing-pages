@@ -1,0 +1,465 @@
+/*
+ * S2 What's on + S3 Guests (UX.md). System tokens only; the only literals are grid tracks, aspect ratios and the
+ * clipped-corner geometry. The paper band (S2) re-points --ink, --muted, --surface, --accent-ink and --focus.
+ */
+
+/* Link (COMPONENTS.md Link): ink, 2 px underline, 4 px and accent-ink on hover; hit area 44 px tall. */
+.wg-link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tap-min);
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  transition: color var(--dur-hover) var(--ease-enter);
+}
+@media (hover: hover) {
+  .wg-link:hover {
+    color: var(--accent-ink);
+    text-decoration-thickness: 4px;
+  }
+}
+.wg-link:active {
+  background: var(--pressed-bg);
+}
+
+/* ------------------------------------------------------------------------------------------------------------ S2 */
+/* Phone: a horizontal snap row that bleeds to the screen edges; the next tile peeks. */
+.wg-tiles {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gap-group);
+}
+.wg-tile {
+  --wg-plate: var(--paper-50);
+  --wg-on-plate: var(--night-950);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  border: var(--border) solid var(--ink);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--ink);
+  /* the one clipped corner; its outline is drawn by ::after */
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%);
+}
+.wg-tile::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset-block-start: calc(-1 * var(--border));
+  inset-inline-end: calc(-1 * var(--border));
+  inline-size: var(--cut);
+  block-size: var(--cut);
+  pointer-events: none;
+  background: linear-gradient(to top right, transparent calc(50% - var(--border)), var(--ink) calc(50% - var(--border)) 50%, transparent 50%); /* taste-skill-ignore: draws the clipped corner outline */
+}
+
+/* channel colour per kind (steal 6): a flat colour band, the glyph in the colour that reads on it */
+.wg-tile[data-kind='concert'] {
+  --wg-plate: var(--hot-500);
+}
+.wg-tile[data-kind='panel'] {
+  --wg-plate: var(--cyan-split);
+}
+.wg-tile[data-kind='cosplay'] {
+  --wg-plate: var(--night-950);
+  --wg-on-plate: var(--paper-50);
+}
+.wg-tile[data-kind='artist'] {
+  --wg-plate: var(--paper-50);
+}
+.wg-tile[data-kind='game'] {
+  --wg-plate: color-mix(in srgb, var(--hot-500) 40%, var(--paper-50));
+}
+.wg-tile-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-block-size: 5.5rem;
+  padding: var(--space-4) var(--inset-card);
+  border-block-end: var(--border) solid var(--ink);
+  background: var(--wg-plate);
+  color: var(--wg-on-plate);
+  overflow: hidden;
+}
+
+/* the halftone print texture, fading toward the glyph */
+.wg-tile-head::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(color-mix(in srgb, currentColor 22%, transparent) 28%, transparent 31%); /* taste-skill-ignore: halftone print dots, style contract device */
+  background-size: var(--halftone-size) var(--halftone-size);
+  mask-image: linear-gradient(to left, #000, transparent 70%); /* taste-skill-ignore: fades the halftone field out */
+  pointer-events: none;
+}
+.wg-tile-head > svg {
+  position: relative;
+  flex: none;
+}
+.wg-tile-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--inset-card);
+}
+.wg-tile-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 900;
+  font-stretch: var(--display-stretch);
+  font-size: var(--step-2);
+  line-height: var(--leading-heading);
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.wg-tile-line {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--step-0);
+  line-height: 1.4;
+  max-inline-size: 36ch;
+}
+
+/* the fact: mono on a skewed night plate with an acid-ink edge (steal 9) */
+.wg-tile-fact {
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: var(--radius-tag);
+  background: var(--band-ink);
+  color: var(--paper-50);
+  font-family: var(--font-mono); /* taste-skill-ignore: mono only on real data (times, counts, channels): FOUNDATIONS §3 */
+  font-weight: 600;
+  font-stretch: 85%;
+  font-size: var(--step--1);
+  letter-spacing: var(--tracking-mono);
+  font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
+  transform: skewX(-8deg);
+  box-shadow: inset 0 -2px 0 var(--accent); /* taste-skill-ignore: an inset bar, not elevation */
+}
+.wg-tile-link {
+  margin-block-start: auto;
+}
+
+/* the one tilted tile: half the angle on a phone (FOUNDATIONS.md §9, COMPONENTS.md Tape) */
+.wg-tile[data-tilt] {
+  --slam-rot: calc(var(--tile-tilt) / 2);
+}
+
+/* at rest (not armed, not playing) the tilt is the rotate property; during the slam the keyframes carry it */
+.wg-tile[data-tilt]:not([data-slam='armed'], [data-slam='in']) {
+  rotate: var(--slam-rot);
+}
+@media (prefers-reduced-motion: reduce) {
+  .wg-tile[data-tilt] {
+    rotate: var(--slam-rot);
+  }
+}
+:root[data-motion='reduced'] .wg-tile[data-tilt] {
+  rotate: var(--slam-rot);
+}
+@media (min-width: 768px) {
+  .wg-tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+  .wg-tile {
+    flex: none;
+  }
+  .wg-tile[data-size='large'] {
+    grid-column: 1 / -1;
+  }
+  .wg-tile[data-size='large'] .wg-tile-head {
+    min-block-size: 9rem;
+  }
+  .wg-tile[data-size='large'] .wg-tile-title {
+    font-size: var(--step-3);
+  }
+  .wg-tile[data-size='large'] .wg-tile-line {
+    font-size: var(--step-1);
+  }
+  .wg-tile[data-tilt] {
+    --slam-rot: var(--tile-tilt);
+  }
+}
+@media (min-width: 1024px) {
+  .wg-tiles {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .wg-tile {
+    grid-column: span 3;
+  }
+  .wg-tile[data-size='large'] {
+    grid-row: span 2;
+  }
+  .wg-tile[data-size='large'] .wg-tile-head {
+    flex: 1;
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------------------ S3 */
+.wg-guests {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.wg-guest-item {
+  min-inline-size: 0;
+}
+.wg-guest {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  inline-size: 100%;
+  min-block-size: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.wg-guest .sc-screen {
+  margin-block-end: var(--space-1);
+  transition: border-color var(--dur-hover) var(--ease-enter);
+}
+@media (hover: hover) {
+  .wg-guest:hover .sc-screen {
+    border-color: var(--accent);
+  }
+}
+.wg-guest[aria-expanded='true'] .sc-screen {
+  border-color: var(--accent);
+}
+.wg-guest-name {
+  display: block;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 900;
+  font-stretch: var(--display-stretch);
+  font-size: var(--step-1);
+  line-height: var(--leading-heading);
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.wg-guest-role {
+  display: block;
+  color: var(--muted);
+  font-size: var(--step--1);
+  line-height: 1.35;
+}
+.wg-guest-slot {
+  display: block;
+  color: var(--accent-ink);
+  font-family: var(--font-mono); /* taste-skill-ignore: mono only on real data (times, counts, channels): FOUNDATIONS §3 */
+  font-weight: 600;
+  font-stretch: 85%;
+  font-size: var(--step--2);
+  letter-spacing: var(--tracking-mono);
+  font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
+}
+
+/* portrait: halftone placeholder behind, image fading in over it, initials when it fails */
+.wg-ph {
+  position: absolute;
+  inset: 0;
+}
+.wg-img {
+  opacity: 1;
+  transition: opacity var(--dur-xl) var(--ease-enter);
+}
+.wg-img[data-state='loading'] {
+  opacity: 0;
+}
+.wg-img[data-state='fail'] {
+  display: none;
+}
+.wg-initials {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 900;
+  font-stretch: var(--display-stretch);
+  font-size: var(--step-3);
+  line-height: 1;
+}
+@media (min-width: 768px) {
+  .wg-guest-name {
+    font-size: var(--step-2);
+  }
+  .wg-guest-role {
+    font-size: var(--step-0);
+  }
+  .wg-guest-slot {
+    font-size: var(--step--1);
+  }
+}
+@media (min-width: 1024px) {
+  .wg-guests {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-7) var(--gap-group);
+  }
+}
+
+/* the guest sheet (one shared Sheet) */
+.wg-sheet {
+  display: grid;
+  gap: var(--space-5);
+}
+.wg-sheet-portrait {
+  inline-size: min(100%, 20rem);
+}
+.wg-sheet-text {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+.wg-sheet-role {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--step-0);
+}
+.wg-sheet-bio {
+  margin: 0;
+  max-inline-size: 46ch;
+  line-height: var(--leading-body);
+}
+.wg-sheet-h {
+  margin: var(--space-2) 0 0;
+  font-size: var(--step-1);
+}
+.wg-sheet-slots {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-mono); /* taste-skill-ignore: mono only on real data (times, counts, channels): FOUNDATIONS §3 */
+  font-stretch: 85%;
+  font-size: var(--step--1);
+  letter-spacing: var(--tracking-mono);
+  font-variant-numeric: tabular-nums;
+}
+.wg-sheet-slots li {
+  padding-inline-start: var(--space-3);
+  border-inline-start: var(--border) solid var(--ink);
+}
+.wg-sheet-note {
+  margin: var(--space-2) 0 0;
+  padding: var(--space-3);
+  border: var(--border-thin) dashed var(--line-strong);
+  border-radius: var(--radius-tag);
+  font-size: var(--step--1);
+  line-height: 1.4;
+}
+@media (min-width: 768px) {
+  .wg-sheet {
+    grid-template-columns: 19rem minmax(0, 1fr);
+    grid-template-areas: 'card text' 'card actions';
+    grid-template-rows: auto 1fr;
+    align-items: start;
+  }
+  .wg-sheet-portrait {
+    grid-area: card;
+  }
+  .wg-sheet-text {
+    grid-area: text;
+  }
+  .wg-chcard-actions {
+    grid-area: actions;
+  }
+  .wg-sheet-portrait {
+    inline-size: 100%;
+  }
+}
+
+/* The large tile carries its real shows: the two night concerts with day, time and stage. */
+.wg-tile-shows {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0 var(--inset-card) var(--inset-card);
+  list-style: none;
+}
+.wg-tile-shows li {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: var(--border) solid var(--ink);
+  border-radius: var(--radius-card);
+  background: var(--band-bg);
+}
+.wg-tile-show-when,
+.wg-tile-show-where {
+  font-family: var(--font-mono); /* taste-skill-ignore: show times and stages are data */
+  font-stretch: 85%;
+  font-size: var(--step--2);
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+}
+.wg-tile-show-when {
+  color: var(--band-signal-ink);
+  font-weight: 700;
+}
+.wg-tile-show-what {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 900;
+  font-stretch: 70%;
+  font-size: var(--step-2);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.wg-tile-show-where {
+  color: var(--band-muted);
+}
+@media (min-width: 768px) {
+  .wg-tile[data-size='large'] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+  }
+  .wg-tile[data-size='large'] > .wg-tile-head {
+    grid-column: 1 / -1;
+  }
+  .wg-tile[data-size='large'] > .wg-tile-shows {
+    align-content: center;
+    padding-block-start: var(--inset-card);
+  }
+}
+
+/* the channel card itself is the system's ChannelCard (ui.css); here only its place in the sheet */
+.wg-chcard-actions {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+}
+.wg-chcard-hint {
+  margin: 0;
+  font-size: var(--step--1);
+  color: var(--subtle);
+}

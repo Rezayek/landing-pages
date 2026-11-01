@@ -1,0 +1,67 @@
+/*
+ * SIGNAL//CON page layout (shared by every section). System tokens only; page-only values live in tokens.css.
+ * Section contract: <section class="pg-section" data-band="paper"|none data-wipe style="--wipe-color: …">
+ *   <div class="pg-wrap"> SectionHeader + content </div></section>
+ * Bands alternate night and paper; each section's wipe slab is the previous band's colour.
+ */
+[data-page='signalcon-landing'] {
+  background: var(--bg);
+  color: var(--ink);
+  overflow-x: clip;
+}
+
+.pg-wrap {
+  inline-size: 100%;
+  max-inline-size: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.pg-section {
+  position: relative;
+  padding-block: var(--gap-section);
+  background: var(--bg);
+  /* the diagonal join: each section overlaps the one above on a 6° cut */
+  clip-path: polygon(0 var(--pg-cut), 100% 0, 100% 100%, 0 100%);
+  margin-block-start: calc(-1 * var(--pg-cut));
+  padding-block-start: calc(var(--gap-section) + var(--pg-cut));
+}
+.pg-section[data-band='paper'] {
+  background: var(--band-bg);
+}
+/* the paper bands carry the halftone print texture in one corner */
+.pg-section[data-band='paper']::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto auto;
+  inline-size: min(48vw, 520px);
+  block-size: min(48vw, 520px);
+  background-image: radial-gradient(color-mix(in srgb, var(--band-ink) 14%, transparent) 28%, transparent 31%); /* taste-skill-ignore: halftone print dots, style contract device */
+  background-size: var(--halftone-size) var(--halftone-size);
+  mask-image: radial-gradient(circle at 100% 0, #000 0, transparent 70%); /* taste-skill-ignore: fades the halftone field out */
+  pointer-events: none;
+}
+.pg-section > .pg-wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.pg-kicker-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+.pg-after {
+  margin-block-start: var(--space-7);
+}
+
+/* the sample label used beside fictional numbers */
+.pg-sample {
+  font-family: var(--font-mono); /* taste-skill-ignore: mono only on real data (times, counts, channels): FOUNDATIONS §3 */
+  font-stretch: 85%;
+  font-size: var(--step--2);
+  letter-spacing: var(--tracking-mono);
+  color: var(--subtle);
+  text-transform: uppercase;
+}
