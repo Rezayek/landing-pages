@@ -3,7 +3,8 @@
 A growing collection of landing pages, each with its own look, motion and component set. Every one is a
 standalone React 19 + TypeScript + Vite + Tailwind 4 app with GSAP and Lenis for scroll-driven motion.
 
-Made with a tool I'm building. More on that soon.
+Made with [UI/UX Workflow](https://rezayek.gumroad.com/l/ui-ux-workflow), a Claude Code plugin I built: it writes a design
+system for each page, then builds the page through 12 checked phases and a critique loop.
 
 ---
 
